@@ -1,0 +1,2445 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Административная панель</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Глобальные стили */
+        :root {
+            --dark-gray: #121212;
+            --medium-gray: #1e1e1e;
+            --light-gray: #2d2d2d;
+            --lighter-gray: #3a3a3a;
+            --text-light: #e0e0e0;
+            --text-lighter: #f5f5f5;
+            --primary-green: #2ecc71;
+            --secondary-green: #27ae60;
+            --accent-green: #219653;
+            --hover-green: #1abc9c;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --info: #3498db;
+            
+            /* Размеры шрифтов */
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 0.95rem;
+            --font-size-lg: 1.1rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.75rem;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--dark-gray);
+            color: var(--text-light);
+            overflow-x: hidden;
+            font-size: var(--font-size-base);
+        }
+
+        /* Навигация */
+        .navbar {
+            background-color: var(--medium-gray) !important;
+            border-bottom: 1px solid rgba(46, 204, 113, 0.2);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            padding: 0.5rem 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: var(--font-size-lg);
+            color: var(--primary-green) !important;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-green) !important;
+        }
+
+        /* Боковая панель */
+        .sidebar {
+            position: fixed;
+            top: 55px;
+            bottom: 0;
+            left: 0;
+            width: 220px;
+            background-color: var(--light-gray);
+            border-right: 1px solid rgba(46, 204, 113, 0.1);
+            z-index: 1000;
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link {
+            color: var(--text-light);
+            padding: 10px 20px;
+            margin: 3px 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: var(--font-size-sm);
+        }
+
+        .sidebar .nav-link::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background-color: var(--primary-green);
+            transform: scaleY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: rgba(46, 204, 113, 0.1);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link:hover::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar .nav-link.active {
+            background-color: rgba(46, 204, 113, 0.15);
+            color: var(--primary-green);
+        }
+
+        .sidebar .nav-link.active::before {
+            transform: scaleY(1);
+        }
+
+        .sidebar .nav-link i {
+            width: 16px;
+            margin-right: 10px;
+            font-size: 0.9rem;
+        }
+
+        .sidebar .nav-link span {
+            font-weight: 500;
+        }
+
+        /* Основной контент */
+        main {
+            margin-top: 55px;
+            margin-left: 220px;
+            padding: 1rem;
+            min-height: calc(100vh - 55px);
+            background-color: var(--dark-gray);
+            transition: all 0.3s ease;
+        }
+
+        /* Заголовки */
+        .section-header {
+            background: linear-gradient(135deg, var(--medium-gray), var(--light-gray));
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .section-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--text-lighter);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: var(--primary-green);
+        }
+
+        /* Карточки */
+        .admin-card {
+            background: var(--light-gray);
+            border-radius: 10px;
+            padding: 1rem;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .admin-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(46, 204, 113, 0.15);
+        }
+
+        .admin-card .card-title {
+            color: var(--text-lighter);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            font-size: var(--font-size-lg);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-card .card-title i {
+            color: var(--primary-green);
+        }
+
+        /* Формы */
+        .form-label {
+            color: var(--text-lighter);
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            font-size: var(--font-size-sm);
+        }
+
+        .form-control {
+            background-color: var(--lighter-gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border-radius: 6px;
+            padding: 8px 12px;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-sm);
+        }
+
+        .form-control:focus {
+            background-color: var(--lighter-gray);
+            border-color: var(--primary-green);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.2rem rgba(46, 204, 113, 0.25);
+        }
+
+        .form-control::placeholder {
+            color: rgba(224, 224, 224, 0.5);
+        }
+
+        .form-text {
+            color: rgba(224, 224, 224, 0.7);
+            font-size: var(--font-size-xs);
+        }
+
+        /* Кнопки */
+        .btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            letter-spacing: 0.3px;
+            font-size: var(--font-size-sm);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: var(--primary-green);
+            color: var(--dark-gray);
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary-green);
+            color: var(--dark-gray);
+            box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-success {
+            background: var(--primary-green);
+            color: var(--dark-gray);
+        }
+
+        .btn-success:hover {
+            background: var(--secondary-green);
+            color: var(--dark-gray);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+            color: white;
+        }
+
+        .btn-info {
+            background: var(--info);
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #2980b9;
+            color: white;
+        }
+
+        /* Карточки фотографий */
+        .photo-card-admin {
+            background: var(--lighter-gray);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            height: 100%;
+        }
+
+        .photo-card-admin:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-green);
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.2);
+        }
+
+        .photo-card-admin img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: all 0.5s ease;
+        }
+
+        .photo-card-admin:hover img {
+            transform: scale(1.05);
+        }
+
+        .photo-info {
+            padding: 0.8rem;
+        }
+
+        .photo-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--text-lighter);
+            margin-bottom: 0.3rem;
+        }
+
+        .photo-meta {
+            font-size: var(--font-size-xs);
+            color: var(--text-light);
+            opacity: 0.8;
+            margin-bottom: 0.6rem;
+        }
+
+        .photo-meta i {
+            color: var(--primary-green);
+            margin-right: 5px;
+        }
+
+        .photo-description {
+            color: var(--text-light);
+            font-size: var(--font-size-xs);
+            line-height: 1.4;
+            margin-bottom: 0.6rem;
+        }
+
+        .photo-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .photo-actions .btn-sm {
+            padding: 4px 8px;
+            font-size: var(--font-size-xs);
+            border-radius: 4px;
+            flex: 1;
+        }
+
+        /* Модальные окна */
+        .modal-content {
+            background-color: var(--light-gray);
+            border-radius: 15px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            color: var(--text-light);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.8rem;
+        }
+
+        .modal-title {
+            color: var(--text-lighter);
+            font-weight: 600;
+            font-size: var(--font-size-lg);
+        }
+
+        .modal-body {
+            padding: 0.8rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.6rem 0.8rem;
+        }
+
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        /* Toast уведомления */
+        .toast {
+            background-color: var(--light-gray);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .toast-header {
+            background-color: var(--medium-gray);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            border-radius: 10px 10px 0 0;
+        }
+
+        .toast-header .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+
+        .toast-body {
+            color: var(--text-light);
+        }
+
+        .bg-success {
+            background-color: var(--primary-green) !important;
+        }
+
+        .bg-danger {
+            background-color: var(--danger) !important;
+        }
+
+        .bg-info {
+            background-color: var(--info) !important;
+        }
+
+        /* Alert */
+        .alert {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            color: var(--text-light);
+            border-radius: 6px;
+            padding: 0.8rem;
+        }
+
+        .alert h5 {
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: var(--font-size-base);
+        }
+
+        .alert h5 i {
+            font-size: 1.2rem;
+        }
+
+        /* Таблицы */
+        .table {
+            color: var(--text-light);
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .table th {
+            background-color: var(--medium-gray);
+            color: var(--text-lighter);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table td {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table tr:hover {
+            background-color: rgba(46, 204, 113, 0.05);
+        }
+
+        /* Секции контента */
+        .content-section {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 200px;
+                transform: translateX(-100%);
+                z-index: 1050;
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            main {
+                margin-left: 0;
+            }
+            
+            .sidebar-toggle {
+                display: block !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            main {
+                padding: 0.8rem;
+            }
+            
+            .section-header {
+                padding: 1rem;
+            }
+            
+            .section-title {
+                font-size: var(--font-size-lg);
+            }
+            
+            .admin-card {
+                padding: 1rem;
+            }
+            
+            .photo-actions {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .navbar-brand {
+                font-size: var(--font-size-base);
+            }
+            
+            .section-title {
+                font-size: var(--font-size-base);
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 3px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: var(--font-size-xs);
+            }
+        }
+
+        /* Дополнительные элементы */
+        .stats-card {
+            background: linear-gradient(135deg, var(--medium-gray), var(--light-gray));
+            border-radius: 8px;
+            padding: 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(46, 204, 113, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary-green);
+        }
+
+        .stats-card i {
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 0.4rem;
+        }
+
+        .stats-card .stats-number {
+            font-size: var(--font-size-2xl);
+            font-weight: 700;
+            color: var(--text-lighter);
+            margin-bottom: 0.2rem;
+        }
+
+        .stats-card .stats-label {
+            color: var(--text-light);
+            font-size: var(--font-size-xs);
+            opacity: 0.9;
+        }
+
+        /* Переключатель боковой панели */
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.3rem;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            color: var(--primary-green);
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--medium-gray);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-green);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--secondary-green);
+        }
+
+        /* Стили для визуального редактора */
+        .preview-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .editable {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            padding: 8px;
+        }
+
+        .editable:hover {
+            background: rgba(46, 204, 113, 0.1);
+            transform: scale(1.02);
+        }
+
+        .editing {
+            background: var(--text-lighter);
+            border: 2px solid var(--primary-green);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .edit-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: var(--dark-gray);
+            font-size: inherit;
+            font-family: inherit;
+            resize: vertical;
+            outline: none;
+        }
+
+        .edit-actions {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            display: none;
+            gap: 8px;
+        }
+
+        .editing .edit-actions {
+            display: flex;
+        }
+
+        .btn-save {
+            background: var(--primary-green);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+        }
+
+        .btn-cancel {
+            background: var(--medium-gray);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+        }
+
+        /* Стили как на главной странице */
+        .hero-section {
+            padding: 100px 0;
+        }
+
+        .hero-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--text-lighter);
+            margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons .btn {
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero-image {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-image img {
+            max-width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary-green);
+        }
+
+        .about-section {
+            padding: 50px 0;
+        }
+
+        .section-title {
+            font-size: var(--font-size-lg);
+            color: var(--text-lighter);
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .about-content {
+            padding: 1rem;
+        }
+
+        .about-text {
+            font-size: var(--font-size-base);
+            line-height: 1.6;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        .skills-container {
+            margin-bottom: 2rem;
+        }
+
+        .skill-item {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .skill-item i {
+            font-size: 3rem;
+            color: var(--primary-green);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .skill-item h5 {
+            color: var(--text-lighter);
+            margin-bottom: 0.5rem;
+        }
+
+        .skill-item p {
+            color: var(--text-light);
+            font-size: var(--font-size-sm);
+            margin: 0;
+        }
+
+        .abilities-container {
+            margin-top: 2rem;
+        }
+
+        .ability-item {
+            background: var(--text-lighter);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-green);
+        }
+
+        .ability-item .d-flex {
+            align-items: center;
+        }
+
+        .ability-item i {
+            color: var(--primary-green);
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .ability-item span {
+            color: var(--dark-gray);
+            font-weight: 500;
+        }
+
+        .contact-section {
+            padding: 50px 0;
+        }
+
+        .contact-info {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .contact-item i {
+            color: var(--primary-green);
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .contact-item strong {
+            color: var(--text-lighter);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-item a {
+            color: var(--text-light);
+            text-decoration: none;
+        }
+
+        .contact-item a:hover {
+            color: var(--primary-green);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .social-links a {
+            width: 50px;
+            height: 50px;
+            background: var(--primary-green);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.1);
+            background: var(--secondary-green);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <a class="navbar-brand" href="admin.html">
+                <i class="fas fa-cog"></i> Админ панель
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="index.html" target="_blank">
+                    <i class="fas fa-eye me-1"></i> Просмотр сайта
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Боковая панель -->
+    <nav class="sidebar">
+        <div class="sidebar-sticky">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#" data-section="content">
+                        <i class="fas fa-edit"></i>
+                        <span>Контент</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="visual-editor">
+                        <i class="fas fa-magic"></i>
+                        <span>Визуальный редактор</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="photos">
+                        <i class="fas fa-images"></i>
+                        <span>Фотографии</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="stats">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Статистика</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="settings">
+                        <i class="fas fa-cogs"></i>
+                        <span>Настройки</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <main>
+        <!-- Секция контента -->
+        <div id="content-section" class="content-section">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-edit"></i>
+                    Управление контентом
+                </h1>
+                <p class="text-muted mb-0">Редактирование основного контента сайта</p>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-heading"></i>
+                    Основная информация
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="site_title" class="form-label">Заголовок сайта</label>
+                        <input type="text" class="form-control" id="site_title" value="Иван Петров">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="site_description" class="form-label">Описание сайта</label>
+                        <input type="text" class="form-control" id="site_description" value="Full Stack разработчик и UI/UX дизайнер">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 mb-3">
+                        <label for="avatar_url" class="form-label">URL аватарки</label>
+                        <div class="input-group">
+                            <input type="url" class="form-control" id="avatar_url" placeholder="https://example.com/avatar.jpg" value="https://picsum.photos/seed/profile/400/400.jpg">
+                            <button class="btn btn-primary" type="button" onclick="previewAvatar()">
+                                <i class="fas fa-eye"></i> Предпросмотр
+                            </button>
+                        </div>
+                        <div class="form-text">Введите URL изображения или загрузите с компьютера ниже</div>
+                    </div>
+                    <div class="col-12 mb-3">
+                        <label for="avatar_file" class="form-label">Загрузить аватарку с компьютера</label>
+                        <input type="file" class="form-control" id="avatar_file" accept="image/*" onchange="handleAvatarUpload(event)">
+                        <div class="form-text">Поддерживаемые форматы: JPG, PNG, GIF. Максимальный размер: 5MB</div>
+                    </div>
+                </div>
+                <div class="row" id="avatar-preview" style="display: none;">
+                    <div class="col-12 text-center">
+                        <label class="form-label">Предпросмотр аватарки:</label>
+                        <div class="mb-3">
+                            <img id="avatar-preview-img" src="" alt="Предпросмотр аватарки" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary-green);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-user"></i>
+                    О себе
+                </h5>
+                <div class="mb-3">
+                    <label for="about_text" class="form-label">Текст о себе</label>
+                    <textarea class="form-control" id="about_text" rows="6">Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. Специализируюсь на создании современных веб-приложений с использованием передовых технологий. Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.</textarea>
+                </div>
+                
+                <!-- Управление навыками -->
+                <div class="mb-3">
+                    <label class="form-label">Навыки и технологии</label>
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="new_skill" placeholder="Добавить навык (например: JavaScript, Python, React)">
+                            <button class="btn btn-primary" type="button" onclick="addSkill()">
+                                <i class="fas fa-plus"></i> Добавить
+                            </button>
+                        </div>
+                    </div>
+                    <div id="skills-list" class="d-flex flex-wrap gap-2">
+                        <!-- Навыки будут добавлены здесь -->
+                    </div>
+                </div>
+                
+                <!-- Управление возможностями -->
+                <div class="mb-3">
+                    <label class="form-label">Ключевые возможности и достижения</label>
+                    <div class="mb-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="new_ability" placeholder="Добавить возможность (например: 5+ лет опыта, 50+ проектов)">
+                            <button class="btn btn-primary" type="button" onclick="addAbility()">
+                                <i class="fas fa-plus"></i> Добавить
+                            </button>
+                        </div>
+                    </div>
+                    <div id="abilities-list" class="list-group">
+                        <!-- Возможности будут добавлены здесь -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-address-book"></i>
+                    Контактная информация
+                </h5>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="contact_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="contact_email" value="ivan.petrov@example.com">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="contact_phone" class="form-label">Телефон</label>
+                        <input type="tel" class="form-control" id="contact_phone" value="+7 (999) 123-45-67">
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-share-alt"></i>
+                    Социальные сети
+                </h5>
+                <div class="mb-3">
+                    <label for="social_links" class="form-label">Социальные сети (JSON)</label>
+                    <textarea class="form-control" id="social_links" rows="4">{"github": "https://github.com/ivanpetrov", "linkedin": "https://linkedin.com/in/ivanpetrov", "telegram": "https://telegram.me/ivanpetrov", "instagram": "https://instagram.com/ivanpetrov"}</textarea>
+                    <div class="form-text">Введите в формате JSON: {"platform": "url", ...}</div>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button class="btn btn-primary btn-lg me-2" onclick="saveContent()">
+                    <i class="fas fa-save me-2"></i> Сохранить изменения
+                </button>
+                <button class="btn btn-success btn-lg" onclick="openVisualEditor()">
+                    <i class="fas fa-magic me-2"></i> Визуальный редактор
+                </button>
+            </div>
+        </div>
+
+        <!-- Визуальный редактор -->
+        <div id="visual-editor-section" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-magic"></i>
+                    Визуальный редактор страницы
+                </h1>
+                <p class="text-muted mb-0">Редактирование страницы как у пользователя с возможностью клика на элементы</p>
+            </div>
+
+            <div class="preview-container">
+                <!-- Главный экран -->
+                <section id="home" class="hero-section">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <div class="hero-content">
+                                    <h1 class="hero-title editable" data-field="hero-title">Иван Петров</h1>
+                                    <p class="hero-subtitle editable" data-field="hero-description">Full Stack разработчик и UI/UX дизайнер</p>
+                                    <div class="hero-buttons">
+                                        <a href="#about" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-user-circle me-2"></i>Узнать больше
+                                        </a>
+                                        <a href="#contact" class="btn btn-outline-light btn-lg">
+                                            <i class="fas fa-envelope me-2"></i>Связаться
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="hero-image">
+                                    <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="editable" data-field="hero-avatar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- О себе -->
+                <section id="about" class="about-section">
+                    <div class="container">
+                        <h2 class="section-title">О себе</h2>
+                        <div class="about-content">
+                            <p class="about-text editable" data-field="about-text">
+                                Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
+                                Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
+                                Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
+                            </p>
+                            
+                            <div class="skills-container">
+                                <!-- Навыки будут загружены здесь -->
+                            </div>
+                            
+                            <div class="abilities-container">
+                                <!-- Возможности будут загружены здесь -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Контакты -->
+                <section id="contact" class="contact-section">
+                    <div class="container">
+                        <h2 class="section-title">Контакты</h2>
+                        <div class="contact-info">
+                            <div class="contact-item editable" data-field="contact-email">
+                                <i class="fas fa-envelope"></i>
+                                <strong>Email:</strong>
+                                <a href="mailto:ivan.petrov@example.com">ivan.petrov@example.com</a>
+                            </div>
+                            <div class="contact-item editable" data-field="contact-phone">
+                                <i class="fas fa-phone"></i>
+                                <strong>Телефон:</strong>
+                                <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <strong>Адрес:</strong>
+                                <span>Москва, Россия</span>
+                            </div>
+                            <div class="social-links">
+                                <a href="https://github.com/ivanpetrov" target="_blank" title="GitHub">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="https://linkedin.com/in/ivanpetrov" target="_blank" title="LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="https://telegram.me/ivanpetrov" target="_blank" title="Telegram">
+                                    <i class="fab fa-telegram"></i>
+                                </a>
+                                <a href="https://instagram.com/ivanpetrov" target="_blank" title="Instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="text-end mt-4">
+                <button class="btn btn-primary btn-lg" onclick="saveVisualEditorContent()">
+                    <i class="fas fa-save me-2"></i> Сохранить изменения
+                </button>
+            </div>
+        </div>
+
+        <!-- Секция портфолио -->
+        <div id="photos-section" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-images"></i>
+                    Управление портфолио
+                </h1>
+                <p class="text-muted mb-0">Управление категориями и проектами портфолио</p>
+            </div>
+
+            <!-- Управление категориями -->
+            <div class="admin-card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-tags me-2"></i>Категории портфолио
+                    </h5>
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <input type="text" class="form-control" id="category-input" placeholder="Название категории">
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-primary w-100" onclick="addCategory()">
+                                <i class="fas fa-plus me-2"></i>Добавить категорию
+                            </button>
+                        </div>
+                    </div>
+                    <div id="categories-list" class="d-flex flex-wrap gap-2">
+                        <!-- Категории будут загружаться сюда -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Управление проектами -->
+            <div class="admin-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-project-diagram me-2"></i>Проекты портфолио
+                        </h5>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#projectModal">
+                            <i class="fas fa-plus me-2"></i>Добавить проект
+                        </button>
+                                <i class="fas fa-folder"></i> Веб-разработка<br>
+                                <i class="fas fa-calendar"></i> 10.02.2024
+                            </div>
+                            <p class="photo-description">Облачная CRM система для малого бизнеса</p>
+                            <div class="photo-actions">
+                                <button class="btn btn-sm btn-primary" onclick="viewPhoto('https://picsum.photos/seed/project4/400/300.jpg')">
+                                    <i class="fas fa-eye me-1"></i> Просмотр
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePhoto(4)">
+                                    <i class="fas fa-trash me-1"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="photo-card-admin">
+                        <img src="https://picsum.photos/seed/project5/400/300.jpg" alt="Проект 5" class="img-fluid">
+                        <div class="photo-info">
+                            <div class="photo-title">Landing page</div>
+                            <div class="photo-meta">
+                                <i class="fas fa-folder"></i> Дизайн<br>
+                                <i class="fas fa-calendar"></i> 15.02.2024
+                            </div>
+                            <p class="photo-description">Продающая страница для стартапа</p>
+                            <div class="photo-actions">
+                                <button class="btn btn-sm btn-primary" onclick="viewPhoto('https://picsum.photos/seed/project5/400/300.jpg')">
+                                    <i class="fas fa-eye me-1"></i> Просмотр
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePhoto(5)">
+                                    <i class="fas fa-trash me-1"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="photo-card-admin">
+                        <img src="https://picsum.photos/seed/project6/400/300.jpg" alt="Проект 6" class="img-fluid">
+                        <div class="photo-info">
+                            <div class="photo-title">Блог платформа</div>
+                            <div class="photo-meta">
+                                <i class="fas fa-folder"></i> Веб-разработка<br>
+                                <i class="fas fa-calendar"></i> 20.02.2024
+                            </div>
+                            <p class="photo-description">Система управления контентом с CMS</p>
+                            <div class="photo-actions">
+                                <button class="btn btn-sm btn-primary" onclick="viewPhoto('https://picsum.photos/seed/project6/400/300.jpg')">
+                                    <i class="fas fa-eye me-1"></i> Просмотр
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deletePhoto(6)">
+                                    <i class="fas fa-trash me-1"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция статистики -->
+        <div id="stats-section" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Статистика сайта
+                </h1>
+                <p class="text-muted mb-0">Просмотр аналитики и метрик сайта</p>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stats-card">
+                        <i class="fas fa-eye"></i>
+                        <div class="stats-number">1,234</div>
+                        <div class="stats-label">Просмотры</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stats-card">
+                        <i class="fas fa-users"></i>
+                        <div class="stats-number">567</div>
+                        <div class="stats-label">Посетители</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stats-card">
+                        <i class="fas fa-image"></i>
+                        <div class="stats-number">12</div>
+                        <div class="stats-label">Фотографии</div>
+                    </div>
+                </div>
+                <div class="col-md-3 col-sm-6 mb-3">
+                    <div class="stats-card">
+                        <i class="fas fa-envelope"></i>
+                        <div class="stats-number">45</div>
+                        <div class="stats-label">Контакты</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Активность
+                </h5>
+                <p>Графики и детальная статистика будут доступны после подключения аналитики.</p>
+                <div class="alert">
+                    <h5><i class="fas fa-info-circle"></i> Информация</h5>
+                    <p class="mb-0">Для получения детальной статистики подключите Google Analytics или другую систему аналитики.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция настроек -->
+        <div id="settings-section" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-cogs"></i>
+                    Настройки системы
+                </h1>
+                <p class="text-muted mb-0">Конфигурация и системные параметры</p>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle"></i>
+                    Информация о системе
+                </h5>
+                <div class="alert">
+                    <h5><i class="fas fa-code"></i> Техническая информация</h5>
+                    <p><strong>Версия:</strong> 1.0.0</p>
+                    <p><strong>Тип:</strong> Статический сайт с административной панелью</p>
+                    <p><strong>База данных:</strong> LocalStorage (браузерное хранилище)</p>
+                    <p><strong>Технологии:</strong> HTML5, CSS3, JavaScript, Bootstrap 5</p>
+                    <p class="mb-0"><strong>Дата последнего обновления:</strong> 20.02.2024</p>
+                </div>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-download"></i>
+                    Резервное копирование
+                </h5>
+                <p>Создайте резервную копию данных сайта. Файл резервной копии будет скачан на ваш компьютер.</p>
+                <button class="btn btn-success" onclick="createBackup()">
+                    <i class="fas fa-download me-2"></i> Создать резервную копию
+                </button>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-file-export"></i>
+                    Экспорт контента
+                </h5>
+                <p>Экспортируйте весь контент в JSON формат для переноса или хранения.</p>
+                <button class="btn btn-info" onclick="exportContent()">
+                    <i class="fas fa-file-export me-2"></i> Экспортировать контент
+                </button>
+            </div>
+
+            <div class="admin-card">
+                <h5 class="card-title">
+                    <i class="fas fa-database"></i>
+                    Очистка данных
+                </h5>
+                <p>Внимание! Это действие удалит все данные из LocalStorage и восстановит значения по умолчанию.</p>
+                <button class="btn btn-danger" onclick="clearData()">
+                    <i class="fas fa-trash-alt me-2"></i> Очистить все данные
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Модальное окно загрузки фото -->
+    <div class="modal fade" id="uploadModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-upload me-2"></i>
+                        Загрузка фотографии
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadForm" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="photoFile" class="form-label">Выберите файл</label>
+                            <input type="file" class="form-control" id="photoFile" accept="image/*" required>
+                            <div class="form-text">Поддерживаются форматы: JPG, PNG, GIF, WebP (макс. 5MB)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="photoTitle" class="form-label">Название</label>
+                            <input type="text" class="form-control" id="photoTitle" placeholder="Введите название фотографии" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="photoDescription" class="form-label">Описание</label>
+                            <textarea class="form-control" id="photoDescription" rows="3" placeholder="Введите описание фотографии"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="photoCategory" class="form-label">Категория</label>
+                            <select class="form-control" id="photoCategory" required>
+                                <option value="web">Веб-разработка</option>
+                                <option value="mobile">Мобильная разработка</option>
+                                <option value="design">Дизайн</option>
+                                <option value="marketing">Маркетинг</option>
+                                <option value="other">Другое</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Отмена
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="uploadPhoto()">
+                        <i class="fas fa-upload me-2"></i> Загрузить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно добавления/редактирования проекта -->
+    <div class="modal fade" id="projectModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-project-diagram me-2"></i>
+                        <span id="projectModalTitle">Добавить проект</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="projectForm">
+                        <input type="hidden" id="projectId">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="projectTitle" class="form-label">Название проекта</label>
+                                    <input type="text" class="form-control" id="projectTitle" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="projectCategory" class="form-label">Категория</label>
+                                    <select class="form-control" id="projectCategory" required>
+                                        <option value="">Выберите категорию</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectImage" class="form-label">URL изображения</label>
+                            <input type="url" class="form-control" id="projectImage" placeholder="https://example.com/image.jpg">
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectDescription" class="form-label">Описание проекта</label>
+                            <textarea class="form-control" id="projectDescription" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i> Отмена
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="saveProject()">
+                        <i class="fas fa-save me-2"></i> Сохранить проект
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast уведомления -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1060">
+        <div id="successToast" class="toast" role="alert">
+            <div class="toast-header bg-success">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Успешно</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body" id="successMessage">
+                Операция выполнена успешно!
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Настройка навигации
+        function setupNavigation() {
+            const navLinks = document.querySelectorAll('.sidebar .nav-link');
+            const sections = document.querySelectorAll('.content-section');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Удаляем активный класс у всех ссылок и секций
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    sections.forEach(s => s.style.display = 'none');
+                    
+                    // Добавляем активный класс текущей ссылке
+                    this.classList.add('active');
+                    
+                    // Показываем соответствующую секцию
+                    const targetSection = this.getAttribute('data-section');
+                    const section = document.getElementById(targetSection + '-section');
+                    if (section) {
+                        section.style.display = 'block';
+                        
+                        // Если это секция портфолио, загружаем данные
+                        if (targetSection === 'photos') {
+                            setTimeout(() => {
+                                renderCategories();
+                                renderProjects();
+                                updateCategorySelect();
+                            }, 100);
+                        }
+                    }
+                    
+                    // Закрываем боковую панель на мобильных
+                    if (window.innerWidth <= 992) {
+                        document.querySelector('.sidebar').classList.remove('show');
+                    }
+                });
+            });
+        }
+
+        // Показать секцию
+        function showSection(sectionName) {
+            // Скрываем все секции
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Показываем выбранную секцию
+            const targetSection = document.getElementById(sectionName + '-section');
+            if (targetSection) {
+                targetSection.style.display = 'block';
+                // Прокручиваем к началу секции
+                targetSection.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // Переключение боковой панели на мобильных устройствах
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('show');
+        }
+
+        // Сохранение контента
+        function saveContent() {
+            const content = {
+                site_title: document.getElementById('site_title').value,
+                site_description: document.getElementById('site_description').value,
+                about_text: document.getElementById('about_text').value,
+                contact_email: document.getElementById('contact_email').value,
+                contact_phone: document.getElementById('contact_phone').value,
+                social_links: document.getElementById('social_links').value
+            };
+            
+            // Сохраняем в localStorage для админки
+            localStorage.setItem('siteContent', JSON.stringify(content));
+            
+            // Также сохраняем для главной страницы
+            localStorage.setItem('mainPageContent', JSON.stringify(content));
+            
+            // Сохраняем аватарку отдельно
+            saveAvatar();
+            
+            showToast('Контент успешно сохранен!', 'success');
+        }
+
+        // Загрузка фотографии
+        function uploadPhoto() {
+            const fileInput = document.getElementById('photoFile');
+            const title = document.getElementById('photoTitle').value;
+            const description = document.getElementById('photoDescription').value;
+            const category = document.getElementById('photoCategory').value;
+            
+            if (!fileInput.files[0]) {
+                showToast('Выберите файл для загрузки', 'error');
+                return;
+            }
+            
+            if (!title.trim()) {
+                showToast('Введите название фотографии', 'error');
+                return;
+            }
+            
+            // В реальном приложении здесь будет загрузка на сервер
+            // Для демо просто показываем сообщение об успехе
+            
+            showToast('Фотография "' + title + '" успешно загружена!', 'success');
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+            modal.hide();
+            
+            // Очищаем форму
+            document.getElementById('uploadForm').reset();
+        }
+
+        // Удаление фотографии
+        function deletePhoto(photoId) {
+            if (!confirm('Вы уверены, что хотите удалить эту фотографию? Это действие нельзя отменить.')) {
+                return;
+            }
+            
+            // В реальном приложении здесь будет удаление на сервере
+            // Для демо просто показываем сообщение об успехе
+            
+            showToast('Фотография успешно удалена!', 'success');
+        }
+
+        // Просмотр фотографии
+        function viewPhoto(imageUrl) {
+            window.open(imageUrl, '_blank');
+        }
+
+        // Создание резервной копии
+        function createBackup() {
+            const content = {
+                site_title: document.getElementById('site_title').value,
+                site_description: document.getElementById('site_description').value,
+                about_text: document.getElementById('about_text').value,
+                contact_email: document.getElementById('contact_email').value,
+                contact_phone: document.getElementById('contact_phone').value,
+                social_links: document.getElementById('social_links').value,
+                backup_date: new Date().toISOString(),
+                version: '1.0.0'
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(content, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "backup_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            showToast('Резервная копия создана и скачана!', 'success');
+        }
+
+        // Экспорт контента
+        function exportContent() {
+            const content = {
+                site_title: document.getElementById('site_title').value,
+                site_description: document.getElementById('site_description').value,
+                about_text: document.getElementById('about_text').value,
+                contact_email: document.getElementById('contact_email').value,
+                contact_phone: document.getElementById('contact_phone').value,
+                social_links: document.getElementById('social_links').value,
+                export_date: new Date().toISOString(),
+                version: '1.0.0'
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(content, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "content_export_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+            
+            showToast('Контент экспортирован и скачан!', 'success');
+        }
+
+        // Очистка всех данных
+        function clearData() {
+            if (!confirm('ВНИМАНИЕ! Вы уверены, что хотите удалить ВСЕ данные? Это действие удалит весь сохраненный контент и восстановит значения по умолчанию.')) {
+                return;
+            }
+            
+            // Очищаем localStorage
+            localStorage.removeItem('siteContent');
+            localStorage.removeItem('mainPageContent');
+            
+            // Восстанавливаем значения по умолчанию
+            document.getElementById('site_title').value = "Иван Петров";
+            document.getElementById('site_description').value = "Full Stack разработчик и UI/UX дизайнер";
+            document.getElementById('about_text').value = "Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. Специализируюсь на создании современных веб-приложений с использованием передовых технологий. Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.";
+            document.getElementById('contact_email').value = "ivan.petrov@example.com";
+            document.getElementById('contact_phone').value = "+7 (999) 123-45-67";
+            document.getElementById('social_links').value = '{"github": "https://github.com/ivanpetrov", "linkedin": "https://linkedin.com/in/ivanpetrov", "telegram": "https://telegram.me/ivanpetrov", "instagram": "https://instagram.com/ivanpetrov"}';
+            
+            showToast('Все данные были очищены и восстановлены значения по умолчанию!', 'info');
+        }
+
+        // Показать toast уведомление
+        function showToast(message, type = 'success') {
+            const toastElement = document.getElementById('successToast');
+            const toastMessage = document.getElementById('successMessage');
+            const toastHeader = toastElement.querySelector('.toast-header');
+            
+            // Устанавливаем сообщение
+            toastMessage.textContent = message;
+            
+            // Настраиваем стили в зависимости от типа
+            toastHeader.className = 'toast-header';
+            
+            switch(type) {
+                case 'success':
+                    toastHeader.classList.add('bg-success', 'text-white');
+                    toastHeader.querySelector('i').className = 'fas fa-check-circle me-2';
+                    break;
+                case 'error':
+                    toastHeader.classList.add('bg-danger', 'text-white');
+                    toastHeader.querySelector('i').className = 'fas fa-exclamation-circle me-2';
+                    break;
+                case 'info':
+                    toastHeader.classList.add('bg-info', 'text-white');
+                    toastHeader.querySelector('i').className = 'fas fa-info-circle me-2';
+                    break;
+                case 'warning':
+                    toastHeader.classList.add('bg-warning', 'text-white');
+                    toastHeader.querySelector('i').className = 'fas fa-exclamation-triangle me-2';
+                    break;
+            }
+            
+            // Показываем toast
+            const toast = new bootstrap.Toast(toastElement);
+            toast.show();
+        }
+
+        // Загрузка сохраненного контента
+        function loadSavedContent() {
+            const savedContent = localStorage.getItem('siteContent');
+            if (savedContent) {
+                try {
+                    const content = JSON.parse(savedContent);
+                    Object.keys(content).forEach(key => {
+                        const element = document.getElementById(key);
+                        if (element) {
+                            element.value = content[key];
+                        }
+                    });
+                    showToast('Сохраненный контент загружен!', 'success');
+                } catch (error) {
+                    console.error('Ошибка загрузки контента:', error);
+                    showToast('Ошибка загрузки сохраненного контента', 'error');
+                }
+            }
+        }
+
+        // Закрытие боковой панели при клике вне ее на мобильных
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.querySelector('.sidebar-toggle');
+            
+            if (window.innerWidth <= 992 && 
+                !sidebar.contains(event.target) && 
+                !sidebarToggle.contains(event.target) && 
+                sidebar.classList.contains('show')) {
+                sidebar.classList.remove('show');
+            }
+        });
+
+        // Управление категориями портфолио
+        let portfolioCategories = ['Все работы', 'Веб-разработка', 'Мобильная разработка', 'Дизайн'];
+        let portfolioProjects = [
+            {
+                id: 1,
+                title: 'E-commerce платформа',
+                category: 'Веб-разработка',
+                image: 'https://picsum.photos/seed/project1/400/300.jpg',
+                description: 'Современный интернет-магазин с панелью администратора'
+            },
+            {
+                id: 2,
+                title: 'Мобильное приложение',
+                category: 'Мобильная разработка',
+                image: 'https://picsum.photos/seed/project2/400/300.jpg',
+                description: 'React Native приложение для доставки еды'
+            },
+            {
+                id: 3,
+                title: 'UI/UX дизайн',
+                category: 'Дизайн',
+                image: 'https://picsum.photos/seed/project3/400/300.jpg',
+                description: 'Дизайн интерфейса для финансового приложения'
+            }
+        ];
+
+        function loadPortfolioData() {
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            const savedProjects = localStorage.getItem('portfolioProjects');
+            
+            if (savedCategories) {
+                portfolioCategories = JSON.parse(savedCategories);
+            }
+            
+            if (savedProjects) {
+                portfolioProjects = JSON.parse(savedProjects);
+            }
+            
+            // Проверяем, активна ли секция портфолио
+            const photosSection = document.getElementById('photos-section');
+            if (photosSection && photosSection.style.display !== 'none') {
+                renderCategories();
+                renderProjects();
+                updateCategorySelect();
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categories-list');
+            if (!container) {
+                console.error('Контейнер категорий не найден!');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            portfolioCategories.forEach((category, index) => {
+                const categoryTag = document.createElement('div');
+                categoryTag.className = 'd-flex align-items-center gap-2 px-3 py-1 bg-primary text-white rounded-pill';
+                categoryTag.innerHTML = `
+                    <span>${category}</span>
+                    ${category !== 'Все работы' ? `<button class="btn btn-sm btn-link text-white p-0" onclick="removeCategory(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>` : ''}
+                `;
+                container.appendChild(categoryTag);
+            });
+        }
+
+        function addCategory() {
+            const input = document.getElementById('category-input');
+            const categoryName = input.value.trim();
+            
+            if (categoryName && !portfolioCategories.includes(categoryName)) {
+                portfolioCategories.push(categoryName);
+                savePortfolioData();
+                renderCategories();
+                updateCategorySelect();
+                input.value = '';
+                showToast(`Категория "${categoryName}" добавлена!`, 'success');
+            }
+        }
+
+        function removeCategory(index) {
+            const category = portfolioCategories[index];
+            portfolioCategories.splice(index, 1);
+            savePortfolioData();
+            renderCategories();
+            updateCategorySelect();
+            showToast(`Категория "${category}" удалена!`, 'success');
+        }
+
+        function renderProjects() {
+            const container = document.getElementById('projects-list');
+            if (!container) {
+                console.error('Контейнер проектов не найден!');
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            portfolioProjects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'col-md-6 col-lg-4 mb-4';
+                projectCard.innerHTML = `
+                    <div class="photo-card-admin">
+                        <img src="${project.image}" alt="${project.title}" class="img-fluid">
+                        <div class="photo-info">
+                            <div class="photo-title">${project.title}</div>
+                            <div class="photo-meta">
+                                <i class="fas fa-folder"></i> ${project.category}<br>
+                                <i class="fas fa-calendar"></i> ${new Date().toLocaleDateString()}
+                            </div>
+                            <p class="photo-description">${project.description}</p>
+                            <div class="photo-actions">
+                                <button class="btn btn-sm btn-primary" onclick="editProject(${project.id})">
+                                    <i class="fas fa-edit me-1"></i> Редактировать
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteProject(${project.id})">
+                                    <i class="fas fa-trash me-1"></i> Удалить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(projectCard);
+            });
+        }
+
+        function updateCategorySelect() {
+            const select = document.getElementById('projectCategory');
+            if (!select) {
+                console.error('Селектор категорий не найден!');
+                return;
+            }
+            
+            select.innerHTML = '<option value="">Выберите категорию</option>';
+            
+            portfolioCategories.filter(cat => cat !== 'Все работы').forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = category;
+                select.appendChild(option);
+            });
+        }
+
+        function saveProject() {
+            const id = document.getElementById('projectId').value;
+            const title = document.getElementById('projectTitle').value;
+            const category = document.getElementById('projectCategory').value;
+            const image = document.getElementById('projectImage').value || `https://picsum.photos/seed/project${Date.now()}/400/300.jpg`;
+            const description = document.getElementById('projectDescription').value;
+            
+            if (!title || !category || !description) {
+                showToast('Заполните все обязательные поля!', 'error');
+                return;
+            }
+            
+            if (id) {
+                // Редактирование существующего проекта
+                const projectIndex = portfolioProjects.findIndex(p => p.id == id);
+                if (projectIndex !== -1) {
+                    portfolioProjects[projectIndex] = { id: parseInt(id), title, category, image, description };
+                    showToast('Проект успешно обновлен!', 'success');
+                }
+            } else {
+                // Добавление нового проекта
+                const newProject = {
+                    id: Date.now(),
+                    title,
+                    category,
+                    image,
+                    description
+                };
+                portfolioProjects.push(newProject);
+                showToast('Проект успешно добавлен!', 'success');
+            }
+            
+            savePortfolioData();
+            renderProjects();
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('projectModal'));
+            modal.hide();
+            
+            // Очищаем форму
+            document.getElementById('projectForm').reset();
+            document.getElementById('projectId').value = '';
+        }
+
+        function editProject(id) {
+            const project = portfolioProjects.find(p => p.id === id);
+            if (project) {
+                document.getElementById('projectId').value = project.id;
+                document.getElementById('projectTitle').value = project.title;
+                document.getElementById('projectCategory').value = project.category;
+                document.getElementById('projectImage').value = project.image;
+                document.getElementById('projectDescription').value = project.description;
+                document.getElementById('projectModalTitle').textContent = 'Редактировать проект';
+                
+                const modal = new bootstrap.Modal(document.getElementById('projectModal'));
+                modal.show();
+            }
+        }
+
+        function deleteProject(id) {
+            if (confirm('Вы уверены, что хотите удалить этот проект?')) {
+                portfolioProjects = portfolioProjects.filter(p => p.id !== id);
+                savePortfolioData();
+                renderProjects();
+                showToast('Проект удален!', 'success');
+            }
+        }
+
+        function savePortfolioData() {
+            localStorage.setItem('portfolioCategories', JSON.stringify(portfolioCategories));
+            localStorage.setItem('portfolioProjects', JSON.stringify(portfolioProjects));
+        }
+
+        // Управление аватаркой
+        function previewAvatar() {
+            const avatarUrl = document.getElementById('avatar_url').value.trim();
+            const previewContainer = document.getElementById('avatar-preview');
+            const previewImg = document.getElementById('avatar-preview-img');
+            
+            if (avatarUrl) {
+                previewImg.src = avatarUrl;
+                previewContainer.style.display = 'block';
+                
+                // Проверяем, загрузилось ли изображение
+                previewImg.onerror = function() {
+                    showToast('Не удалось загрузить изображение по указанному URL', 'error');
+                    previewContainer.style.display = 'none';
+                };
+            } else {
+                previewContainer.style.display = 'none';
+            }
+        }
+
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            
+            if (!file) return;
+            
+            // Проверка размера файла (2MB для надежности)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Размер файла не должен превышать 2MB', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            // Проверка типа файла
+            if (!file.type.startsWith('image/')) {
+                showToast('Выберите файл изображения', 'error');
+                event.target.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                
+                // Проверяем размер base64
+                if (base64Image.length > 1000000) { // ~1MB
+                    showToast('Изображение слишком большое, выберите файл меньшего размера', 'error');
+                    event.target.value = '';
+                    return;
+                }
+                
+                // Сохраняем base64 в localStorage
+                try {
+                    localStorage.setItem('avatar_base64', base64Image);
+                    localStorage.setItem('avatar_filename', file.name);
+                    
+                    // Обновляем поле URL
+                    document.getElementById('avatar_url').value = base64Image;
+                    
+                    // Показываем предпросмотр
+                    const previewContainer = document.getElementById('avatar-preview');
+                    const previewImg = document.getElementById('avatar-preview-img');
+                    previewImg.src = base64Image;
+                    previewContainer.style.display = 'block';
+                    
+                    console.log('Аватарка успешно обработана:', base64Image.length, 'байт');
+                    showToast('Аватарка успешно загружена!', 'success');
+                } catch (error) {
+                    console.error('Ошибка сохранения аватарки:', error);
+                    showToast('Ошибка сохранения аватарки', 'error');
+                }
+            };
+            
+            reader.onerror = function() {
+                console.error('Ошибка чтения файла');
+                showToast('Ошибка при чтении файла', 'error');
+                event.target.value = '';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function loadSavedAvatar() {
+            const savedAvatar = localStorage.getItem('avatar_url');
+            const savedBase64 = localStorage.getItem('avatar_base64');
+            
+            if (savedBase64) {
+                document.getElementById('avatar_url').value = savedBase64;
+                previewAvatar();
+            } else if (savedAvatar) {
+                document.getElementById('avatar_url').value = savedAvatar;
+                previewAvatar();
+            }
+        }
+
+        function saveAvatar() {
+            const avatarUrl = document.getElementById('avatar_url').value.trim();
+            const base64Image = localStorage.getItem('avatar_base64');
+            
+            if (base64Image) {
+                // Если есть base64, сохраняем его
+                localStorage.setItem('avatar_url', base64Image);
+                showToast('Аватарка сохранена в базе данных!', 'success');
+            } else if (avatarUrl) {
+                // Если только URL, сохраняем URL
+                localStorage.setItem('avatar_url', avatarUrl);
+                localStorage.removeItem('avatar_base64');
+                showToast('Аватарка сохранена!', 'success');
+            } else {
+                // Очищаем все
+                localStorage.removeItem('avatar_url');
+                localStorage.removeItem('avatar_base64');
+                localStorage.removeItem('avatar_filename');
+                showToast('Будет использоваться аватарка по умолчанию', 'success');
+            }
+        }
+
+        // Управление визуальным редактором
+        function openVisualEditor() {
+            // Скрываем все секции
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Показываем визуальный редактор
+            const visualEditorSection = document.getElementById('visual-editor-section');
+            if (visualEditorSection) {
+                visualEditorSection.style.display = 'block';
+            }
+            
+            // Загружаем контент для визуального редактора
+            loadVisualEditorContent();
+        }
+
+        function loadVisualEditorContent() {
+            const savedContent = localStorage.getItem('visualEditorContent');
+            if (savedContent) {
+                const content = JSON.parse(savedContent);
+                
+                Object.keys(content).forEach(field => {
+                    const element = document.querySelector(`[data-field="${field}"]`);
+                    if (element && content[field]) {
+                        if (element.tagName === 'IMG') {
+                            element.src = content[field];
+                        } else {
+                            element.textContent = content[field];
+                        }
+                    }
+                });
+            }
+            
+            // Загружаем навыки и возможности
+            loadSkillsAndAbilities();
+        }
+
+        function saveVisualEditorContent() {
+            const content = {};
+            
+            document.querySelectorAll('[data-field]').forEach(element => {
+                const field = element.getAttribute('data-field');
+                if (element.tagName === 'IMG') {
+                    content[field] = element.src;
+                } else {
+                    content[field] = element.textContent;
+                }
+            });
+            
+            localStorage.setItem('visualEditorContent', JSON.stringify(content));
+            localStorage.setItem('mainPageContent', JSON.stringify(content));
+            
+            showToast('Изменения в визуальном редакторе сохранены!', 'success');
+        }
+
+        // Функции для визуального редактора
+        let isEditMode = true;
+        let currentEditing = null;
+
+        // Обработка клика на редактируемый элемент
+        document.addEventListener('click', function(e) {
+            if (!isEditMode) return;
+            
+            const editable = e.target.closest('.editable');
+            if (!editable || currentEditing) return;
+            
+            startEdit(editable);
+        });
+
+        // Начало редактирования
+        function startEdit(element) {
+            if (currentEditing) {
+                cancelEdit();
+            }
+            
+            currentEditing = element;
+            const currentText = element.tagName === 'IMG' ? element.src : element.textContent;
+            
+            element.classList.add('editing');
+            
+            if (element.tagName === 'IMG') {
+                element.innerHTML = `
+                    <div class="edit-actions">
+                        <button class="btn-save" onclick="saveEdit()"><i class="fas fa-check"></i></button>
+                        <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <input type="file" class="edit-input" accept="image/*" onchange="updateImage(this)">
+                    <img src="${currentText}" style="max-width: 100%; border-radius: 8px;">
+                `;
+            } else {
+                element.innerHTML = `
+                    <div class="edit-actions">
+                        <button class="btn-save" onclick="saveEdit()"><i class="fas fa-check"></i></button>
+                        <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <textarea class="edit-input">${currentText}</textarea>
+                `;
+            }
+            
+            // Фокус на поле ввода
+            const input = element.querySelector('.edit-input');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }
+
+        // Сохранение редактирования
+        function saveEdit() {
+            if (!currentEditing) return;
+            
+            const input = currentEditing.querySelector('.edit-input');
+            const newValue = input.value.trim();
+            
+            if (currentEditing.tagName === 'IMG') {
+                currentEditing.src = newValue;
+            } else {
+                currentEditing.textContent = newValue;
+            }
+            
+            cancelEdit();
+        }
+
+        // Отмена редактирования
+        function cancelEdit() {
+            if (!currentEditing) return;
+            
+            const field = currentEditing.getAttribute('data-field');
+            const savedContent = localStorage.getItem('visualEditorContent');
+            
+            if (savedContent) {
+                const content = JSON.parse(savedContent);
+                const currentValue = currentEditing.tagName === 'IMG' ? currentEditing.src : currentEditing.textContent;
+                
+                if (content[field]) {
+                    if (currentEditing.tagName === 'IMG') {
+                        currentEditing.src = content[field];
+                    } else {
+                        currentEditing.textContent = content[field];
+                    }
+                }
+            }
+            
+            currentEditing.classList.remove('editing');
+            currentEditing.innerHTML = currentValue;
+            currentEditing = null;
+        }
+
+        // Обновление изображения
+        function updateImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentEditing.querySelector('img').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Управление навыками и возможностями
+        let skills = [];
+        let abilities = [];
+
+        function loadSkillsAndAbilities() {
+            const savedSkills = localStorage.getItem('skills');
+            const savedAbilities = localStorage.getItem('abilities');
+            
+            if (savedSkills) {
+                skills = JSON.parse(savedSkills);
+            }
+            
+            if (savedAbilities) {
+                abilities = JSON.parse(savedAbilities);
+            }
+            
+            renderSkills();
+            renderAbilities();
+        }
+
+        function renderSkills() {
+            const container = document.getElementById('skills-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            skills.forEach((skill, index) => {
+                const skillTag = document.createElement('div');
+                skillTag.className = 'd-flex align-items-center gap-2 px-3 py-1 bg-primary text-white rounded-pill';
+                skillTag.innerHTML = `
+                    <span>${skill}</span>
+                    <button class="btn btn-sm btn-link text-white p-0" onclick="removeSkill(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(skillTag);
+            });
+        }
+
+        function renderAbilities() {
+            const container = document.getElementById('abilities-list');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            
+            abilities.forEach((ability, index) => {
+                const abilityItem = document.createElement('div');
+                abilityItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                abilityItem.innerHTML = `
+                    <span>${ability}</span>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2" onclick="editAbility(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="removeAbility(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(abilityItem);
+            });
+        }
+
+        function addSkill() {
+            const input = document.getElementById('new_skill');
+            const skill = input.value.trim();
+            
+            if (!skill) {
+                showToast('Введите название навыка', 'error');
+                return;
+            }
+            
+            if (skills.includes(skill)) {
+                showToast('Такой навык уже существует', 'error');
+                return;
+            }
+            
+            skills.push(skill);
+            saveSkillsAndAbilities();
+            renderSkills();
+            input.value = '';
+            showToast('Навык добавлен!', 'success');
+        }
+
+        function removeSkill(index) {
+            const skill = skills[index];
+            if (confirm(`Удалить навык "${skill}"?`)) {
+                skills.splice(index, 1);
+                saveSkillsAndAbilities();
+                renderSkills();
+                showToast('Навык удален!', 'success');
+            }
+        }
+
+        function addAbility() {
+            const input = document.getElementById('new_ability');
+            const ability = input.value.trim();
+            
+            if (!ability) {
+                showToast('Введите описание возможности', 'error');
+                return;
+            }
+            
+            abilities.push(ability);
+            saveSkillsAndAbilities();
+            renderAbilities();
+            input.value = '';
+            showToast('Возможность добавлена!', 'success');
+        }
+
+        function editAbility(index) {
+            const newAbility = prompt('Редактировать возможность:', abilities[index]);
+            if (newAbility && newAbility.trim()) {
+                abilities[index] = newAbility.trim();
+                saveSkillsAndAbilities();
+                renderAbilities();
+                showToast('Возможность обновлена!', 'success');
+            }
+        }
+
+        function removeAbility(index) {
+            const ability = abilities[index];
+            if (confirm(`Удалить возможность "${ability}"?`)) {
+                abilities.splice(index, 1);
+                saveSkillsAndAbilities();
+                renderAbilities();
+                showToast('Возможность удалена!', 'success');
+            }
+        }
+
+        function saveSkillsAndAbilities() {
+            localStorage.setItem('skills', JSON.stringify(skills));
+            localStorage.setItem('abilities', JSON.stringify(abilities));
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            setupNavigation();
+            loadSavedContent();
+            loadSkillsAndAbilities();
+            
+            // Добавляем задержку для загрузки DOM
+            setTimeout(() => {
+                loadPortfolioData();
+                loadSavedAvatar();
+            }, 100);
+            
+            // Инициализация всех всплывающих подсказок
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Закрытие боковой панели при ресайзе на мобильных
+            window.addEventListener('resize', function() {
+                const sidebar = document.querySelector('.sidebar');
+                if (window.innerWidth > 992 && sidebar.classList.contains('show')) {
+                    sidebar.classList.remove('show');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
