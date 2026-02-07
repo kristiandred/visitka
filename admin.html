@@ -613,18 +613,16 @@
             background: var(--medium-gray);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-green);
-            border-radius: 4px;
-        }
+            .ability-item i {
+                color: var(--primary-green);
+                margin-right: 1rem;
+                font-size: 1.2rem;
+            }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--secondary-green);
-        }
-    </style>
-</head>
-<body>
-    <!-- Навигация -->
+            .ability-item span {
+                color: var(--dark-gray);
+                font-weight: 500;
+            }
     <nav class="navbar navbar-expand-lg fixed-top">
         <div class="container-fluid">
             <button class="sidebar-toggle" onclick="toggleSidebar()">
@@ -652,6 +650,12 @@
                     <a class="nav-link active" href="#" data-section="content">
                         <i class="fas fa-edit"></i>
                         <span>Контент</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-section="visual-editor">
+                        <i class="fas fa-magic"></i>
+                        <span>Визуальный редактор</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -803,7 +807,116 @@
             </div>
 
             <div class="text-end">
-                <button class="btn btn-primary btn-lg" onclick="saveContent()">
+                <button class="btn btn-primary btn-lg me-2" onclick="saveContent()">
+                    <i class="fas fa-save me-2"></i> Сохранить изменения
+                </button>
+                <button class="btn btn-success btn-lg" onclick="openVisualEditor()">
+                    <i class="fas fa-magic me-2"></i> Визуальный редактор
+                </button>
+            </div>
+        </div>
+
+        <!-- Визуальный редактор -->
+        <div id="visual-editor-section" class="content-section" style="display: none;">
+            <div class="section-header">
+                <h1 class="section-title">
+                    <i class="fas fa-magic"></i>
+                    Визуальный редактор страницы
+                </h1>
+                <p class="text-muted mb-0">Редактирование страницы как у пользователя с возможностью клика на элементы</p>
+            </div>
+
+            <div class="preview-container">
+                <!-- Главный экран -->
+                <section id="home" class="hero-section">
+                    <div class="container">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6">
+                                <div class="hero-content">
+                                    <h1 class="hero-title editable" data-field="hero-title">Иван Петров</h1>
+                                    <p class="hero-subtitle editable" data-field="hero-description">Full Stack разработчик и UI/UX дизайнер</p>
+                                    <div class="hero-buttons">
+                                        <a href="#about" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-user-circle me-2"></i>Узнать больше
+                                        </a>
+                                        <a href="#contact" class="btn btn-outline-light btn-lg">
+                                            <i class="fas fa-envelope me-2"></i>Связаться
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="hero-image">
+                                    <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="editable" data-field="hero-avatar">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- О себе -->
+                <section id="about" class="about-section">
+                    <div class="container">
+                        <h2 class="section-title">О себе</h2>
+                        <div class="about-content">
+                            <p class="about-text editable" data-field="about-text">
+                                Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
+                                Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
+                                Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
+                            </p>
+                            
+                            <div class="skills-container">
+                                <!-- Навыки будут загружены здесь -->
+                            </div>
+                            
+                            <div class="abilities-container">
+                                <!-- Возможности будут загружены здесь -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Контакты -->
+                <section id="contact" class="contact-section">
+                    <div class="container">
+                        <h2 class="section-title">Контакты</h2>
+                        <div class="contact-info">
+                            <div class="contact-item editable" data-field="contact-email">
+                                <i class="fas fa-envelope"></i>
+                                <strong>Email:</strong>
+                                <a href="mailto:ivan.petrov@example.com">ivan.petrov@example.com</a>
+                            </div>
+                            <div class="contact-item editable" data-field="contact-phone">
+                                <i class="fas fa-phone"></i>
+                                <strong>Телефон:</strong>
+                                <a href="tel:+79991234567">+7 (999) 123-45-67</a>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <strong>Адрес:</strong>
+                                <span>Москва, Россия</span>
+                            </div>
+                            <div class="social-links">
+                                <a href="https://github.com/ivanpetrov" target="_blank" title="GitHub">
+                                    <i class="fab fa-github"></i>
+                                </a>
+                                <a href="https://linkedin.com/in/ivanpetrov" target="_blank" title="LinkedIn">
+                                    <i class="fab fa-linkedin"></i>
+                                </a>
+                                <a href="https://telegram.me/ivanpetrov" target="_blank" title="Telegram">
+                                    <i class="fab fa-telegram"></i>
+                                </a>
+                                <a href="https://instagram.com/ivanpetrov" target="_blank" title="Instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="text-end mt-4">
+                <button class="btn btn-primary btn-lg" onclick="saveVisualEditorContent()">
                     <i class="fas fa-save me-2"></i> Сохранить изменения
                 </button>
             </div>
@@ -1746,6 +1859,167 @@
                 localStorage.removeItem('avatar_filename');
                 showToast('Будет использоваться аватарка по умолчанию', 'success');
             }
+        }
+
+        // Управление визуальным редактором
+        function openVisualEditor() {
+            // Скрываем все секции
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Показываем визуальный редактор
+            const visualEditorSection = document.getElementById('visual-editor-section');
+            if (visualEditorSection) {
+                visualEditorSection.style.display = 'block';
+            }
+            
+            // Загружаем контент для визуального редактора
+            loadVisualEditorContent();
+        }
+
+        function loadVisualEditorContent() {
+            const savedContent = localStorage.getItem('visualEditorContent');
+            if (savedContent) {
+                const content = JSON.parse(savedContent);
+                
+                Object.keys(content).forEach(field => {
+                    const element = document.querySelector(`[data-field="${field}"]`);
+                    if (element && content[field]) {
+                        if (element.tagName === 'IMG') {
+                            element.src = content[field];
+                        } else {
+                            element.textContent = content[field];
+                        }
+                    }
+                });
+            }
+            
+            // Загружаем навыки и возможности
+            loadSkillsAndAbilities();
+        }
+
+        function saveVisualEditorContent() {
+            const content = {};
+            
+            document.querySelectorAll('[data-field]').forEach(element => {
+                const field = element.getAttribute('data-field');
+                if (element.tagName === 'IMG') {
+                    content[field] = element.src;
+                } else {
+                    content[field] = element.textContent;
+                }
+            });
+            
+            localStorage.setItem('visualEditorContent', JSON.stringify(content));
+            localStorage.setItem('mainPageContent', JSON.stringify(content));
+            
+            showToast('Изменения в визуальном редакторе сохранены!', 'success');
+        }
+
+        // Функции для визуального редактора
+        let isEditMode = true;
+        let currentEditing = null;
+
+        // Обработка клика на редактируемый элемент
+        document.addEventListener('click', function(e) {
+            if (!isEditMode) return;
+            
+            const editable = e.target.closest('.editable');
+            if (!editable || currentEditing) return;
+            
+            startEdit(editable);
+        });
+
+        // Начало редактирования
+        function startEdit(element) {
+            if (currentEditing) {
+                cancelEdit();
+            }
+            
+            currentEditing = element;
+            const currentText = element.tagName === 'IMG' ? element.src : element.textContent;
+            
+            element.classList.add('editing');
+            
+            if (element.tagName === 'IMG') {
+                element.innerHTML = `
+                    <div class="edit-actions">
+                        <button class="btn-save" onclick="saveEdit()"><i class="fas fa-check"></i></button>
+                        <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <input type="file" class="edit-input" accept="image/*" onchange="updateImage(this)">
+                    <img src="${currentText}" style="max-width: 100%; border-radius: 8px;">
+                `;
+            } else {
+                element.innerHTML = `
+                    <div class="edit-actions">
+                        <button class="btn-save" onclick="saveEdit()"><i class="fas fa-check"></i></button>
+                        <button class="btn-cancel" onclick="cancelEdit()"><i class="fas fa-times"></i></button>
+                    </div>
+                    <textarea class="edit-input">${currentText}</textarea>
+                `;
+            }
+            
+            // Фокус на поле ввода
+            const input = element.querySelector('.edit-input');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }
+
+        // Сохранение редактирования
+        function saveEdit() {
+            if (!currentEditing) return;
+            
+            const input = currentEditing.querySelector('.edit-input');
+            const newValue = input.value.trim();
+            
+            if (currentEditing.tagName === 'IMG') {
+                currentEditing.src = newValue;
+            } else {
+                currentEditing.textContent = newValue;
+            }
+            
+            cancelEdit();
+        }
+
+        // Отмена редактирования
+        function cancelEdit() {
+            if (!currentEditing) return;
+            
+            const field = currentEditing.getAttribute('data-field');
+            const savedContent = localStorage.getItem('visualEditorContent');
+            
+            if (savedContent) {
+                const content = JSON.parse(savedContent);
+                const currentValue = currentEditing.tagName === 'IMG' ? currentEditing.src : currentEditing.textContent;
+                
+                if (content[field]) {
+                    if (currentEditing.tagName === 'IMG') {
+                        currentEditing.src = content[field];
+                    } else {
+                        currentEditing.textContent = content[field];
+                    }
+                }
+            }
+            
+            currentEditing.classList.remove('editing');
+            currentEditing.innerHTML = currentValue;
+            currentEditing = null;
+        }
+
+        // Обновление изображения
+        function updateImage(input) {
+            const file = input.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentEditing.querySelector('img').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         // Управление навыками и возможностями
