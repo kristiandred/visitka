@@ -764,25 +764,16 @@
                             Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
                         </p>
                         <div class="row mt-4">
-                            <div class="col-md-4 mb-4">
-                                <div class="skill-item">
-                                    <i class="fas fa-code"></i>
-                                    <h5>Веб-разработка</h5>
-                                    <p>Создание современных веб-приложений</p>
-                                </div>
+                            <div id="skills-container" class="row">
+                                <!-- Навыки будут загружены здесь -->
                             </div>
-                            <div class="col-md-4 mb-4">
-                                <div class="skill-item">
-                                    <i class="fas fa-mobile-alt"></i>
-                                    <h5>Мобильная разработка</h5>
-                                    <p>Адаптивный дизайн для всех устройств</p>
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-4">
-                                <div class="skill-item">
-                                    <i class="fas fa-palette"></i>
-                                    <h5>UI/UX дизайн</h5>
-                                    <p>Создание интуитивных интерфейсов</p>
+                        </div>
+                        
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <h4 class="text-center mb-4">Ключевые возможности и достижения</h4>
+                                <div id="abilities-container" class="row">
+                                    <!-- Возможности будут загружены здесь -->
                                 </div>
                             </div>
                         </div>
@@ -1171,6 +1162,31 @@
                 console.log('Сохраненная аватарка не найдена');
             }
         }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            // Загружаем сохраненный контент
+            loadSavedContent();
+            
+            // Загружаем портфолио
+            loadPortfolioFromStorage();
+            
+            // Загружаем навыки и возможности
+            loadSkillsAndAbilities();
+            
+            // Добавляем классы для анимации
+            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
+            elementsToAnimate.forEach(element => {
+                element.classList.add('fade-in-up');
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(30px)';
+                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            });
+            
+            // Запускаем анимацию при прокрутке
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll();
+        });
     </script>
 </body>
 </html>
