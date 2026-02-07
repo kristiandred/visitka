@@ -1622,9 +1622,9 @@
             
             if (!file) return;
             
-            // Проверка размера файла (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('Размер файла не должен превышать 5MB', 'error');
+            // Проверка размера файла (2MB для надежности)
+            if (file.size > 2 * 1024 * 1024) {
+                showToast('Размер файла не должен превышать 2MB', 'error');
                 event.target.value = '';
                 return;
             }
@@ -1640,23 +1640,37 @@
             reader.onload = function(e) {
                 const base64Image = e.target.result;
                 
+                // Проверяем размер base64
+                if (base64Image.length > 1000000) { // ~1MB
+                    showToast('Изображение слишком большое, выберите файл меньшего размера', 'error');
+                    event.target.value = '';
+                    return;
+                }
+                
                 // Сохраняем base64 в localStorage
-                localStorage.setItem('avatar_base64', base64Image);
-                localStorage.setItem('avatar_filename', file.name);
-                
-                // Обновляем поле URL
-                document.getElementById('avatar_url').value = base64Image;
-                
-                // Показываем предпросмотр
-                const previewContainer = document.getElementById('avatar-preview');
-                const previewImg = document.getElementById('avatar-preview-img');
-                previewImg.src = base64Image;
-                previewContainer.style.display = 'block';
-                
-                showToast('Аватарка успешно загружена!', 'success');
+                try {
+                    localStorage.setItem('avatar_base64', base64Image);
+                    localStorage.setItem('avatar_filename', file.name);
+                    
+                    // Обновляем поле URL
+                    document.getElementById('avatar_url').value = base64Image;
+                    
+                    // Показываем предпросмотр
+                    const previewContainer = document.getElementById('avatar-preview');
+                    const previewImg = document.getElementById('avatar-preview-img');
+                    previewImg.src = base64Image;
+                    previewContainer.style.display = 'block';
+                    
+                    console.log('Аватарка успешно обработана:', base64Image.length, 'байт');
+                    showToast('Аватарка успешно загружена!', 'success');
+                } catch (error) {
+                    console.error('Ошибка сохранения аватарки:', error);
+                    showToast('Ошибка сохранения аватарки', 'error');
+                }
             };
             
             reader.onerror = function() {
+                console.error('Ошибка чтения файла');
                 showToast('Ошибка при чтении файла', 'error');
                 event.target.value = '';
             };
