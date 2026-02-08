@@ -759,22 +759,38 @@
                 <div class="col-lg-12">
                     <h2 class="section-title">О себе</h2>
                     <div class="about-content">
-                        <p id="about-text" class="lead text-center mb-5">
+                        <p id="about-text" class="lead text-center mb-4">
                             Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
                             Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
                             Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
                         </p>
-                        <div class="row mt-4">
-                            <div id="skills-container" class="row">
-                                <!-- Навыки будут загружены здесь -->
-                            </div>
+                        
+                        <h4 id="achievements-title" class="text-center mb-4">Ключевые возможности и достижения</h4>
+                        
+                        <div class="row mt-4" id="achievements-row">
+                            <!-- Достижения будут загружены здесь -->
                         </div>
                         
-                        <div class="row mt-5">
-                            <div class="col-12">
-                                <h4 class="text-center mb-4">Ключевые возможности и достижения</h4>
-                                <div id="abilities-container" class="row">
-                                    <!-- Возможности будут загружены здесь -->
+                        <div class="row mt-4" id="skills-row">
+                            <div class="col-md-4 mb-4">
+                                <div class="skill-item">
+                                    <i class="fab fa-js-square"></i>
+                                    <h5>JavaScript</h5>
+                                    <p>React, Vue, Node.js, Express</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="skill-item">
+                                    <i class="fab fa-python"></i>
+                                    <h5>Python</h5>
+                                    <p>Django, Flask, Data Science</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="skill-item">
+                                    <i class="fas fa-database"></i>
+                                    <h5>Базы данных</h5>
+                                    <p>MySQL, PostgreSQL, MongoDB</p>
                                 </div>
                             </div>
                         </div>
@@ -1176,6 +1192,50 @@
             } else {
                 console.log('Сохраненная аватарка не найдена');
             }
+            
+            // Загружаем достижения
+            loadAchievements();
+        }
+
+        function loadAchievements() {
+            const savedAchievements = localStorage.getItem('achievements');
+            if (savedAchievements) {
+                const achievements = JSON.parse(savedAchievements);
+                const achievementsRow = document.getElementById('achievements-row');
+                achievementsRow.innerHTML = '';
+                
+                achievements.forEach((achievement, index) => {
+                    const achievementCol = document.createElement('div');
+                    achievementCol.className = 'col-md-6 mb-4';
+                    achievementCol.innerHTML = `
+                        <div class="skill-item">
+                            <i class="fas fa-${achievement.icon || 'star'}"></i>
+                            <h5>${achievement.title}</h5>
+                            <p>${achievement.description}</p>
+                        </div>
+                    `;
+                    achievementsRow.appendChild(achievementCol);
+                });
+            } else {
+                // Если нет сохраненных достижений, показываем стандартные
+                const achievementsRow = document.getElementById('achievements-row');
+                achievementsRow.innerHTML = `
+                    <div class="col-md-6 mb-4">
+                        <div class="skill-item">
+                            <i class="fas fa-medal"></i>
+                            <h5>Более 50 проектов</h5>
+                            <p>Успешно завершенных и запущенных</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="skill-item">
+                            <i class="fas fa-users"></i>
+                            <h5>Командная работа</h5>
+                            <p>Опыт работы в Agile/Scrum командах</p>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
         // Функция для загрузки аватарки с компьютера
@@ -1199,7 +1259,6 @@
                 console.log('Пожалуйста, выберите изображение!');
             }
         }
-
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненный контент

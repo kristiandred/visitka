@@ -740,6 +740,42 @@
             opacity: 1;
         }
 
+        /* Кнопки управления для достижений */
+        .achievement-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .achievement-item:hover .achievement-controls {
+            opacity: 1;
+        }
+
+        .add-achievement-btn {
+            position: absolute;
+            top: -50px;
+            right: 0;
+            background: var(--primary-green);
+            color: var(--dark-gray);
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .add-achievement-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-green);
+        }
+
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -845,12 +881,48 @@
                 <div class="col-lg-12">
                     <h2 class="section-title">О себе</h2>
                     <div class="about-content">
-                        <p id="about-text" class="lead text-center mb-5 editable" data-field="about_text">
+                        <p id="about-text" class="lead text-center mb-4 editable" data-field="about_text">
                             Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
                             Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
                             Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
                         </p>
-                        <div class="row mt-4">
+                        
+                        <h4 id="achievements-title" class="text-center mb-4 editable" data-field="achievements_title">Ключевые возможности и достижения</h4>
+                        
+                        <div style="position: relative;">
+                            <button class="add-achievement-btn" onclick="addAchievement()" title="Добавить достижение">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            
+                            <div class="row mt-4" id="achievements-row">
+                                <div class="col-md-6 mb-4 achievement-item">
+                                    <div class="skill-item editable" data-field="achievement_0_title" style="position: relative;">
+                                        <div class="achievement-controls">
+                                            <button class="btn btn-sm btn-danger" onclick="deleteAchievement(0)" title="Удалить достижение">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <i class="fas fa-medal"></i>
+                                        <h5 class="editable" data-field="achievement_0_title">Более 50 проектов</h5>
+                                        <p class="editable" data-field="achievement_0_desc">Успешно завершенных и запущенных</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-4 achievement-item">
+                                    <div class="skill-item editable" data-field="achievement_1_title" style="position: relative;">
+                                        <div class="achievement-controls">
+                                            <button class="btn btn-sm btn-danger" onclick="deleteAchievement(1)" title="Удалить достижение">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                        <i class="fas fa-users"></i>
+                                        <h5 class="editable" data-field="achievement_1_title">Командная работа</h5>
+                                        <p class="editable" data-field="achievement_1_desc">Опыт работы в Agile/Scrum командах</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
                                 <div class="skill-item">
                                     <i class="fab fa-js-square"></i>
@@ -870,28 +942,6 @@
                                     <i class="fas fa-database"></i>
                                     <h5>Базы данных</h5>
                                     <p>MySQL, PostgreSQL, MongoDB</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-5">
-                            <div class="col-12">
-                                <h4 class="text-center mb-4">Ключевые возможности и достижения</h4>
-                                <div class="row">
-                                    <div class="col-md-6 mb-4">
-                                        <div class="skill-item">
-                                            <i class="fas fa-medal"></i>
-                                            <h5>Более 50 проектов</h5>
-                                            <p>Успешно завершенных и запущенных</p>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mb-4">
-                                        <div class="skill-item">
-                                            <i class="fas fa-users"></i>
-                                            <h5>Командная работа</h5>
-                                            <p>Опыт работы в Agile/Scrum командах</p>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1079,6 +1129,9 @@
             
             // Загружаем портфолио
             loadPortfolioFromStorage();
+            
+            // Загружаем достижения
+            loadAchievements();
         }
 
         // Функция для загрузки аватарки с компьютера
@@ -1101,6 +1154,95 @@
             } else {
                 showNotification('Пожалуйста, выберите изображение!', 'danger');
             }
+        }
+
+        // Функции для управления достижениями
+        let achievementCounter = 2; // Начинаем с 2, так как у нас уже есть 0 и 1
+
+        function addAchievement() {
+            const achievementsRow = document.getElementById('achievements-row');
+            const newIndex = achievementCounter++;
+            
+            const achievementCol = document.createElement('div');
+            achievementCol.className = 'col-md-6 mb-4 achievement-item';
+            achievementCol.innerHTML = `
+                <div class="skill-item editable" data-field="achievement_${newIndex}_title" style="position: relative;">
+                    <div class="achievement-controls">
+                        <button class="btn btn-sm btn-danger" onclick="deleteAchievement(${newIndex})" title="Удалить достижение">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <i class="fas fa-star"></i>
+                    <h5 class="editable" data-field="achievement_${newIndex}_title">Новое достижение</h5>
+                    <p class="editable" data-field="achievement_${newIndex}_desc">Описание достижения</p>
+                </div>
+            `;
+            
+            achievementsRow.appendChild(achievementCol);
+            showNotification('Новое достижение добавлено!');
+        }
+
+        function deleteAchievement(index) {
+            if (confirm('Вы уверены, что хотите удалить это достижение?')) {
+                const achievementItems = document.querySelectorAll('.achievement-item');
+                achievementItems.forEach(item => {
+                    const titleElement = item.querySelector('[data-field*="achievement_"]');
+                    if (titleElement && titleElement.getAttribute('data-field') === `achievement_${index}_title`) {
+                        item.remove();
+                        showNotification('Достижение удалено!');
+                        return;
+                    }
+                });
+            }
+        }
+
+        function loadAchievements() {
+            const savedAchievements = localStorage.getItem('achievements');
+            if (savedAchievements) {
+                const achievements = JSON.parse(savedAchievements);
+                const achievementsRow = document.getElementById('achievements-row');
+                achievementsRow.innerHTML = '';
+                
+                achievements.forEach((achievement, index) => {
+                    const achievementCol = document.createElement('div');
+                    achievementCol.className = 'col-md-6 mb-4 achievement-item';
+                    achievementCol.innerHTML = `
+                        <div class="skill-item editable" data-field="achievement_${index}_title" style="position: relative;">
+                            <div class="achievement-controls">
+                                <button class="btn btn-sm btn-danger" onclick="deleteAchievement(${index})" title="Удалить достижение">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <i class="fas fa-${achievement.icon || 'star'}"></i>
+                            <h5 class="editable" data-field="achievement_${index}_title">${achievement.title}</h5>
+                            <p class="editable" data-field="achievement_${index}_desc">${achievement.description}</p>
+                        </div>
+                    `;
+                    achievementsRow.appendChild(achievementCol);
+                });
+                
+                achievementCounter = achievements.length;
+            }
+        }
+
+        function saveAchievements() {
+            const achievementItems = document.querySelectorAll('.achievement-item');
+            const achievements = [];
+            
+            achievementItems.forEach((item, index) => {
+                const titleElement = item.querySelector(`[data-field="achievement_${index}_title"]`);
+                const descElement = item.querySelector(`[data-field="achievement_${index}_desc"]`);
+                
+                if (titleElement && descElement) {
+                    achievements.push({
+                        title: titleElement.textContent.trim(),
+                        description: descElement.textContent.trim(),
+                        icon: 'star'
+                    });
+                }
+            });
+            
+            localStorage.setItem('achievements', JSON.stringify(achievements));
         }
 
         // Загрузка портфолио из localStorage
@@ -1229,6 +1371,10 @@
             };
             
             localStorage.setItem('mainPageContent', JSON.stringify(content));
+            
+            // Сохраняем достижения отдельно
+            saveAchievements();
+            
             showNotification('Все изменения сохранены!');
         }
 
