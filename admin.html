@@ -830,7 +830,8 @@
                 </div>
                 <div class="col-lg-6">
                     <div class="hero-image text-center float-animation">
-                        <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="img-fluid">
+                        <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="img-fluid" style="cursor: pointer;" title="Нажмите для изменения аватарки">
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
                     </div>
                 </div>
             </div>
@@ -1078,6 +1079,28 @@
             
             // Загружаем портфолио
             loadPortfolioFromStorage();
+        }
+
+        // Функция для загрузки аватарки с компьютера
+        function handleAvatarUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageData = e.target.result;
+                    
+                    // Сохраняем в localStorage
+                    localStorage.setItem('avatar_url', imageData);
+                    
+                    // Обновляем аватарку на текущей странице
+                    document.getElementById('hero-avatar').src = imageData;
+                    
+                    showNotification('Аватарка успешно обновлена!');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                showNotification('Пожалуйста, выберите изображение!', 'danger');
+            }
         }
 
         // Загрузка портфолио из localStorage
@@ -1371,6 +1394,20 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненный контент
             loadSavedContent();
+            
+            // Добавляем обработчики для загрузки аватарки
+            const avatarImg = document.getElementById('hero-avatar');
+            const avatarUpload = document.getElementById('avatar-upload');
+            
+            if (avatarImg && avatarUpload) {
+                // Клик на аватарку открывает выбор файла
+                avatarImg.addEventListener('click', function() {
+                    avatarUpload.click();
+                });
+                
+                // Обработка выбора файла
+                avatarUpload.addEventListener('change', handleAvatarUpload);
+            }
             
             // Анимации при прокрутке
             const elementsToAnimate = document.querySelectorAll('.fade-in-up');
