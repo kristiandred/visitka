@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админ-панель</title>
+    <title>Мой Сайт-Визитка</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -97,7 +97,6 @@
             display: flex;
             align-items: center;
         }
-
 
         .hero-section .row {
             --bs-gutter-x: -20rem;
@@ -648,13 +647,121 @@
             border-radius: 5px;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-green);
-            border-radius: 5px;
+        /* Стили для редактируемых элементов (скрытые в обычном режиме) */
+        .editable {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .hero-section .row {
-            --bs-gutter-x: -20rem;
+        .editable::after {
+            content: '✎';
+            position: absolute;
+            top: -5px;
+            right: -20px;
+            font-size: 12px;
+            color: var(--primary-green);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .editable:hover::after {
+            opacity: 1;
+        }
+
+        .editable:hover {
+            outline: 2px solid rgba(46, 204, 113, 0.3);
+            border-radius: 4px;
+        }
+
+        .editing {
+            background: var(--text-lighter) !important;
+            color: var(--dark-gray) !important;
+            outline: 2px solid var(--primary-green) !important;
+            z-index: 1000;
+            position: relative;
+        }
+
+        /* Админ-кнопка (показывается только в админ-панели) */
+        .admin-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary-green);
+            color: var(--dark-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+            transition: all 0.3s ease;
+            border: none;
+            z-index: 9999;
+        }
+
+        .admin-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-green);
+        }
+
+        /* Модальные окна */
+        .modal-content {
+            background: var(--light-gray);
+            color: var(--text-light);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .modal-footer {
+            border-top: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .form-control-admin {
+            background: var(--medium-gray);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            color: var(--text-light);
+        }
+
+        .form-control-admin:focus {
+            background: var(--medium-gray);
+            border-color: var(--primary-green);
+            color: var(--text-light);
+            box-shadow: 0 0 0 0.25rem rgba(46, 204, 113, 0.25);
+        }
+
+        /* Уведомления */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            background: var(--light-gray);
+            color: var(--text-light);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            border-left: 4px solid var(--primary-green);
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Кнопки управления на карточках портфолио */
+        .portfolio-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .photo-card:hover .portfolio-controls {
+            opacity: 1;
         }
 
         /* Вернуть стандартный порядок для мобильных */
@@ -692,8 +799,285 @@
                 margin: 0 !important;
             }
         }
-
     </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-code me-2"></i>Портфолио
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Главная</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">О себе</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#portfolio">Портфолио</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Контакты</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Главный экран -->
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <h1 id="hero-title" class="hero-title mb-4 editable" data-field="hero-title">
+                            Иван Петров
+                        </h1>
+                        <p id="hero-description" class="hero-subtitle mb-4 editable" data-field="hero-description">
+                            Full Stack разработчик и UI/UX дизайнер
+                        </p>
+                        <div class="hero-buttons">
+                            <a href="#about" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-user-circle me-2"></i>Узнать больше
+                            </a>
+                            <a href="#contact" class="btn btn-outline-light btn-lg">
+                                <i class="fas fa-envelope me-2"></i>Связаться
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-image text-center float-animation">
+                        <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- О себе -->
+    <section id="about" class="py-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2 class="section-title">О себе</h2>
+                    <div class="about-content">
+                        <p id="about-text" class="lead text-center mb-5 editable" data-field="about_text">
+                            Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
+                            Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
+                            Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
+                        </p>
+                        <div class="row mt-4">
+                            <div class="col-md-4 mb-4">
+                                <div class="skill-item">
+                                    <i class="fab fa-js-square"></i>
+                                    <h5>JavaScript</h5>
+                                    <p>React, Vue, Node.js, Express</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="skill-item">
+                                    <i class="fab fa-python"></i>
+                                    <h5>Python</h5>
+                                    <p>Django, Flask, Data Science</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-4">
+                                <div class="skill-item">
+                                    <i class="fas fa-database"></i>
+                                    <h5>Базы данных</h5>
+                                    <p>MySQL, PostgreSQL, MongoDB</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-5">
+                            <div class="col-12">
+                                <h4 class="text-center mb-4">Ключевые возможности и достижения</h4>
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <div class="skill-item">
+                                            <i class="fas fa-medal"></i>
+                                            <h5>Более 50 проектов</h5>
+                                            <p>Успешно завершенных и запущенных</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <div class="skill-item">
+                                            <i class="fas fa-users"></i>
+                                            <h5>Командная работа</h5>
+                                            <p>Опыт работы в Agile/Scrum командах</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Портфолио с фотографиями -->
+    <section id="portfolio" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center">Портфолио</h2>
+            <div class="portfolio-filter">
+                <button class="filter-btn active" data-filter="all">Все работы</button>
+                <button class="filter-btn" data-filter="web">Веб-разработка</button>
+                <button class="filter-btn" data-filter="mobile">Мобильная разработка</button>
+                <button class="filter-btn" data-filter="design">Дизайн</button>
+            </div>
+            <div class="row" id="photos-gallery">
+                <!-- Проекты будут загружены динамически -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Контакты -->
+    <section id="contact" class="py-5">
+        <div class="container">
+            <h2 class="section-title text-center">Контакты</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <strong>Email:</strong>
+                            <a id="contact-email" href="mailto:ivan.petrov@example.com" class="editable" data-field="contact_email">ivan.petrov@example.com</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone"></i>
+                            <strong>Телефон:</strong>
+                            <a id="contact-phone" href="tel:+79991234567" class="editable" data-field="contact_phone">+7 (999) 123-45-67</a>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <strong>Адрес:</strong>
+                            <span>Москва, Россия</span>
+                        </div>
+                        <div class="social-links">
+                            <a href="https://github.com/ivanpetrov" target="_blank" title="GitHub">
+                                <i class="fab fa-github"></i>
+                            </a>
+                            <a href="https://linkedin.com/in/ivanpetrov" target="_blank" title="LinkedIn">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                            <a href="https://telegram.me/ivanpetrov" target="_blank" title="Telegram">
+                                <i class="fab fa-telegram"></i>
+                            </a>
+                            <a href="https://instagram.com/ivanpetrov" target="_blank" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Футер -->
+    <footer class="py-4">
+        <div class="container">
+            <div class="text-center">
+                <p>&copy; 2024 Иван Петров. Все права защищены.</p>
+                <a href="index.html" class="small">
+                    <i class="fas fa-external-link-alt me-1"></i>Перейти в режим просмотра
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Админ-кнопка -->
+    <button class="admin-btn" onclick="showAdminMenu()">
+        <i class="fas fa-cog"></i>
+    </button>
+
+    <!-- Модальное окно для аватарки -->
+    <div class="modal fade" id="avatarModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Изменение аватарки</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">URL изображения</label>
+                        <input type="url" id="avatar-url" class="form-control form-control-admin" 
+                               placeholder="https://example.com/avatar.jpg" 
+                               value="https://picsum.photos/seed/profile/400/400.jpg">
+                    </div>
+                    <div class="alert alert-info mb-0">
+                        <small>
+                            <i class="fas fa-info-circle me-1"></i>
+                            Используйте прямой URL к изображению. Рекомендуемый размер: 400x400 пикселей.
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAvatar()">Сохранить</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для портфолио -->
+    <div class="modal fade" id="portfolioModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить проект в портфолио</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Название проекта</label>
+                            <input type="text" id="project-title" class="form-control form-control-admin" placeholder="Название проекта">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Категория</label>
+                            <select id="project-category" class="form-select form-control-admin">
+                                <option value="web">Веб-разработка</option>
+                                <option value="mobile">Мобильная разработка</option>
+                                <option value="design">Дизайн</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Описание проекта</label>
+                        <textarea id="project-description" class="form-control form-control-admin" rows="3" placeholder="Описание проекта"></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">URL изображения</label>
+                        <input type="url" id="project-image-url" class="form-control form-control-admin" 
+                               placeholder="https://example.com/project.jpg" 
+                               value="https://picsum.photos/seed/project/400/300.jpg">
+                        <div class="mt-2 text-center">
+                            <img id="project-preview" src="https://picsum.photos/seed/project/400/300.jpg" 
+                                 alt="Preview" class="img-fluid rounded" style="max-height: 200px;">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProject()">Добавить проект</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Эффект прокрутки для навбара
@@ -723,16 +1107,13 @@
         // Фильтрация портфолио
         document.querySelectorAll('.filter-btn').forEach(button => {
             button.addEventListener('click', function() {
-                // Удаляем активный класс у всех кнопок
                 document.querySelectorAll('.filter-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
-                
-                // Добавляем активный класс текущей кнопке
                 this.classList.add('active');
                 
                 const filter = this.getAttribute('data-filter');
-                const items = document.querySelectorAll('.photo-card').forEach(card => {
+                document.querySelectorAll('.photo-card').forEach(card => {
                     const parent = card.closest('[data-category]');
                     if (filter === 'all' || parent.getAttribute('data-category') === filter) {
                         parent.style.display = 'block';
@@ -751,103 +1132,138 @@
             });
         });
 
-        // Анимация при прокрутке
-        function animateOnScroll() {
-            const elements = document.querySelectorAll('.fade-in-up');
-            
-            elements.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const elementBottom = element.getBoundingClientRect().bottom;
+        // Загрузка сохраненного контента
+        function loadSavedContent() {
+            const savedContent = localStorage.getItem('mainPageContent');
+            if (savedContent) {
+                const content = JSON.parse(savedContent);
                 
-                if (elementTop < window.innerHeight && elementBottom > 0) {
-                    element.style.opacity = '1';
-                    element.style.transform = 'translateY(0)';
+                // Обновляем заголовок и описание
+                if (content.site_title) {
+                    document.getElementById('hero-title').textContent = content.site_title;
+                    document.title = content.site_title;
                 }
-            });
+                
+                if (content.site_description) {
+                    document.getElementById('hero-description').textContent = content.site_description;
+                }
+                
+                if (content.about_text) {
+                    document.getElementById('about-text').textContent = content.about_text;
+                }
+                
+                if (content.contact_email) {
+                    const emailElement = document.getElementById('contact-email');
+                    emailElement.textContent = content.contact_email;
+                    emailElement.href = `mailto:${content.contact_email}`;
+                }
+                
+                if (content.contact_phone) {
+                    const phoneElement = document.getElementById('contact-phone');
+                    phoneElement.textContent = content.contact_phone;
+                    phoneElement.href = `tel:${content.contact_phone.replace(/[^\d+]/g, '')}`;
+                }
+                
+                // Загружаем пользовательские поля
+                if (content['hero-title']) {
+                    document.getElementById('hero-title').textContent = content['hero-title'];
+                }
+                
+                if (content['hero-description']) {
+                    document.getElementById('hero-description').textContent = content['hero-description'];
+                }
+            }
+            
+            // Загружаем аватарку
+            const savedAvatar = localStorage.getItem('avatar_url');
+            if (savedAvatar) {
+                document.getElementById('hero-avatar').src = savedAvatar;
+                document.getElementById('avatar-url').value = savedAvatar;
+            }
+            
+            // Загружаем портфолио
+            loadPortfolioFromStorage();
         }
 
         // Загрузка портфолио из localStorage
         function loadPortfolioFromStorage() {
-            const savedCategories = localStorage.getItem('portfolioCategories');
             const savedProjects = localStorage.getItem('portfolioProjects');
-            
-            if (savedCategories) {
-                const categories = JSON.parse(savedCategories);
-                updatePortfolioFilters(categories);
-            }
+            const gallery = document.getElementById('photos-gallery');
             
             if (savedProjects) {
                 const projects = JSON.parse(savedProjects);
                 updatePortfolioGallery(projects);
+            } else {
+                // Если нет сохраненных проектов, загружаем демо-проекты
+                const demoProjects = [
+                    {
+                        title: "E-commerce платформа",
+                        description: "Современный интернет-магазин с панелью администратора",
+                        category: "web",
+                        image: "https://picsum.photos/seed/project1/400/300.jpg"
+                    },
+                    {
+                        title: "Мобильное приложение",
+                        description: "React Native приложение для доставки еды",
+                        category: "mobile",
+                        image: "https://picsum.photos/seed/project2/400/300.jpg"
+                    },
+                    {
+                        title: "Корпоративный сайт",
+                        description: "Дизайн и разработка сайта для IT компании",
+                        category: "design",
+                        image: "https://picsum.photos/seed/project3/400/300.jpg"
+                    },
+                    {
+                        title: "SaaS платформа",
+                        description: "Облачная CRM система для малого бизнеса",
+                        category: "web",
+                        image: "https://picsum.photos/seed/project4/400/300.jpg"
+                    },
+                    {
+                        title: "Landing page",
+                        description: "Продающая страница для стартапа",
+                        category: "design",
+                        image: "https://picsum.photos/seed/project5/400/300.jpg"
+                    },
+                    {
+                        title: "Блог платформа",
+                        description: "Система управления контентом с CMS",
+                        category: "web",
+                        image: "https://picsum.photos/seed/project6/400/300.jpg"
+                    }
+                ];
+                
+                updatePortfolioGallery(demoProjects);
+                localStorage.setItem('portfolioProjects', JSON.stringify(demoProjects));
             }
         }
 
-        function updatePortfolioFilters(categories) {
-            const filterContainer = document.querySelector('.portfolio-filter');
-            if (!filterContainer) return;
-            
-            filterContainer.innerHTML = '';
-            
-            categories.forEach(category => {
-                const button = document.createElement('button');
-                button.className = 'filter-btn';
-                button.setAttribute('data-filter', category === 'Все работы' ? 'all' : category.toLowerCase().replace(' ', '-'));
-                button.textContent = category;
-                
-                if (category === 'Все работы') {
-                    button.classList.add('active');
-                }
-                
-                button.addEventListener('click', function() {
-                    // Удаляем активный класс у всех кнопок
-                    document.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    
-                    // Добавляем активный класс текущей кнопке
-                    this.classList.add('active');
-                    
-                    const filter = this.getAttribute('data-filter');
-                    const items = document.querySelectorAll('.photo-card').forEach(card => {
-                        const parent = card.closest('[data-category]');
-                        if (filter === 'all' || parent.getAttribute('data-category') === filter) {
-                            parent.style.display = 'block';
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0)';
-                            }, 100);
-                        } else {
-                            card.style.opacity = '0';
-                            card.style.transform = 'translateY(20px)';
-                            setTimeout(() => {
-                                parent.style.display = 'none';
-                            }, 300);
-                        }
-                    });
-                });
-                
-                filterContainer.appendChild(button);
-            });
-        }
-
+        // Обновление галереи портфолио
         function updatePortfolioGallery(projects) {
             const gallery = document.getElementById('photos-gallery');
-            if (!gallery) return;
-            
             gallery.innerHTML = '';
             
-            projects.forEach(project => {
+            projects.forEach((project, index) => {
+                const categoryName = getCategoryName(project.category);
+                
                 const projectCard = document.createElement('div');
                 projectCard.className = 'col-lg-4 col-md-6 mb-4';
-                projectCard.setAttribute('data-category', project.category.toLowerCase().replace(' ', '-'));
+                projectCard.setAttribute('data-category', project.category);
                 
                 projectCard.innerHTML = `
                     <div class="photo-card">
-                        <img src="${project.image}" alt="${project.title}" class="img-fluid">
+                        <div class="portfolio-controls">
+                            <button class="btn btn-sm btn-danger" onclick="deleteProject(${index})" title="Удалить проект">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                        <img src="${project.image}" alt="${project.title}" class="img-fluid" 
+                             onerror="this.src='https://picsum.photos/seed/project${index}/400/300.jpg'">
                         <div class="photo-card-body">
-                            <h5 class="photo-title">${project.title}</h5>
-                            <p class="photo-description">${project.description}</p>
-                            <span class="photo-category">${project.category}</span>
+                            <h5 class="photo-title editable" data-field="project_title_${index}">${project.title}</h5>
+                            <p class="photo-description editable" data-field="project_description_${index}">${project.description}</p>
+                            <span class="photo-category">${categoryName}</span>
                         </div>
                     </div>
                 `;
@@ -856,288 +1272,371 @@
             });
         }
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('=== ЗАГРУЗКА ADMIN.HTML ===');
+        // Получение имени категории
+        function getCategoryName(category) {
+            const categories = {
+                'web': 'Веб-разработка',
+                'mobile': 'Мобильная разработка',
+                'design': 'Дизайн'
+            };
+            return categories[category] || category;
+        }
+
+        // Открытие модального окна аватарки
+        function openAvatarModal() {
+            const modal = new bootstrap.Modal(document.getElementById('avatarModal'));
+            modal.show();
+        }
+
+        // Сохранение аватарки
+        function saveAvatar() {
+            const avatarUrl = document.getElementById('avatar-url').value;
+            if (avatarUrl) {
+                localStorage.setItem('avatar_url', avatarUrl);
+                document.getElementById('hero-avatar').src = avatarUrl;
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('avatarModal'));
+                modal.hide();
+                
+                showNotification('Аватарка успешно обновлена!');
+            }
+        }
+
+        // Открытие модального окна портфолио
+        function openPortfolioModal() {
+            const modal = new bootstrap.Modal(document.getElementById('portfolioModal'));
+            modal.show();
+        }
+
+        // Сохранение проекта
+        function saveProject() {
+            const title = document.getElementById('project-title').value;
+            const description = document.getElementById('project-description').value;
+            const category = document.getElementById('project-category').value;
+            const imageUrl = document.getElementById('project-image-url').value;
             
+            if (!title || !description || !imageUrl) {
+                showNotification('Заполните все поля!', 'danger');
+                return;
+            }
+            
+            const project = {
+                title,
+                description,
+                category,
+                image: imageUrl
+            };
+            
+            // Получаем существующие проекты
+            const savedProjects = localStorage.getItem('portfolioProjects');
+            const projects = savedProjects ? JSON.parse(savedProjects) : [];
+            
+            // Добавляем новый проект
+            projects.push(project);
+            
+            // Сохраняем обратно в localStorage
+            localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+            
+            // Обновляем галерею
+            updatePortfolioGallery(projects);
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('portfolioModal'));
+            modal.hide();
+            
+            // Очищаем форму
+            document.getElementById('project-title').value = '';
+            document.getElementById('project-description').value = '';
+            document.getElementById('project-image-url').value = 'https://picsum.photos/seed/project/400/300.jpg';
+            
+            showNotification('Проект успешно добавлен!');
+        }
+
+        // Удаление проекта
+        function deleteProject(index) {
+            if (confirm('Вы уверены, что хотите удалить этот проект?')) {
+                const savedProjects = localStorage.getItem('portfolioProjects');
+                const projects = savedProjects ? JSON.parse(savedProjects) : [];
+                
+                projects.splice(index, 1);
+                localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+                
+                updatePortfolioGallery(projects);
+                showNotification('Проект удален!');
+            }
+        }
+
+        // Показать меню администратора
+        function showAdminMenu() {
+            const actions = [
+                {name: 'Изменить аватар', icon: 'camera', action: openAvatarModal},
+                {name: 'Добавить проект', icon: 'plus', action: openPortfolioModal},
+                {name: 'Сохранить все', icon: 'save', action: saveAllContent},
+                {name: 'Перейти на сайт', icon: 'external-link-alt', action: () => window.location.href = 'index.html'}
+            ];
+            
+            // Создаем меню
+            const menu = document.createElement('div');
+            menu.className = 'admin-menu';
+            menu.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                background: var(--light-gray);
+                border: 1px solid rgba(46, 204, 113, 0.2);
+                border-radius: 8px;
+                padding: 10px;
+                z-index: 1000;
+                min-width: 200px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            `;
+            
+            actions.forEach(action => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-sm btn-light w-100 mb-2';
+                button.style.cssText = 'text-align: left;';
+                button.innerHTML = `<i class="fas fa-${action.icon} me-2"></i>${action.name}`;
+                button.onclick = () => {
+                    action.action();
+                    menu.remove();
+                };
+                menu.appendChild(button);
+            });
+            
+            // Кнопка закрытия
+            const closeBtn = document.createElement('button');
+            closeBtn.className = 'btn btn-sm btn-outline-danger w-100';
+            closeBtn.innerHTML = '<i class="fas fa-times me-2"></i>Закрыть';
+            closeBtn.onclick = () => menu.remove();
+            menu.appendChild(closeBtn);
+            
+            document.body.appendChild(menu);
+            
+            // Закрытие меню при клике вне его
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menu.contains(e.target) && !e.target.closest('.admin-btn')) {
+                        menu.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 10);
+        }
+
+        // Сохранить весь контент
+        function saveAllContent() {
+            const content = {
+                site_title: document.getElementById('hero-title').textContent,
+                site_description: document.getElementById('hero-description').textContent,
+                'hero-title': document.getElementById('hero-title').textContent,
+                'hero-description': document.getElementById('hero-description').textContent,
+                about_text: document.getElementById('about-text').textContent,
+                contact_email: document.getElementById('contact-email').textContent,
+                contact_phone: document.getElementById('contact-phone').textContent
+            };
+            
+            localStorage.setItem('mainPageContent', JSON.stringify(content));
+            showNotification('Все изменения сохранены!');
+        }
+
+        // Показать уведомление
+        function showNotification(message, type = 'success') {
+            // Удаляем старое уведомление
+            const oldNotification = document.querySelector('.notification');
+            if (oldNotification) {
+                oldNotification.remove();
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = `notification`;
+            notification.innerHTML = `
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2 text-${type === 'success' ? 'success' : 'danger'}"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Автоматически скрыть через 3 секунды
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }
+            }, 3000);
+        }
+
+        // Функции для редактирования текста
+        let currentEditing = null;
+
+        // Обработка клика на редактируемый элемент
+        document.addEventListener('click', function(e) {
+            const editable = e.target.closest('.editable');
+            if (!editable || currentEditing) return;
+            
+            startEdit(editable);
+        });
+
+        // Начало редактирования
+        function startEdit(element) {
+            if (currentEditing) {
+                cancelEdit();
+            }
+            
+            currentEditing = element;
+            const field = element.getAttribute('data-field');
+            const currentText = element.textContent;
+            
+            element.classList.add('editing');
+            
+            const input = document.createElement('textarea');
+            input.value = currentText;
+            input.style.cssText = `
+                width: 100%;
+                border: none;
+                background: transparent;
+                color: var(--dark-gray);
+                resize: vertical;
+                outline: none;
+                font-size: inherit;
+                font-family: inherit;
+                padding: 0;
+                margin: 0;
+                line-height: inherit;
+                min-height: 60px;
+            `;
+            
+            element.innerHTML = '';
+            element.appendChild(input);
+            
+            // Кнопки сохранения/отмены
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.style.cssText = 'position: absolute; top: -40px; right: 0; display: flex; gap: 8px; z-index: 1000;';
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+            saveBtn.className = 'btn btn-sm btn-success';
+            saveBtn.style.cssText = 'padding: 4px 8px;';
+            saveBtn.onclick = saveEdit;
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+            cancelBtn.className = 'btn btn-sm btn-secondary';
+            cancelBtn.style.cssText = 'padding: 4px 8px;';
+            cancelBtn.onclick = cancelEdit;
+            
+            buttonsDiv.appendChild(saveBtn);
+            buttonsDiv.appendChild(cancelBtn);
+            element.style.position = 'relative';
+            element.appendChild(buttonsDiv);
+            
+            input.focus();
+            input.select();
+            
+            // Сохранение по Enter
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    saveEdit();
+                } else if (e.key === 'Escape') {
+                    cancelEdit();
+                }
+            });
+        }
+
+        // Сохранение редактирования
+        function saveEdit() {
+            if (!currentEditing) return;
+            
+            const input = currentEditing.querySelector('textarea');
+            if (!input) return;
+            
+            const newValue = input.value;
+            const field = currentEditing.getAttribute('data-field');
+            
+            currentEditing.textContent = newValue;
+            currentEditing.classList.remove('editing');
+            currentEditing.style.position = '';
+            
+            // Сохраняем в localStorage
+            const content = localStorage.getItem('mainPageContent') || '{}';
+            const parsedContent = JSON.parse(content);
+            parsedContent[field] = newValue;
+            localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
+            
+            showNotification('Изменения сохранены!');
+            
+            currentEditing = null;
+        }
+
+        // Отмена редактирования
+        function cancelEdit() {
+            if (!currentEditing) return;
+            
+            const field = currentEditing.getAttribute('data-field');
+            const savedContent = localStorage.getItem('mainPageContent');
+            
+            if (savedContent) {
+                try {
+                    const content = JSON.parse(savedContent);
+                    const originalValue = content[field] || currentEditing.textContent;
+                    currentEditing.textContent = originalValue;
+                } catch (e) {
+                    // Если нет сохраненного значения, оставляем текущий
+                }
+            }
+            
+            currentEditing.classList.remove('editing');
+            currentEditing.style.position = '';
+            
+            currentEditing = null;
+        }
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненный контент
-            console.log('Загружаем сохраненный контент...');
             loadSavedContent();
             
-            // Загружаем портфолио
-            console.log('Загружаем портфолио...');
-            loadPortfolioFromStorage();
+            // Инициализация предпросмотра изображения проекта
+            const imagePreview = document.getElementById('project-preview');
+            const imageUrlInput = document.getElementById('project-image-url');
             
-            // Добавляем классы для анимации
-            console.log('Добавляем классы для анимации...');
-            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
-            console.log('Найдено элементов для анимации:', elementsToAnimate.length);
+            if (imageUrlInput && imagePreview) {
+                imageUrlInput.addEventListener('input', function() {
+                    imagePreview.src = this.value;
+                });
+            }
+            
+            // Анимации при прокрутке
+            const elementsToAnimate = document.querySelectorAll('.fade-in-up');
             elementsToAnimate.forEach(element => {
-                element.classList.add('fade-in-up');
                 element.style.opacity = '0';
                 element.style.transform = 'translateY(30px)';
                 element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
             });
             
-            // Запускаем анимацию при прокрутке
-            console.log('Запускаем анимацию при прокрутке...');
+            function animateOnScroll() {
+                elementsToAnimate.forEach(element => {
+                    const elementTop = element.getBoundingClientRect().top;
+                    const elementBottom = element.getBoundingClientRect().bottom;
+                    
+                    if (elementTop < window.innerHeight && elementBottom > 0) {
+                        element.style.opacity = '1';
+                        element.style.transform = 'translateY(0)';
+                    }
+                });
+            }
+            
             window.addEventListener('scroll', animateOnScroll);
             animateOnScroll();
             
-            console.log('=== ИНИЦИАЛИЗАЦИЯ ЗАВЕРШЕНА ===');
+            console.log('Админ-панель готова! Страница выглядит идентично основной.');
         });
-
-        // Загрузка сохраненного контента
-        function loadSavedContent() {
-            console.log('=== ЗАГРУЗКА СОХРАНЕННОГО КОНТЕНТА ===');
-            const savedContent = localStorage.getItem('mainPageContent');
-            console.log('Найдено сохраненного контента:', savedContent ? 'ДА' : 'НЕТ');
-            
-            if (savedContent) {
-                const content = JSON.parse(savedContent);
-                console.log('Распарсенный контент:', content);
-                
-                if (content['hero-title']) {
-                    const heroTitle = document.getElementById('hero-title');
-                    console.log('Ищем hero-title:', heroTitle ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
-                    if (heroTitle) {
-                        heroTitle.textContent = content['hero-title'];
-                        console.log('Установлен hero-title:', content['hero-title']);
-                    }
-                }
-                
-                if (content['hero-description']) {
-                    const heroDesc = document.getElementById('hero-description');
-                    console.log('Ищем hero-description:', heroDesc ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
-                    if (heroDesc) {
-                        heroDesc.textContent = content['hero-description'];
-                        console.log('Установлен hero-description:', content['hero-description']);
-                    }
-                }
-                
-                if (content.site_title) {
-                    document.title = content.site_title;
-                    const heroTitle = document.getElementById('hero-title');
-                    if (heroTitle) {
-                        heroTitle.textContent = content.site_title;
-                    }
-                }
-                
-                if (content.site_description) {
-                    const heroDesc = document.getElementById('hero-description');
-                    if (heroDesc) {
-                        heroDesc.textContent = content.site_description;
-                    }
-                }
-                
-                if (content.about_text) {
-                    const aboutElement = document.getElementById('about-text');
-                    if (aboutElement) {
-                        aboutElement.textContent = content.about_text;
-                    }
-                }
-                
-                if (content.contact_email) {
-                    const emailElement = document.getElementById('contact-email');
-                    if (emailElement) {
-                        emailElement.textContent = content.contact_email;
-                        emailElement.href = `mailto:${content.contact_email}`;
-                    }
-                }
-                
-                if (content.contact_phone) {
-                    const phoneElement = document.getElementById('contact-phone');
-                    if (phoneElement) {
-                        phoneElement.textContent = content.contact_phone;
-                        phoneElement.href = `tel:${content.contact_phone.replace(/[^\d+]/g, '')}`;
-                    }
-                }
-                
-                console.log('Контент загружен:', content);
-            } else {
-                console.log('Сохраненный контент не найден');
-            }
-            
-            // Загружаем аватарку
-            const savedAvatar = localStorage.getItem('avatar_url');
-            console.log('Ищем аватарку:', savedAvatar ? 'НАЙДЕНА' : 'НЕ НАЙДЕНА');
-            if (savedAvatar) {
-                const avatarElement = document.getElementById('hero-avatar');
-                console.log('Ищем элемент аватарки:', avatarElement ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
-                if (avatarElement) {
-                    avatarElement.src = savedAvatar;
-                    avatarElement.onerror = function() {
-                        // Если изображение не загрузилось, возвращаем стандартное
-                        console.log('Ошибка загрузки аватарки, используем стандартную');
-                        this.src = 'https://picsum.photos/seed/profile/400/400.jpg';
-                    };
-                    console.log('Аватарка загружена:', savedAvatar.substring(0, 50) + '...');
-                }
-            } else {
-                console.log('Сохраненная аватарка не найдена');
-            }
-            
-            console.log('=== ЗАГРУЗКА КОНТЕНТА ЗАВЕРШЕНА ===');
-        }
-
-        // Функции для редактирования текста
-let currentEditing = null;
-
-// Обработка клика на редактируемый элемент
-document.addEventListener('click', function(e) {
-    const editable = e.target.closest('.editable');
-    console.log('Клик по элементу:', editable ? 'РЕДАКТИРУЕМЫЙ' : 'НЕ РЕДАКТИРУЕМЫЙ');
-    if (!editable || currentEditing) {
-        console.log('Пропускаем - уже редактируем или не редактируемый элемент');
-        return;
-    }
-    
-    console.log('Начинаем редактирование элемента:', editable);
-    startEdit(editable);
-});
-
-// Начало редактирования
-function startEdit(element) {
-    if (currentEditing) {
-        cancelEdit();
-    }
-    
-    currentEditing = element;
-    const field = element.getAttribute('data-field');
-    const currentText = element.textContent;
-    
-    element.style.background = 'var(--text-lighter)';
-    element.style.border = '2px solid var(--primary-green)';
-    element.style.outline = 'none';
-    
-    const input = document.createElement('textarea');
-    input.value = currentText;
-    input.style.width = '100%';
-    input.style.border = 'none';
-    input.style.background = 'transparent';
-    input.style.color = 'var(--dark-gray)';
-    input.style.resize = 'vertical';
-    input.style.outline = 'none';
-    input.style.fontSize = window.getComputedStyle(element).fontSize;
-    input.style.fontFamily = window.getComputedStyle(element).fontFamily;
-    
-    element.innerHTML = '';
-    element.appendChild(input);
-    
-    // Кнопки сохранения/отмены
-    const buttonsDiv = document.createElement('div');
-    buttonsDiv.style.cssText = 'position: absolute; top: -40px; right: 0; display: flex; gap: 8px; z-index: 1000;';
-    
-    const saveBtn = document.createElement('button');
-    saveBtn.innerHTML = '<i class="fas fa-check"></i>';
-    saveBtn.className = 'btn btn-sm btn-success';
-    saveBtn.style.cssText = 'padding: 4px 8px;';
-    saveBtn.onclick = saveEdit;
-    
-    const cancelBtn = document.createElement('button');
-    cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
-    cancelBtn.className = 'btn btn-sm btn-secondary';
-    cancelBtn.style.cssText = 'padding: 4px 8px;';
-    cancelBtn.onclick = cancelEdit;
-    
-    buttonsDiv.appendChild(saveBtn);
-    buttonsDiv.appendChild(cancelBtn);
-    element.style.position = 'relative';
-    element.appendChild(buttonsDiv);
-    
-    input.focus();
-    input.select();
-    
-    // Сохранение по Enter
-    input.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && e.ctrlKey) {
-            saveEdit();
-        } else if (e.key === 'Escape') {
-            cancelEdit();
-        }
-    });
-}
-
-// Сохранение редактирования
-function saveEdit() {
-    console.log('=== ПОПЫТКА СОХРАНЕНИЯ ИЗМЕНЕНИЙ ===');
-    if (!currentEditing) {
-        console.log('Нечего сохранять - currentEditing = null');
-        return;
-    }
-    
-    const input = currentEditing.querySelector('textarea');
-    if (!input) {
-        console.log('Не найден textarea для сохранения');
-        return;
-    }
-    
-    const newValue = input.value;
-    const field = currentEditing.getAttribute('data-field');
-    console.log('Сохраняем поле:', field);
-    console.log('Новое значение:', newValue);
-    
-    currentEditing.textContent = newValue;
-    currentEditing.style.background = '';
-    currentEditing.style.border = '';
-    currentEditing.style.position = '';
-    
-    // Сохраняем в localStorage
-    const content = localStorage.getItem('mainPageContent') || '{}';
-    const parsedContent = JSON.parse(content);
-    parsedContent[field] = newValue;
-    localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
-    console.log('Сохранено в localStorage:', parsedContent);
-    
-    // Показываем уведомление
-    showNotification('Изменения сохранены!');
-    
-    currentEditing = null;
-    console.log('=== СОХРАНЕНИЕ ЗАВЕРШЕНО ===');
-}
-
-// Отмена редактирования
-function cancelEdit() {
-    if (!currentEditing) return;
-    
-    const field = currentEditing.getAttribute('data-field');
-    const savedContent = localStorage.getItem('mainPageContent');
-    
-    if (savedContent) {
-        try {
-            const content = JSON.parse(savedContent);
-            const originalValue = content[field] || currentEditing.textContent;
-            currentEditing.textContent = originalValue;
-        } catch (e) {
-            // Если нет сохраненного значения, оставляем текущий
-        }
-    }
-    
-    currentEditing.style.background = '';
-    currentEditing.style.border = '';
-    currentEditing.style.position = '';
-    
-    currentEditing = null;
-}
-
-// Показ уведомления
-function showNotification(message) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
-    alertDiv.style.cssText = 'top: 70px; right: 20px; z-index: 9999; min-width: 300px;';
-    alertDiv.innerHTML = `
-        <i class="fas fa-check-circle me-2"></i>
-        <strong>Успешно!</strong> ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    document.body.appendChild(alertDiv);
-    
-    setTimeout(() => {
-        if (alertDiv.parentNode) {
-            alertDiv.parentNode.removeChild(alertDiv);
-        }
-    }, 3000);
-}
-</script>
+    </script>
 </body>
 </html>
