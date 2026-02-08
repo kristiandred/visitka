@@ -858,14 +858,20 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('=== ЗАГРУЗКА ADMIN.HTML ===');
+            
             // Загружаем сохраненный контент
+            console.log('Загружаем сохраненный контент...');
             loadSavedContent();
             
             // Загружаем портфолио
+            console.log('Загружаем портфолио...');
             loadPortfolioFromStorage();
             
             // Добавляем классы для анимации
+            console.log('Добавляем классы для анимации...');
             const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
+            console.log('Найдено элементов для анимации:', elementsToAnimate.length);
             elementsToAnimate.forEach(element => {
                 element.classList.add('fade-in-up');
                 element.style.opacity = '0';
@@ -874,27 +880,38 @@
             });
             
             // Запускаем анимацию при прокрутке
+            console.log('Запускаем анимацию при прокрутке...');
             window.addEventListener('scroll', animateOnScroll);
             animateOnScroll();
+            
+            console.log('=== ИНИЦИАЛИЗАЦИЯ ЗАВЕРШЕНА ===');
         });
 
         // Загрузка сохраненного контента
         function loadSavedContent() {
+            console.log('=== ЗАГРУЗКА СОХРАНЕННОГО КОНТЕНТА ===');
             const savedContent = localStorage.getItem('mainPageContent');
+            console.log('Найдено сохраненного контента:', savedContent ? 'ДА' : 'НЕТ');
+            
             if (savedContent) {
                 const content = JSON.parse(savedContent);
+                console.log('Распарсенный контент:', content);
                 
                 if (content['hero-title']) {
                     const heroTitle = document.getElementById('hero-title');
+                    console.log('Ищем hero-title:', heroTitle ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
                     if (heroTitle) {
                         heroTitle.textContent = content['hero-title'];
+                        console.log('Установлен hero-title:', content['hero-title']);
                     }
                 }
                 
                 if (content['hero-description']) {
                     const heroDesc = document.getElementById('hero-description');
+                    console.log('Ищем hero-description:', heroDesc ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
                     if (heroDesc) {
                         heroDesc.textContent = content['hero-description'];
+                        console.log('Установлен hero-description:', content['hero-description']);
                     }
                 }
                 
@@ -943,8 +960,10 @@
             
             // Загружаем аватарку
             const savedAvatar = localStorage.getItem('avatar_url');
+            console.log('Ищем аватарку:', savedAvatar ? 'НАЙДЕНА' : 'НЕ НАЙДЕНА');
             if (savedAvatar) {
                 const avatarElement = document.getElementById('hero-avatar');
+                console.log('Ищем элемент аватарки:', avatarElement ? 'НАЙДЕН' : 'НЕ НАЙДЕН');
                 if (avatarElement) {
                     avatarElement.src = savedAvatar;
                     avatarElement.onerror = function() {
@@ -957,6 +976,8 @@
             } else {
                 console.log('Сохраненная аватарка не найдена');
             }
+            
+            console.log('=== ЗАГРУЗКА КОНТЕНТА ЗАВЕРШЕНА ===');
         }
 
         // Функции для редактирования текста
@@ -965,8 +986,13 @@ let currentEditing = null;
 // Обработка клика на редактируемый элемент
 document.addEventListener('click', function(e) {
     const editable = e.target.closest('.editable');
-    if (!editable || currentEditing) return;
+    console.log('Клик по элементу:', editable ? 'РЕДАКТИРУЕМЫЙ' : 'НЕ РЕДАКТИРУЕМЫЙ');
+    if (!editable || currentEditing) {
+        console.log('Пропускаем - уже редактируем или не редактируемый элемент');
+        return;
+    }
     
+    console.log('Начинаем редактирование элемента:', editable);
     startEdit(editable);
 });
 
@@ -1034,13 +1060,22 @@ function startEdit(element) {
 
 // Сохранение редактирования
 function saveEdit() {
-    if (!currentEditing) return;
+    console.log('=== ПОПЫТКА СОХРАНЕНИЯ ИЗМЕНЕНИЙ ===');
+    if (!currentEditing) {
+        console.log('Нечего сохранять - currentEditing = null');
+        return;
+    }
     
     const input = currentEditing.querySelector('textarea');
-    if (!input) return;
+    if (!input) {
+        console.log('Не найден textarea для сохранения');
+        return;
+    }
     
     const newValue = input.value;
     const field = currentEditing.getAttribute('data-field');
+    console.log('Сохраняем поле:', field);
+    console.log('Новое значение:', newValue);
     
     currentEditing.textContent = newValue;
     currentEditing.style.background = '';
@@ -1052,11 +1087,13 @@ function saveEdit() {
     const parsedContent = JSON.parse(content);
     parsedContent[field] = newValue;
     localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
+    console.log('Сохранено в localStorage:', parsedContent);
     
     // Показываем уведомление
     showNotification('Изменения сохранены!');
     
     currentEditing = null;
+    console.log('=== СОХРАНЕНИЕ ЗАВЕРШЕНО ===');
 }
 
 // Отмена редактирования
