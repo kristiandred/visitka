@@ -905,6 +905,9 @@
         <div class="container">
             <div class="text-center">
                 <p>&copy; 2024 Иван Петров. Все права защищены.</p>
+                <a href="index.html" class="small me-3">
+                    <i class="fas fa-user me-1"></i>Пользователь
+                </a>
                 <a href="admin.html" class="small">
                     <i class="fas fa-lock me-1"></i>Админ-панель
                 </a>
@@ -1170,9 +1173,6 @@
             
             // Загружаем портфолио
             loadPortfolioFromStorage();
-            
-            // Загружаем навыки и возможности
-            loadSkillsAndAbilities();
             
             // Добавляем классы для анимации
             const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
