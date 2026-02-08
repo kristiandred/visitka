@@ -1177,22 +1177,6 @@
             }
         }
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохраненный контент
-            loadSavedContent();
-            
-            // Загружаем портфолио
-            loadPortfolioFromStorage();
-            
-            // Загружаем навыки и возможности
-            loadSkillsAndAbilities();
-            
-            // Добавляем классы для анимации
-            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
-            elementsToAnimate.forEach(element => {
-                element.classList.add('fade-in-up');
-                element.style.opacity = '0';
                 element.style.transform = 'translateY(30px)';
                 element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
             });
