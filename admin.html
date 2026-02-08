@@ -1245,18 +1245,17 @@
             if (savedContent) {
                 const content = JSON.parse(savedContent);
                 
-                if (content.site_title) {
-                    document.title = content.site_title;
+                if (content['hero-title']) {
                     const heroTitle = document.getElementById('hero-title');
                     if (heroTitle) {
-                        heroTitle.textContent = content.site_title;
+                        heroTitle.textContent = content['hero-title'];
                     }
                 }
                 
-                if (content.site_description) {
+                if (content['hero-description']) {
                     const heroDesc = document.getElementById('hero-description');
                     if (heroDesc) {
-                        heroDesc.textContent = content.site_description;
+                        heroDesc.textContent = content['hero-description'];
                     }
                 }
                 

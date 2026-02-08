@@ -1102,6 +1102,20 @@
             if (savedContent) {
                 const content = JSON.parse(savedContent);
                 
+                if (content['hero-title']) {
+                    const heroTitle = document.getElementById('hero-title');
+                    if (heroTitle) {
+                        heroTitle.textContent = content['hero-title'];
+                    }
+                }
+                
+                if (content['hero-description']) {
+                    const heroDesc = document.getElementById('hero-description');
+                    if (heroDesc) {
+                        heroDesc.textContent = content['hero-description'];
+                    }
+                }
+                
                 if (content.site_title) {
                     document.title = content.site_title;
                     const heroTitle = document.getElementById('hero-title');
