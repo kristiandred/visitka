@@ -694,369 +694,8 @@
         }
 
     </style>
-</head>
-<body>
-    <!-- Навигация -->
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href="#home">
-                <i class="fas fa-cog me-2"></i>Админ-панель
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#home">Главная</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#about">О себе</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#portfolio">Портфолио</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#contact">Контакты</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Главный экран -->
-    <section id="home" class="hero-section">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-6">
-                    <div class="hero-content">
-                        <h1 id="hero-title" class="hero-title mb-4 editable" data-field="hero-title" style="cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease;">Иван Петров</h1>
-                        <p id="hero-description" class="hero-subtitle mb-4 editable" data-field="hero-description" style="cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease;">Full Stack разработчик и UI/UX дизайнер</p>
-                        <div class="hero-buttons">
-                            <a href="#about" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-user-circle me-2"></i>Узнать больше
-                            </a>
-                            <a href="#contact" class="btn btn-outline-light btn-lg">
-                                <i class="fas fa-envelope me-2"></i>Связаться
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="hero-image text-center float-animation">
-                        <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="img-fluid">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- О себе -->
-    <section id="about" class="py-5">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-12">
-                    <h2 class="section-title">О себе</h2>
-                    <div class="about-content">
-                        <p id="about-text" class="lead text-center mb-5">
-                            Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
-                            Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
-                            Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
-                        </p>
-                        <div class="row mt-4">
-                            <div id="skills-container" class="row">
-                                <!-- Навыки будут загружены здесь -->
-                            </div>
-                        </div>
-                        
-                        <div class="row mt-5">
-                            <div class="col-12">
-                                <h4 class="text-center mb-4">Ключевые возможности и достижения</h4>
-                                <div id="abilities-container" class="row">
-                                    <!-- Возможности будут загружены здесь -->
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Портфолио с фотографиями -->
-    <section id="portfolio" class="py-5">
-        <div class="container">
-            <h2 class="section-title text-center">Портфолио</h2>
-            <div class="portfolio-filter">
-                <button class="filter-btn active" data-filter="all">Все работы</button>
-                <button class="filter-btn" data-filter="web">Веб-разработка</button>
-                <button class="filter-btn" data-filter="mobile">Мобильная разработка</button>
-                <button class="filter-btn" data-filter="design">Дизайн</button>
-            </div>
-            <div class="row" id="photos-gallery">
-                <div class="col-lg-4 col-md-6 mb-4" data-category="web">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project1/400/300.jpg" alt="Проект 1" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">E-commerce платформа</h5>
-                            <p class="photo-description">Современный интернет-магазин с панелью администратора</p>
-                            <span class="photo-category">Веб-разработка</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="mobile">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project2/400/300.jpg" alt="Проект 2" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Мобильное приложение</h5>
-                            <p class="photo-description">React Native приложение для доставки еды</p>
-                            <span class="photo-category">Мобильная разработка</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="design">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project3/400/300.jpg" alt="Проект 3" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Корпоративный сайт</h5>
-                            <p class="photo-description">Дизайн и разработка сайта для IT компании</p>
-                            <span class="photo-category">Дизайн</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="web">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project4/400/300.jpg" alt="Проект 4" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">SaaS платформа</h5>
-                            <p class="photo-description">Облачная CRM система для малого бизнеса</p>
-                            <span class="photo-category">Веб-разработка</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="design">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project5/400/300.jpg" alt="Проект 5" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Landing page</h5>
-                            <p class="photo-description">Продающая страница для стартапа</p>
-                            <span class="photo-category">Дизайн</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="web">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project6/400/300.jpg" alt="Проект 6" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Блог платформа</h5>
-                            <p class="photo-description">Система управления контентом с CMS</p>
-                            <span class="photo-category">Веб-разработка</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Контакты -->
-    <section id="contact" class="py-5">
-        <div class="container">
-            <h2 class="section-title text-center">Контакты</h2>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <strong>Email:</strong>
-                            <a id="contact-email" href="mailto:ivan.petrov@example.com">ivan.petrov@example.com</a>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <strong>Телефон:</strong>
-                            <a id="contact-phone" href="tel:+79991234567">+7 (999) 123-45-67</a>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <strong>Адрес:</strong>
-                            <span>Москва, Россия</span>
-                        </div>
-                        <div class="social-links">
-                            <a href="https://github.com/ivanpetrov" target="_blank" title="GitHub">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://linkedin.com/in/ivanpetrov" target="_blank" title="LinkedIn">
-                                <i class="fab fa-linkedin"></i>
-                            </a>
-                            <a href="https://telegram.me/ivanpetrov" target="_blank" title="Telegram">
-                                <i class="fab fa-telegram"></i>
-                            </a>
-                            <a href="https://instagram.com/ivanpetrov" target="_blank" title="Instagram">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Футер -->
-    <footer class="py-4">
-        <div class="container">
-            <div class="text-center">
-                <p>&copy; 2024 Иван Петров. Все права защищены.</p>
-                <a href="index.html" class="small me-3">
-                    <i class="fas fa-user me-1"></i>Пользователь
-                </a>
-            </div>
-        </div>
-    </footer>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Функции для редактирования текста
-        let currentEditing = null;
-
-        // Обработка клика на редактируемый элемент
-        document.addEventListener('click', function(e) {
-            const editable = e.target.closest('.editable');
-            if (!editable || currentEditing) return;
-            
-            startEdit(editable);
-        });
-
-        // Начало редактирования
-        function startEdit(element) {
-            if (currentEditing) {
-                cancelEdit();
-            }
-            
-            currentEditing = element;
-            const field = element.getAttribute('data-field');
-            const currentText = element.textContent;
-            
-            element.style.background = 'var(--text-lighter)';
-            element.style.border = '2px solid var(--primary-green)';
-            element.style.outline = 'none';
-            
-            const input = document.createElement('textarea');
-            input.value = currentText;
-            input.style.width = '100%';
-            input.style.border = 'none';
-            input.style.background = 'transparent';
-            input.style.color = 'var(--dark-gray)';
-            input.style.resize = 'vertical';
-            input.style.outline = 'none';
-            input.style.fontSize = window.getComputedStyle(element).fontSize;
-            input.style.fontFamily = window.getComputedStyle(element).fontFamily;
-            
-            element.innerHTML = '';
-            element.appendChild(input);
-            
-            // Кнопки сохранения/отмены
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.style.cssText = 'position: absolute; top: -40px; right: 0; display: flex; gap: 8px; z-index: 1000;';
-            
-            const saveBtn = document.createElement('button');
-            saveBtn.innerHTML = '<i class="fas fa-check"></i>';
-            saveBtn.className = 'btn btn-sm btn-success';
-            saveBtn.style.cssText = 'padding: 4px 8px;';
-            saveBtn.onclick = saveEdit;
-            
-            const cancelBtn = document.createElement('button');
-            cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
-            cancelBtn.className = 'btn btn-sm btn-secondary';
-            cancelBtn.style.cssText = 'padding: 4px 8px;';
-            cancelBtn.onclick = cancelEdit;
-            
-            buttonsDiv.appendChild(saveBtn);
-            buttonsDiv.appendChild(cancelBtn);
-            element.style.position = 'relative';
-            element.appendChild(buttonsDiv);
-            
-            input.focus();
-            input.select();
-            
-            // Сохранение по Enter
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && e.ctrlKey) {
-                    saveEdit();
-                } else if (e.key === 'Escape') {
-                    cancelEdit();
-                }
-            });
-        }
-
-        // Сохранение редактирования
-        function saveEdit() {
-            if (!currentEditing) return;
-            
-            const input = currentEditing.querySelector('textarea');
-            if (!input) return;
-            
-            const newValue = input.value;
-            const field = currentEditing.getAttribute('data-field');
-            
-            currentEditing.textContent = newValue;
-            currentEditing.style.background = '';
-            currentEditing.style.border = '';
-            currentEditing.style.position = '';
-            
-            // Сохраняем в localStorage
-            const content = localStorage.getItem('mainPageContent') || '{}';
-            const parsedContent = JSON.parse(content);
-            parsedContent[field] = newValue;
-            localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
-            
-            // Показываем уведомление
-            showNotification('Изменения сохранены!');
-            
-            currentEditing = null;
-        }
-
-        // Отмена редактирования
-        function cancelEdit() {
-            if (!currentEditing) return;
-            
-            const field = currentEditing.getAttribute('data-field');
-            const savedContent = localStorage.getItem('mainPageContent');
-            
-            if (savedContent) {
-                try {
-                    const content = JSON.parse(savedContent);
-                    const originalValue = content[field] || currentEditing.textContent;
-                    currentEditing.textContent = originalValue;
-                } catch (e) {
-                    // Если нет сохраненного значения, оставляем текущий
-                }
-            }
-            
-            currentEditing.style.background = '';
-            currentEditing.style.border = '';
-            currentEditing.style.position = '';
-            
-            currentEditing = null;
-        }
-
-        // Показ уведомления
-        function showNotification(message) {
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
-            alertDiv.style.cssText = 'top: 70px; right: 20px; z-index: 9999; min-width: 300px;';
-            alertDiv.innerHTML = `
-                <i class="fas fa-check-circle me-2"></i>
-                <strong>Успешно!</strong> ${message}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            `;
-            document.body.appendChild(alertDiv);
-            
-            setTimeout(() => {
-                if (alertDiv.parentNode) {
-                    alertDiv.parentNode.removeChild(alertDiv);
-                }
-            }, 3000);
-        }
-
         // Эффект прокрутки для навбара
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('.navbar');
@@ -1259,6 +898,21 @@
                     }
                 }
                 
+                if (content.site_title) {
+                    document.title = content.site_title;
+                    const heroTitle = document.getElementById('hero-title');
+                    if (heroTitle) {
+                        heroTitle.textContent = content.site_title;
+                    }
+                }
+                
+                if (content.site_description) {
+                    const heroDesc = document.getElementById('hero-description');
+                    if (heroDesc) {
+                        heroDesc.textContent = content.site_description;
+                    }
+                }
+                
                 if (content.about_text) {
                     const aboutElement = document.getElementById('about-text');
                     if (aboutElement) {
@@ -1305,27 +959,145 @@
             }
         }
 
-        // Инициализация
-        document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохраненный контент
-            loadSavedContent();
-            
-            // Загружаем портфолио
-            loadPortfolioFromStorage();
-            
-            // Добавляем классы для анимации
-            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
-            elementsToAnimate.forEach(element => {
-                element.classList.add('fade-in-up');
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(30px)';
-                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            });
-            
-            // Запускаем анимацию при прокрутке
-            window.addEventListener('scroll', animateOnScroll);
-            animateOnScroll();
-        });
-    </script>
-</body>
-</html>
+        // Функции для редактирования текста
+let currentEditing = null;
+
+// Обработка клика на редактируемый элемент
+document.addEventListener('click', function(e) {
+    const editable = e.target.closest('.editable');
+    if (!editable || currentEditing) return;
+    
+    startEdit(editable);
+});
+
+// Начало редактирования
+function startEdit(element) {
+    if (currentEditing) {
+        cancelEdit();
+    }
+    
+    currentEditing = element;
+    const field = element.getAttribute('data-field');
+    const currentText = element.textContent;
+    
+    element.style.background = 'var(--text-lighter)';
+    element.style.border = '2px solid var(--primary-green)';
+    element.style.outline = 'none';
+    
+    const input = document.createElement('textarea');
+    input.value = currentText;
+    input.style.width = '100%';
+    input.style.border = 'none';
+    input.style.background = 'transparent';
+    input.style.color = 'var(--dark-gray)';
+    input.style.resize = 'vertical';
+    input.style.outline = 'none';
+    input.style.fontSize = window.getComputedStyle(element).fontSize;
+    input.style.fontFamily = window.getComputedStyle(element).fontFamily;
+    
+    element.innerHTML = '';
+    element.appendChild(input);
+    
+    // Кнопки сохранения/отмены
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.style.cssText = 'position: absolute; top: -40px; right: 0; display: flex; gap: 8px; z-index: 1000;';
+    
+    const saveBtn = document.createElement('button');
+    saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+    saveBtn.className = 'btn btn-sm btn-success';
+    saveBtn.style.cssText = 'padding: 4px 8px;';
+    saveBtn.onclick = saveEdit;
+    
+    const cancelBtn = document.createElement('button');
+    cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+    cancelBtn.className = 'btn btn-sm btn-secondary';
+    cancelBtn.style.cssText = 'padding: 4px 8px;';
+    cancelBtn.onclick = cancelEdit;
+    
+    buttonsDiv.appendChild(saveBtn);
+    buttonsDiv.appendChild(cancelBtn);
+    element.style.position = 'relative';
+    element.appendChild(buttonsDiv);
+    
+    input.focus();
+    input.select();
+    
+    // Сохранение по Enter
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && e.ctrlKey) {
+            saveEdit();
+        } else if (e.key === 'Escape') {
+            cancelEdit();
+        }
+    });
+}
+
+// Сохранение редактирования
+function saveEdit() {
+    if (!currentEditing) return;
+    
+    const input = currentEditing.querySelector('textarea');
+    if (!input) return;
+    
+    const newValue = input.value;
+    const field = currentEditing.getAttribute('data-field');
+    
+    currentEditing.textContent = newValue;
+    currentEditing.style.background = '';
+    currentEditing.style.border = '';
+    currentEditing.style.position = '';
+    
+    // Сохраняем в localStorage
+    const content = localStorage.getItem('mainPageContent') || '{}';
+    const parsedContent = JSON.parse(content);
+    parsedContent[field] = newValue;
+    localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
+    
+    // Показываем уведомление
+    showNotification('Изменения сохранены!');
+    
+    currentEditing = null;
+}
+
+// Отмена редактирования
+function cancelEdit() {
+    if (!currentEditing) return;
+    
+    const field = currentEditing.getAttribute('data-field');
+    const savedContent = localStorage.getItem('mainPageContent');
+    
+    if (savedContent) {
+        try {
+            const content = JSON.parse(savedContent);
+            const originalValue = content[field] || currentEditing.textContent;
+            currentEditing.textContent = originalValue;
+        } catch (e) {
+            // Если нет сохраненного значения, оставляем текущий
+        }
+    }
+    
+    currentEditing.style.background = '';
+    currentEditing.style.border = '';
+    currentEditing.style.position = '';
+    
+    currentEditing = null;
+}
+
+// Показ уведомления
+function showNotification(message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+    alertDiv.style.cssText = 'top: 70px; right: 20px; z-index: 9999; min-width: 300px;';
+    alertDiv.innerHTML = `
+        <i class="fas fa-check-circle me-2"></i>
+        <strong>Успешно!</strong> ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+    document.body.appendChild(alertDiv);
+    
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.parentNode.removeChild(alertDiv);
+        }
+    }, 3000);
+}
