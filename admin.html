@@ -730,8 +730,8 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <div class="hero-content">
-                        <h1 id="hero-title" class="hero-title mb-4">Иван Петров</h1>
-                        <p id="hero-description" class="hero-subtitle mb-4">Full Stack разработчик и UI/UX дизайнер</p>
+                        <h1 id="hero-title" class="hero-title mb-4 editable" data-field="hero-title" style="cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease;">Иван Петров</h1>
+                        <p id="hero-description" class="hero-subtitle mb-4 editable" data-field="hero-description" style="cursor: pointer; padding: 8px; border-radius: 8px; transition: all 0.3s ease;">Full Stack разработчик и UI/UX дизайнер</p>
                         <div class="hero-buttons">
                             <a href="#about" class="btn btn-primary btn-lg me-3">
                                 <i class="fas fa-user-circle me-2"></i>Узнать больше
@@ -908,15 +908,155 @@
                 <a href="index.html" class="small me-3">
                     <i class="fas fa-user me-1"></i>Пользователь
                 </a>
-                <a href="admin.html" class="small">
-                    <i class="fas fa-lock me-1"></i>Админ-панель
-                </a>
             </div>
         </div>
     </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // Функции для редактирования текста
+        let currentEditing = null;
+
+        // Обработка клика на редактируемый элемент
+        document.addEventListener('click', function(e) {
+            const editable = e.target.closest('.editable');
+            if (!editable || currentEditing) return;
+            
+            startEdit(editable);
+        });
+
+        // Начало редактирования
+        function startEdit(element) {
+            if (currentEditing) {
+                cancelEdit();
+            }
+            
+            currentEditing = element;
+            const field = element.getAttribute('data-field');
+            const currentText = element.textContent;
+            
+            element.style.background = 'var(--text-lighter)';
+            element.style.border = '2px solid var(--primary-green)';
+            element.style.outline = 'none';
+            
+            const input = document.createElement('textarea');
+            input.value = currentText;
+            input.style.width = '100%';
+            input.style.border = 'none';
+            input.style.background = 'transparent';
+            input.style.color = 'var(--dark-gray)';
+            input.style.resize = 'vertical';
+            input.style.outline = 'none';
+            input.style.fontSize = window.getComputedStyle(element).fontSize;
+            input.style.fontFamily = window.getComputedStyle(element).fontFamily;
+            
+            element.innerHTML = '';
+            element.appendChild(input);
+            
+            // Кнопки сохранения/отмены
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.style.cssText = 'position: absolute; top: -40px; right: 0; display: flex; gap: 8px; z-index: 1000;';
+            
+            const saveBtn = document.createElement('button');
+            saveBtn.innerHTML = '<i class="fas fa-check"></i>';
+            saveBtn.className = 'btn btn-sm btn-success';
+            saveBtn.style.cssText = 'padding: 4px 8px;';
+            saveBtn.onclick = saveEdit;
+            
+            const cancelBtn = document.createElement('button');
+            cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
+            cancelBtn.className = 'btn btn-sm btn-secondary';
+            cancelBtn.style.cssText = 'padding: 4px 8px;';
+            cancelBtn.onclick = cancelEdit;
+            
+            buttonsDiv.appendChild(saveBtn);
+            buttonsDiv.appendChild(cancelBtn);
+            element.style.position = 'relative';
+            element.appendChild(buttonsDiv);
+            
+            input.focus();
+            input.select();
+            
+            // Сохранение по Enter
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && e.ctrlKey) {
+                    saveEdit();
+                } else if (e.key === 'Escape') {
+                    cancelEdit();
+                }
+            });
+        }
+
+        // Сохранение редактирования
+        function saveEdit() {
+            if (!currentEditing) return;
+            
+            const input = currentEditing.querySelector('textarea');
+            if (!input) return;
+            
+            const newValue = input.value;
+            const field = currentEditing.getAttribute('data-field');
+            
+            currentEditing.textContent = newValue;
+            currentEditing.style.background = '';
+            currentEditing.style.border = '';
+            currentEditing.style.position = '';
+            
+            // Сохраняем в localStorage
+            const content = localStorage.getItem('mainPageContent') || '{}';
+            const parsedContent = JSON.parse(content);
+            parsedContent[field] = newValue;
+            localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
+            
+            // Показываем уведомление
+            showNotification('Изменения сохранены!');
+            
+            currentEditing = null;
+        }
+
+        // Отмена редактирования
+        function cancelEdit() {
+            if (!currentEditing) return;
+            
+            const field = currentEditing.getAttribute('data-field');
+            const savedContent = localStorage.getItem('mainPageContent');
+            
+            if (savedContent) {
+                try {
+                    const content = JSON.parse(savedContent);
+                    const originalValue = content[field] || currentEditing.textContent;
+                    currentEditing.textContent = originalValue;
+                } catch (e) {
+                    // Если нет сохраненного значения, оставляем текущий
+                }
+            }
+            
+            currentEditing.style.background = '';
+            currentEditing.style.border = '';
+            currentEditing.style.position = '';
+            
+            currentEditing = null;
+        }
+
+        // Показ уведомления
+        function showNotification(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show position-fixed';
+            alertDiv.style.cssText = 'top: 70px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Успешно!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.parentNode.removeChild(alertDiv);
+                }
+            }, 3000);
+        }
+
         // Эффект прокрутки для навбара
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('.navbar');
