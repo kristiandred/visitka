@@ -1198,6 +1198,53 @@
         </div>
     </div>
 
+    <!-- Модальное окно для редактирования проекта -->
+    <div class="modal fade" id="editProjectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать проект</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editProjectForm">
+                        <div class="mb-3">
+                            <label for="projectTitle" class="form-label">Название проекта</label>
+                            <input type="text" class="form-control" id="projectTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectDescription" class="form-label">Описание проекта</label>
+                            <textarea class="form-control" id="projectDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectCategory" class="form-label">Категория</label>
+                            <select class="form-select" id="projectCategory">
+                                <!-- Категории будут загружены динамически -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectImage" class="form-label">URL изображения</label>
+                            <input type="text" class="form-control" id="projectImage" placeholder="https://example.com/image.jpg">
+                            <div class="mt-2">
+                                <input type="file" class="form-control" id="projectImageUpload" accept="image/*">
+                                <small class="text-muted">Или загрузите изображение с компьютера</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="deleteCurrentProject()">
+                        <i class="fas fa-trash me-2"></i>Удалить проект
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveProjectChanges()">
+                        <i class="fas fa-save me-2"></i>Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Контакты -->
     <section id="contact" class="py-5">
         <div class="container">
@@ -1399,6 +1446,9 @@
             
             // Загружаем навыки
             loadSkills();
+            
+            // Инициализируем категории портфолио
+            initializePortfolioCategories();
         }
 
         // Функция для загрузки аватарки с компьютера
@@ -2176,6 +2226,118 @@
             }
         }
 
+        // Редактирование проекта
+        function editProject(index) {
+            const savedProjects = localStorage.getItem('portfolioProjects');
+            const projects = savedProjects ? JSON.parse(savedProjects) : [];
+            
+            if (index < 0 || index >= projects.length) return;
+            
+            const project = projects[index];
+            currentEditingProjectIndex = index;
+            
+            // Инициализируем категории портфолио
+            initializePortfolioCategories();
+            
+            // Заполняем форму данными проекта
+            document.getElementById('projectTitle').value = project.title;
+            document.getElementById('projectDescription').value = project.description;
+            
+            // Заполняем категории
+            const categorySelect = document.getElementById('projectCategory');
+            categorySelect.innerHTML = '';
+            
+            portfolioCategories.forEach(category => {
+                if (category && category.name && category.filter) {
+                    const option = document.createElement('option');
+                    option.value = category.filter;
+                    option.textContent = category.name;
+                    
+                    // Выбираем текущую категорию проекта
+                    let projectCategoryValue = project.category;
+                    if (typeof project.category === 'object' && project.category.filter) {
+                        projectCategoryValue = project.category.filter;
+                    }
+                    
+                    if (category.filter === projectCategoryValue) {
+                        option.selected = true;
+                    }
+                    
+                    categorySelect.appendChild(option);
+                }
+            });
+            
+            document.getElementById('projectImage').value = project.image || '';
+            
+            // Обновляем заголовок модального окна
+            document.querySelector('#editProjectModal .modal-title').textContent = 'Редактировать проект';
+            
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
+            modal.show();
+        }
+
+        // Сохранение изменений проекта
+        function saveProjectChanges() {
+            if (currentEditingProjectIndex === null) return;
+            
+            const title = document.getElementById('projectTitle').value.trim();
+            const description = document.getElementById('projectDescription').value.trim();
+            const category = document.getElementById('projectCategory').value;
+            const image = document.getElementById('projectImage').value.trim();
+            
+            if (!title || !description) {
+                showNotification('Пожалуйста, заполните название и описание!', 'danger');
+                return;
+            }
+            
+            const savedProjects = localStorage.getItem('portfolioProjects');
+            const projects = savedProjects ? JSON.parse(savedProjects) : [];
+            
+            // Обновляем проект
+            projects[currentEditingProjectIndex] = {
+                title: title,
+                description: description,
+                category: category,
+                image: image || `https://picsum.photos/seed/project${currentEditingProjectIndex}/400/300.jpg`
+            };
+            
+            localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+            updatePortfolioGallery(projects);
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            currentEditingProjectIndex = null;
+            showNotification('Проект успешно обновлен!');
+        }
+
+        // Удаление текущего проекта
+        function deleteCurrentProject() {
+            if (currentEditingProjectIndex === null) return;
+            
+            if (confirm('Вы уверены, что хотите удалить этот проект?')) {
+                const savedProjects = localStorage.getItem('portfolioProjects');
+                const projects = savedProjects ? JSON.parse(savedProjects) : [];
+                
+                projects.splice(currentEditingProjectIndex, 1);
+                localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+                updatePortfolioGallery(projects);
+                
+                // Закрываем модальное окно
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
+                if (modal) {
+                    modal.hide();
+                }
+                
+                currentEditingProjectIndex = null;
+                showNotification('Проект удален!');
+            }
+        }
+
         // ============================================
         // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
         // ============================================
@@ -2356,139 +2518,56 @@
                 try {
                     const content = JSON.parse(savedContent);
                     const originalValue = content[field] || currentEditing.textContent;
-
-// ============================================
-// РЕДАКТИРОВАНИЕ ПРОЕКТОВ ПОРТФОЛИО
-// ============================================
-        
-let currentEditingProjectIndex = null;
-
-// Редактирование проекта
-function editProject(index) {
-    const savedProjects = localStorage.getItem('portfolioProjects');
-    const projects = savedProjects ? JSON.parse(savedProjects) : [];
-    
-    if (index < 0 || index >= projects.length) return;
-    
-    const project = projects[index];
-    currentEditingProjectIndex = index;
-    
-    // Инициализируем категории портфолио
-    initializePortfolioCategories();
-    
-    // Заполняем форму данными проекта
-    document.getElementById('projectTitle').value = project.title;
-    document.getElementById('projectDescription').value = project.description;
-    
-    // Заполняем категории
-    const categorySelect = document.getElementById('projectCategory');
-    categorySelect.innerHTML = '';
-    
-    portfolioCategories.forEach(category => {
-        if (category && category.name && category.filter) {
-            const option = document.createElement('option');
-            option.value = category.filter;
-            option.textContent = category.name;
-            
-            // Выбираем текущую категорию проекта
-            let projectCategoryValue = project.category;
-            if (typeof project.category === 'object' && project.category.filter) {
-                projectCategoryValue = project.category.filter;
+                    
+                    currentEditing.textContent = originalValue;
+                } catch (e) {
+                    console.error('Ошибка восстановления контента:', e);
+                }
             }
             
-            if (category.filter === projectCategoryValue) {
-                option.selected = true;
-            }
-            
-            categorySelect.appendChild(option);
+            currentEditing.classList.remove('editing');
+            currentEditing.style.position = '';
+            currentEditing = null;
         }
-    });
-    
-    document.getElementById('projectImage').value = project.image || '';
-    
-    // Обновляем заголовок модального окна
-    document.querySelector('#editProjectModal .modal-title').textContent = 'Редактировать проект';
-    
-    // Показываем модальное окно
-    const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
-    modal.show();
-}
 
-// Сохранение изменений проекта
-function saveProjectChanges() {
-    if (currentEditingProjectIndex === null) return;
-    
-    const title = document.getElementById('projectTitle').value.trim();
-    const description = document.getElementById('projectDescription').value.trim();
-    const category = document.getElementById('projectCategory').value;
-    const image = document.getElementById('projectImage').value.trim();
-    
-    if (!title || !description) {
-        showNotification('Пожалуйста, заполните название и описание!', 'danger');
-        return;
-    }
-    
-    const savedProjects = localStorage.getItem('portfolioProjects');
-    const projects = savedProjects ? JSON.parse(savedProjects) : [];
-    
-    // Обновляем проект
-    projects[currentEditingProjectIndex] = {
-        title: title,
-        description: description,
-        category: category,
-        image: image || `https://picsum.photos/seed/project${currentEditingProjectIndex}/400/300.jpg`
-    };
-    
-    localStorage.setItem('portfolioProjects', JSON.stringify(projects));
-    updatePortfolioGallery(projects);
-    
-    // Закрываем модальное окно
-    const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
-    if (modal) {
-        modal.hide();
-    }
-    
-    currentEditingProjectIndex = null;
-    showNotification('Проект успешно обновлен!');
-}
+        // ============================================
+        // ОБРАБОТКА ЗАГРУЗКИ ИЗОБРАЖЕНИЙ
+        // ============================================
 
-// Удаление текущего проекта
-function deleteCurrentProject() {
-    if (currentEditingProjectIndex === null) return;
-    
-    if (confirm('Вы уверены, что хотите удалить этот проект?')) {
-        const savedProjects = localStorage.getItem('portfolioProjects');
-        const projects = savedProjects ? JSON.parse(savedProjects) : [];
-        
-        projects.splice(currentEditingProjectIndex, 1);
-        localStorage.setItem('portfolioProjects', JSON.stringify(projects));
-        updatePortfolioGallery(projects);
-        
-        // Закрываем модальное окно
-        const modal = bootstrap.Modal.getInstance(document.getElementById('editProjectModal'));
-        if (modal) {
-            modal.hide();
-        }
-        
-        currentEditingProjectIndex = null;
-        showNotification('Проект удален!');
-    }
-}
-
-// Обработка загрузки изображения для проекта
-document.addEventListener('DOMContentLoaded', function() {
-    const imageUpload = document.getElementById('projectImageUpload');
-    if (imageUpload) {
-        imageUpload.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('projectImage').value = event.target.result;
-                    showNotification('Изображение загружено!');
-                };
-                reader.readAsDataURL(file);
+        // Обработка загрузки аватарки
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarUpload = document.getElementById('avatar-upload');
+            const heroAvatar = document.getElementById('hero-avatar');
+            
+            if (avatarUpload && heroAvatar) {
+                heroAvatar.addEventListener('click', function() {
+                    avatarUpload.click();
+                });
+                
+                avatarUpload.addEventListener('change', function(e) {
+                    handleAvatarUpload(e);
+                });
             }
+            
+            // Обработка загрузки изображения для проекта
+            const projectImageUpload = document.getElementById('projectImageUpload');
+            if (projectImageUpload) {
+                projectImageUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            document.getElementById('projectImage').value = event.target.result;
+                            showNotification('Изображение загружено!');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // Загружаем сохраненный контент при загрузке страницы
+            loadSavedContent();
         });
-    }
-});
+    </script>
+</body>
+</html>
