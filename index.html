@@ -236,18 +236,22 @@
             margin-bottom: 0.6rem;
         }
 
-        .skill-item h5 {
-            color: var(--text-lighter);
-            margin-bottom: 0.4rem;
-            font-weight: 600;
-            font-size: var(--font-size-base);
-        }
-
         .skill-item p {
             font-size: var(--font-size-sm);
             color: var(--text-light);
             opacity: 0.9;
-            margin-bottom: 0;
+            margin: 0;
+        }
+
+        /* Зеленая градиентная полоска */
+        .gradient-divider {
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(46, 204, 113, 0.1) 0%, 
+                rgba(46, 204, 113, 0.8) 50%, 
+                rgba(46, 204, 113, 0.1) 100%);
+            margin: 3rem 0;
+            border-radius: 2px;
         }
 
         /* Портфолио */
@@ -771,6 +775,8 @@
                             <!-- Достижения будут загружены здесь -->
                         </div>
                         
+                        <div class="gradient-divider"></div>
+                        
                         <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
                                 <div class="skill-item">
@@ -1195,6 +1201,9 @@
             
             // Загружаем достижения
             loadAchievements();
+            
+            // Загружаем навыки
+            loadSkills();
         }
 
         function loadAchievements() {
@@ -1232,6 +1241,54 @@
                             <i class="fas fa-users"></i>
                             <h5>Командная работа</h5>
                             <p>Опыт работы в Agile/Scrum командах</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function loadSkills() {
+            const savedSkills = localStorage.getItem('skills');
+            if (savedSkills) {
+                const skills = JSON.parse(savedSkills);
+                const skillsRow = document.getElementById('skills-row');
+                skillsRow.innerHTML = '';
+                
+                skills.forEach((skill) => {
+                    const skillCol = document.createElement('div');
+                    skillCol.className = 'col-md-4 mb-4';
+                    skillCol.innerHTML = `
+                        <div class="skill-item">
+                            <i class="${skill.icon}"></i>
+                            <h5>${skill.title}</h5>
+                            <p>${skill.description}</p>
+                        </div>
+                    `;
+                    skillsRow.appendChild(skillCol);
+                });
+            } else {
+                // Если нет сохраненных навыков, показываем стандартные
+                const skillsRow = document.getElementById('skills-row');
+                skillsRow.innerHTML = `
+                    <div class="col-md-4 mb-4">
+                        <div class="skill-item">
+                            <i class="fab fa-js-square"></i>
+                            <h5>JavaScript</h5>
+                            <p>React, Vue, Node.js, Express</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="skill-item">
+                            <i class="fab fa-python"></i>
+                            <h5>Python</h5>
+                            <p>Django, Flask, Data Science</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-4">
+                        <div class="skill-item">
+                            <i class="fas fa-database"></i>
+                            <h5>Базы данных</h5>
+                            <p>MySQL, PostgreSQL, MongoDB</p>
                         </div>
                     </div>
                 `;
