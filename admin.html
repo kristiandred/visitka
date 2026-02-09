@@ -888,6 +888,17 @@
             margin: 0;
         }
 
+        /* Зеленая градиентная полоска */
+        .gradient-divider {
+            height: 3px;
+            background: linear-gradient(90deg, 
+                rgba(46, 204, 113, 0.1) 0%, 
+                rgba(46, 204, 113, 0.8) 50%, 
+                rgba(46, 204, 113, 0.1) 100%);
+            margin: 3rem 0;
+            border-radius: 2px;
+        }
+
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -1026,6 +1037,8 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="gradient-divider"></div>
                         
                         <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
@@ -1299,6 +1312,9 @@
             
             // Загружаем достижения
             loadAchievements();
+            
+            // Загружаем навыки
+            loadSkills();
         }
 
         // Функция для загрузки аватарки с компьютера
@@ -1326,6 +1342,7 @@
         // Функции для управления достижениями
         let achievementCounter = 2; // Начинаем с 2, так как у нас уже есть 0 и 1
         let currentEditingAchievementIndex = null;
+        let currentEditingSkillIndex = null;
 
         // Создание нового достижения
         function createNewAchievement() {
@@ -1368,7 +1385,19 @@
                 return;
             }
             
-            if (currentEditingAchievementIndex === null) {
+            if (currentEditingSkillIndex !== null) {
+                // Обновляем существующий навык
+                const skillBlock = document.querySelector(`[data-skill-index="${currentEditingSkillIndex}"]`);
+                skillBlock.querySelector('.skill-icon').className = iconClass + ' skill-icon';
+                skillBlock.querySelector('.skill-icon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+                skillBlock.querySelector('.skill-title').textContent = title;
+                skillBlock.querySelector('.skill-desc').textContent = description;
+                
+                showNotification('Навык обновлен!');
+                
+                // Сохраняем навыки
+                saveAllSkills();
+            } else if (currentEditingAchievementIndex === null) {
                 // Создаем новое достижение
                 const newIndex = achievementCounter++;
                 const achievementsRow = document.getElementById('achievements-row');
@@ -1385,6 +1414,9 @@
                 
                 achievementsRow.appendChild(achievementCol);
                 showNotification('Новое достижение добавлено!');
+                
+                // Сохраняем достижения
+                saveAllAchievements();
             } else {
                 // Обновляем существующее достижение
                 const achievementBlock = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`);
@@ -1394,10 +1426,10 @@
                 achievementBlock.querySelector('.achievement-desc').textContent = description;
                 
                 showNotification('Достижение обновлено!');
+                
+                // Сохраняем достижения
+                saveAllAchievements();
             }
-            
-            // Сохраняем все достижения
-            saveAllAchievements();
             
             // Закрываем модальное окно
             const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
@@ -1470,6 +1502,10 @@
             // Меняем заголовок модального окна
             document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать навык';
             
+            // Сохраняем индекс редактируемого навыка
+            currentEditingSkillIndex = index;
+            currentEditingAchievementIndex = null;
+            
             console.log('Заполнение формы редактирования завершено');
             
             const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
@@ -1495,6 +1531,26 @@
             });
             
             localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
+        // Сохранение всех навыков в localStorage
+        function saveAllSkills() {
+            const skillBlocks = document.querySelectorAll('.skill-block');
+            const skills = [];
+            
+            skillBlocks.forEach((block) => {
+                const title = block.querySelector('.skill-title').textContent.trim();
+                const description = block.querySelector('.skill-desc').textContent.trim();
+                const iconClass = block.querySelector('.skill-icon').className.replace(' skill-icon', '');
+                
+                skills.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass
+                });
+            });
+            
+            localStorage.setItem('skills', JSON.stringify(skills));
         }
 
         function loadAchievements() {
@@ -1525,6 +1581,36 @@
                 console.log('Загружено достижений:', achievements.length);
             } else {
                 console.log('Сохраненных достижений не найдено, используем стандартные');
+            }
+        }
+
+        function loadSkills() {
+            const savedSkills = localStorage.getItem('skills');
+            console.log('Загрузка навыков из localStorage:', savedSkills);
+            
+            if (savedSkills) {
+                const skills = JSON.parse(savedSkills);
+                console.log('Парсенные навыки:', skills);
+                const skillsRow = document.getElementById('skills-row');
+                skillsRow.innerHTML = '';
+                
+                skills.forEach((skill, index) => {
+                    console.log(`Создание навыка ${index}:`, skill);
+                    const skillCol = document.createElement('div');
+                    skillCol.className = 'col-md-4 mb-4';
+                    skillCol.innerHTML = `
+                        <div class="skill-item skill-block" data-skill-index="${index}" style="position: relative; cursor: pointer;" onclick="editSkill(${index})">
+                            <i class="${skill.icon} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="skill-title">${skill.title}</h5>
+                            <p class="skill-desc">${skill.description}</p>
+                        </div>
+                    `;
+                    skillsRow.appendChild(skillCol);
+                });
+                
+                console.log('Загружено навыков:', skills.length);
+            } else {
+                console.log('Сохраненных навыков не найдено, используем стандартные');
             }
         }
 
