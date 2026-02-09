@@ -863,16 +863,6 @@
             background: var(--secondary-green) !important;
         }
 
-        /* Стили для кнопки создания навыков */
-        .add-skill-btn {
-            transition: all 0.3s ease;
-        }
-
-        .add-skill-btn:hover {
-            transform: scale(1.1);
-            background: var(--secondary-green) !important;
-        }
-
         /* Стили для блоков навыков */
         .skill-block {
             transition: all 0.3s ease;
@@ -1050,12 +1040,7 @@
                         
                         <div class="gradient-divider"></div>
                         
-                        <div style="position: relative;">
-                            <button class="add-skill-btn" onclick="createNewSkill()" title="Добавить навык" style="position: absolute; top: -50px; right: 0; background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                            
-                            <div class="row mt-4" id="skills-row">
+                        <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
                                 <div class="skill-item skill-block" data-skill-index="0" style="position: relative; cursor: pointer;" onclick="editSkill(0)">
                                     <i class="fab fa-js-square skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
