@@ -1089,10 +1089,7 @@
                 </button>
             </div>
             <div class="portfolio-filter" id="portfolio-filter">
-                <button class="filter-btn active" data-filter="all">Все работы</button>
-                <button class="filter-btn" data-filter="web">Веб-разработка</button>
-                <button class="filter-btn" data-filter="mobile">Мобильная разработка</button>
-                <button class="filter-btn" data-filter="design">Дизайн</button>
+                <!-- Фильтры будут загружены динамически -->
             </div>
             <div class="row" id="photos-gallery">
                 <!-- Проекты будут загружены динамически -->
@@ -1254,13 +1251,53 @@
             </div>
         </div>
     </footer>
-
-    
-    
     
     <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        // ============================================
+        // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ
+        // ============================================
+        
+        // Категории портфолио (гарантированно инициализированы)
+        let portfolioCategories = [
+            { name: 'Все работы', filter: 'all' },
+            { name: 'Веб-разработка', filter: 'web' },
+            { name: 'Мобильная разработка', filter: 'mobile' },
+            { name: 'Дизайн', filter: 'design' }
+        ];
+
+        // Переменные для редактирования достижений и навыков
+        let achievementCounter = 2; // Начинаем с 2, так как у нас уже есть 0 и 1
+        let currentEditingAchievementIndex = null;
+        let currentEditingSkillIndex = null;
+
+        // Коллекция иконок для достижений
+        const achievementIcons = [
+            { name: 'star', class: 'fas fa-star', title: 'Звезда' },
+            { name: 'medal', class: 'fas fa-medal', title: 'Медаль' },
+            { name: 'trophy', class: 'fas fa-trophy', title: 'Кубок' },
+            { name: 'users', class: 'fas fa-users', title: 'Команда' },
+            { name: 'code', class: 'fas fa-code', title: 'Код' },
+            { name: 'rocket', class: 'fas fa-rocket', title: 'Ракета' },
+            { name: 'lightbulb', class: 'fas fa-lightbulb', title: 'Идея' },
+            { name: 'heart', class: 'fas fa-heart', title: 'Сердце' },
+            { name: 'fire', class: 'fas fa-fire', title: 'Огонь' },
+            { name: 'gem', class: 'fas fa-gem', title: 'Драгоценность' },
+            { name: 'crown', class: 'fas fa-crown', title: 'Корона' },
+            { name: 'shield-alt', class: 'fas fa-shield-alt', title: 'Щит' },
+            { name: 'bolt', class: 'fas fa-bolt', title: 'Молния' },
+            { name: 'graduation-cap', class: 'fas fa-graduation-cap', title: 'Диплом' },
+            { name: 'certificate', class: 'fas fa-certificate', title: 'Сертификат' },
+            { name: 'award', class: 'fas fa-award', title: 'Награда' },
+            { name: 'check-circle', class: 'fas fa-check-circle', title: 'Галочка' },
+            { name: 'thumbs-up', class: 'fas fa-thumbs-up', title: 'Большой палец' }
+        ];
+
+        // ============================================
+        // ОСНОВНЫЕ ФУНКЦИИ ИНИЦИАЛИЗАЦИИ
+        // ============================================
+        
         // Эффект прокрутки для навбара
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('.navbar');
@@ -1286,17 +1323,13 @@
         });
 
         // Фильтрация портфолио
-        document.querySelectorAll('.filter-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                document.querySelectorAll('.filter-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                this.classList.add('active');
-                
-                const filter = this.getAttribute('data-filter');
-                document.querySelectorAll('.photo-card').forEach(card => {
-                    const parent = card.closest('[data-category]');
-                    if (filter === 'all' || parent.getAttribute('data-category') === filter) {
+        function filterPortfolioItems(filter) {
+            const items = document.querySelectorAll('.photo-card');
+            items.forEach(card => {
+                const parent = card.closest('[data-category]');
+                if (parent) {
+                    const category = parent.getAttribute('data-category');
+                    if (filter === 'all' || category === filter) {
                         parent.style.display = 'block';
                         setTimeout(() => {
                             card.style.opacity = '1';
@@ -1309,9 +1342,9 @@
                             parent.style.display = 'none';
                         }, 300);
                     }
-                });
+                }
             });
-        });
+        }
 
         // Загрузка сохраненного контента
         function loadSavedContent() {
@@ -1393,13 +1426,113 @@
             }
         }
 
-        // Функции для управления категориями портфолио
-        let portfolioCategories = [
-            { name: 'Все работы', filter: 'all' },
-            { name: 'Веб-разработка', filter: 'web' },
-            { name: 'Мобильная разработка', filter: 'mobile' },
-            { name: 'Дизайн', filter: 'design' }
-        ];
+        // ============================================
+        // УПРАВЛЕНИЕ КАТЕГОРИЯМИ ПОРТФОЛИО
+        // ============================================
+        
+        // Инициализация категорий портфолио
+        function initializePortfolioCategories() {
+            // Загружаем сохраненные категории или используем стандартные
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            
+            if (savedCategories) {
+                try {
+                    portfolioCategories = JSON.parse(savedCategories);
+                    
+                    // Проверяем, есть ли категория "Все работы" с фильтром 'all'
+                    const hasAllCategory = portfolioCategories.some(cat => 
+                        cat && cat.filter && cat.filter === 'all'
+                    );
+                    
+                    // Если нет категории "Все работы", добавляем ее в начало
+                    if (!hasAllCategory) {
+                        portfolioCategories.unshift({ 
+                            name: 'Все работы', 
+                            filter: 'all' 
+                        });
+                        savePortfolioCategories();
+                    }
+                } catch (e) {
+                    console.error('Ошибка загрузки категорий:', e);
+                    portfolioCategories = [
+                        { name: 'Все работы', filter: 'all' },
+                        { name: 'Веб-разработка', filter: 'web' },
+                        { name: 'Мобильная разработка', filter: 'mobile' },
+                        { name: 'Дизайн', filter: 'design' }
+                    ];
+                }
+            } else {
+                // Если нет сохраненных, используем стандартные
+                portfolioCategories = [
+                    { name: 'Все работы', filter: 'all' },
+                    { name: 'Веб-разработка', filter: 'web' },
+                    { name: 'Мобильная разработка', filter: 'mobile' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
+            }
+            
+            // Убедимся, что массив существует и является массивом
+            if (!Array.isArray(portfolioCategories)) {
+                portfolioCategories = [
+                    { name: 'Все работы', filter: 'all' },
+                    { name: 'Веб-разработка', filter: 'web' },
+                    { name: 'Мобильная разработка', filter: 'mobile' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
+            }
+            
+            // Обновляем фильтры на странице
+            updatePortfolioFilter();
+        }
+
+        // Обновить фильтры портфолио
+        function updatePortfolioFilter() {
+            const filterContainer = document.getElementById('portfolio-filter');
+            if (!filterContainer) return;
+            
+            filterContainer.innerHTML = '';
+            
+            // Убедимся, что portfolioCategories существует
+            if (!portfolioCategories || !Array.isArray(portfolioCategories) || portfolioCategories.length === 0) {
+                // Если массив пустой, добавляем стандартные категории
+                portfolioCategories = [
+                    { name: 'Все работы', filter: 'all' },
+                    { name: 'Веб-разработка', filter: 'web' },
+                    { name: 'Мобильная разработка', filter: 'mobile' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
+                savePortfolioCategories();
+            }
+            
+            portfolioCategories.forEach((category, index) => {
+                // Проверяем, что категория существует
+                if (!category || !category.name || !category.filter) {
+                    console.warn('Пропущена некорректная категория:', category);
+                    return;
+                }
+                
+                const button = document.createElement('button');
+                button.className = 'filter-btn';
+                if (index === 0) button.classList.add('active'); // Первая категория активна
+                button.setAttribute('data-filter', category.filter);
+                button.textContent = category.name;
+                
+                button.addEventListener('click', function() {
+                    // Удаляем активный класс у всех кнопок
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Добавляем активный класс текущей кнопке
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    filterPortfolioItems(filter);
+                });
+                
+                filterContainer.appendChild(button);
+            });
+        }
 
         // Открыть модальное окно управления категориями
         function openCategoriesModal() {
@@ -1411,6 +1544,8 @@
         // Загрузить категории в список
         function loadCategoriesToList() {
             const categoriesList = document.getElementById('categoriesList');
+            if (!categoriesList) return;
+            
             categoriesList.innerHTML = '';
             
             // Загружаем сохраненные категории или используем стандартные
@@ -1420,7 +1555,12 @@
                     portfolioCategories = JSON.parse(savedCategories);
                 } catch (e) {
                     console.error('Ошибка парсинга категорий:', e);
-                    portfolioCategories = [];
+                    portfolioCategories = [
+                        { name: 'Все работы', filter: 'all' },
+                        { name: 'Веб-разработка', filter: 'web' },
+                        { name: 'Мобильная разработка', filter: 'mobile' },
+                        { name: 'Дизайн', filter: 'design' }
+                    ];
                 }
             }
             
@@ -1443,8 +1583,8 @@
                 const categoryItem = document.createElement('div');
                 categoryItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                 
-                // Категорию "Все работы" нельзя удалять
-                const canDelete = category.filter !== 'all';
+                // Категорию "Все работы" нельзя удалять или редактировать
+                const isAllCategory = category.filter === 'all';
                 
                 categoryItem.innerHTML = `
                     <div>
@@ -1452,14 +1592,16 @@
                         <small class="text-muted ms-2">(${category.filter})</small>
                     </div>
                     <div>
-                        ${canDelete ? `
+                        ${!isAllCategory ? `
                             <button class="btn btn-sm btn-outline-danger me-2" onclick="deleteCategory(${index})">
                                 <i class="fas fa-trash"></i>
                             </button>
                         ` : ''}
-                        <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${index})">
-                            <i class="fas fa-edit"></i>
-                        </button>
+                        ${!isAllCategory ? `
+                            <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${index})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        ` : '<span class="text-muted small">Системная категория</span>'}
                     </div>
                 `;
                 
@@ -1514,6 +1656,7 @@
                 portfolioCategories = [];
             }
             
+            // Добавляем новую категорию (но не в начало, чтобы не заменять "Все работы")
             portfolioCategories.push(newCategory);
             savePortfolioCategories();
             
@@ -1531,6 +1674,12 @@
         function deleteCategory(index) {
             const category = portfolioCategories[index];
             
+            // Не позволяем удалить категорию "Все работы"
+            if (category.filter === 'all') {
+                showNotification('Нельзя удалить системную категорию "Все работы"!', 'danger');
+                return;
+            }
+            
             if (confirm(`Вы уверены, что хотите удалить категорию "${category.name}"?`)) {
                 portfolioCategories.splice(index, 1);
                 savePortfolioCategories();
@@ -1543,6 +1692,13 @@
         // Редактировать категорию
         function editCategory(index) {
             const category = portfolioCategories[index];
+            
+            // Не позволяем редактировать категорию "Все работы"
+            if (category.filter === 'all') {
+                showNotification('Нельзя редактировать системную категорию "Все работы"!', 'danger');
+                return;
+            }
+            
             const newName = prompt('Редактировать название категории:', category.name);
             
             if (newName !== null && newName.trim() !== '' && newName.trim() !== category.name) {
@@ -1565,64 +1721,10 @@
             localStorage.setItem('portfolioCategories', JSON.stringify(portfolioCategories));
         }
 
-        // Обновить фильтры портфолио
-        function updatePortfolioFilter() {
-            const filterContainer = document.getElementById('portfolio-filter');
-            filterContainer.innerHTML = '';
-            
-            portfolioCategories.forEach((category, index) => {
-                const button = document.createElement('button');
-                button.className = 'filter-btn';
-                if (index === 0) button.classList.add('active'); // Первая категория активна
-                button.setAttribute('data-filter', category.filter);
-                button.textContent = category.name;
-                
-                button.addEventListener('click', function() {
-                    // Удаляем активный класс у всех кнопок
-                    document.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    
-                    // Добавляем активный класс текущей кнопке
-                    this.classList.add('active');
-                    
-                    const filter = this.getAttribute('data-filter');
-                    filterPortfolioItems(filter);
-                });
-                
-                filterContainer.appendChild(button);
-            });
-        }
-
-        // Фильтрация элементов портфолио
-        function filterPortfolioItems(filter) {
-            const items = document.querySelectorAll('.photo-card');
-            items.forEach(card => {
-                const parent = card.closest('[data-category]');
-                if (parent) {
-                    const category = parent.getAttribute('data-category');
-                    if (filter === 'all' || category === filter) {
-                        parent.style.display = 'block';
-                        setTimeout(() => {
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0)';
-                        }, 100);
-                    } else {
-                        card.style.opacity = '0';
-                        card.style.transform = 'translateY(20px)';
-                        setTimeout(() => {
-                            parent.style.display = 'none';
-                        }, 300);
-                    }
-                }
-            });
-        }
-
-        // Функции для управления достижениями
-        let achievementCounter = 2; // Начинаем с 2, так как у нас уже есть 0 и 1
-        let currentEditingAchievementIndex = null;
-        let currentEditingSkillIndex = null;
-
+        // ============================================
+        // УПРАВЛЕНИЕ ДОСТИЖЕНИЯМИ И НАВЫКАМИ
+        // ============================================
+        
         // Создание нового достижения
         function createNewAchievement() {
             currentEditingAchievementIndex = null;
@@ -1635,23 +1737,6 @@
             document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
             
             document.querySelector('#editAchievementModal .modal-title').textContent = 'Создать достижение';
-            
-            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
-            modal.show();
-        }
-
-        // Создание нового навыка
-        function createNewSkill() {
-            currentEditingAchievementIndex = null;
-            currentEditingSkillIndex = null;
-            
-            document.getElementById('elementType').value = 'skill';
-            document.getElementById('achievementTitle').value = '';
-            document.getElementById('achievementDescription').value = '';
-            document.getElementById('currentIcon').className = 'fas fa-code me-3';
-            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
-            
-            document.querySelector('#editAchievementModal .modal-title').textContent = 'Создать навык';
             
             const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
             modal.show();
@@ -1675,6 +1760,38 @@
             
             document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать достижение';
             document.querySelector('#editAchievementModal .btn-danger').innerHTML = '<i class="fas fa-trash me-2"></i>Удалить достижение';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
+            modal.show();
+        }
+
+        // Редактирование навыка
+        function editSkill(index) {
+            const skillBlock = document.querySelector(`[data-skill-index="${index}"]`);
+            
+            if (!skillBlock) {
+                console.error('Блок навыка не найден!');
+                return;
+            }
+            
+            const title = skillBlock.querySelector('.skill-title').textContent;
+            const description = skillBlock.querySelector('.skill-desc').textContent;
+            const iconClass = skillBlock.querySelector('.skill-icon').className;
+            
+            // Устанавливаем тип навык
+            document.getElementById('elementType').value = 'skill';
+            document.getElementById('achievementTitle').value = title;
+            document.getElementById('achievementDescription').value = description;
+            document.getElementById('currentIcon').className = iconClass + ' me-3';
+            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            // Меняем заголовок модального окна и кнопку удаления
+            document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать навык';
+            document.querySelector('#editAchievementModal .btn-danger').innerHTML = '<i class="fas fa-trash me-2"></i>Удалить навык';
+            
+            // Сохраняем индекс редактируемого навыка
+            currentEditingSkillIndex = index;
+            currentEditingAchievementIndex = null;
             
             const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
             modal.show();
@@ -1814,46 +1931,6 @@
             }
         }
 
-        // Редактирование навыка
-        function editSkill(index) {
-            console.log('Вызвана функция editSkill с индексом:', index);
-            
-            const skillBlock = document.querySelector(`[data-skill-index="${index}"]`);
-            console.log('Найден блок навыка:', skillBlock);
-            
-            if (!skillBlock) {
-                console.error('Блок навыка не найден!');
-                return;
-            }
-            
-            const title = skillBlock.querySelector('.skill-title').textContent;
-            const description = skillBlock.querySelector('.skill-desc').textContent;
-            const iconClass = skillBlock.querySelector('.skill-icon').className;
-            
-            console.log('Данные навыка:', { title, description, iconClass });
-            
-            // Устанавливаем тип навык
-            document.getElementById('elementType').value = 'skill';
-            document.getElementById('achievementTitle').value = title;
-            document.getElementById('achievementDescription').value = description;
-            document.getElementById('currentIcon').className = iconClass + ' me-3';
-            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
-            
-            // Меняем заголовок модального окна и кнопку удаления
-            document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать навык';
-            document.querySelector('#editAchievementModal .btn-danger').innerHTML = '<i class="fas fa-trash me-2"></i>Удалить навык';
-            
-            // Сохраняем индекс редактируемого навыка
-            currentEditingSkillIndex = index;
-            currentEditingAchievementIndex = null;
-            
-            console.log('Заполнение формы редактирования завершено');
-            
-            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
-            console.log('Попытка открыть модальное окно...');
-            modal.show();
-        }
-
         // Сохранение всех достижений в localStorage
         function saveAllAchievements() {
             const achievementBlocks = document.querySelectorAll('.achievement-block');
@@ -1894,18 +1971,16 @@
             localStorage.setItem('skills', JSON.stringify(skills));
         }
 
+        // Загрузка достижений
         function loadAchievements() {
             const savedAchievements = localStorage.getItem('achievements');
-            console.log('Загрузка достижений из localStorage:', savedAchievements);
             
             if (savedAchievements) {
                 const achievements = JSON.parse(savedAchievements);
-                console.log('Парсенные достижения:', achievements);
                 const achievementsRow = document.getElementById('achievements-row');
                 achievementsRow.innerHTML = '';
                 
                 achievements.forEach((achievement, index) => {
-                    console.log(`Создание достижения ${index}:`, achievement);
                     const achievementCol = document.createElement('div');
                     achievementCol.className = 'col-md-6 mb-4 achievement-item';
                     achievementCol.innerHTML = `
@@ -1919,24 +1994,19 @@
                 });
                 
                 achievementCounter = achievements.length;
-                console.log('Загружено достижений:', achievements.length);
-            } else {
-                console.log('Сохраненных достижений не найдено, используем стандартные');
             }
         }
 
+        // Загрузка навыков
         function loadSkills() {
             const savedSkills = localStorage.getItem('skills');
-            console.log('Загрузка навыков из localStorage:', savedSkills);
             
             if (savedSkills) {
                 const skills = JSON.parse(savedSkills);
-                console.log('Парсенные навыки:', skills);
                 const skillsRow = document.getElementById('skills-row');
                 skillsRow.innerHTML = '';
                 
                 skills.forEach((skill, index) => {
-                    console.log(`Создание навыка ${index}:`, skill);
                     const skillCol = document.createElement('div');
                     skillCol.className = 'col-md-4 mb-4';
                     skillCol.innerHTML = `
@@ -1948,10 +2018,6 @@
                     `;
                     skillsRow.appendChild(skillCol);
                 });
-                
-                console.log('Загружено навыков:', skills.length);
-            } else {
-                console.log('Сохраненных навыков не найдено, используем стандартные');
             }
         }
 
@@ -2000,28 +2066,10 @@
             }
         }
 
-        // Коллекция иконок для достижений
-        const achievementIcons = [
-            { name: 'star', class: 'fas fa-star', title: 'Звезда' },
-            { name: 'medal', class: 'fas fa-medal', title: 'Медаль' },
-            { name: 'trophy', class: 'fas fa-trophy', title: 'Кубок' },
-            { name: 'users', class: 'fas fa-users', title: 'Команда' },
-            { name: 'code', class: 'fas fa-code', title: 'Код' },
-            { name: 'rocket', class: 'fas fa-rocket', title: 'Ракета' },
-            { name: 'lightbulb', class: 'fas fa-lightbulb', title: 'Идея' },
-            { name: 'heart', class: 'fas fa-heart', title: 'Сердце' },
-            { name: 'fire', class: 'fas fa-fire', title: 'Огонь' },
-            { name: 'gem', class: 'fas fa-gem', title: 'Драгоценность' },
-            { name: 'crown', class: 'fas fa-crown', title: 'Корона' },
-            { name: 'shield-alt', class: 'fas fa-shield-alt', title: 'Щит' },
-            { name: 'bolt', class: 'fas fa-bolt', title: 'Молния' },
-            { name: 'graduation-cap', class: 'fas fa-graduation-cap', title: 'Диплом' },
-            { name: 'certificate', class: 'fas fa-certificate', title: 'Сертификат' },
-            { name: 'award', class: 'fas fa-award', title: 'Награда' },
-            { name: 'check-circle', class: 'fas fa-check-circle', title: 'Галочка' },
-            { name: 'thumbs-up', class: 'fas fa-thumbs-up', title: 'Большой палец' }
-        ];
-
+        // ============================================
+        // УПРАВЛЕНИЕ ПОРТФОЛИО
+        // ============================================
+        
         // Загрузка портфолио из localStorage
         function loadPortfolioFromStorage() {
             const savedProjects = localStorage.getItem('portfolioProjects');
@@ -2117,18 +2165,7 @@
             });
         }
 
-        // Получение имени категории
-        function getCategoryName(category) {
-            const categories = {
-                'web': 'Веб-разработка',
-                'mobile': 'Мобильная разработка',
-                'design': 'Дизайн'
-            };
-            return categories[category] || category;
-        }
-
-        
-// Удаление проекта
+        // Удаление проекта
         function deleteProject(index) {
             if (confirm('Вы уверены, что хотите удалить этот проект?')) {
                 const savedProjects = localStorage.getItem('portfolioProjects');
@@ -2142,6 +2179,9 @@
             }
         }
 
+        // ============================================
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+        // ============================================
         
         // Сохранить весь контент
         function saveAllContent() {
@@ -2196,7 +2236,10 @@
             }, 3000);
         }
 
-        // Функции для редактирования текста
+        // ============================================
+        // РЕДАКТИРОВАНИЕ ТЕКСТА
+        // ============================================
+        
         let currentEditing = null;
 
         // Обработка клика на редактируемый элемент
@@ -2328,47 +2371,10 @@
             currentEditing = null;
         }
 
-        // Инициализация категорий портфолио
-        function initializePortfolioCategories() {
-            // Загружаем сохраненные категории или используем стандартные
-            const savedCategories = localStorage.getItem('portfolioCategories');
-            if (savedCategories) {
-                try {
-                    portfolioCategories = JSON.parse(savedCategories);
-                } catch (e) {
-                    console.error('Ошибка загрузки категорий:', e);
-                    portfolioCategories = [
-                        { name: 'Все работы', filter: 'all' },
-                        { name: 'Веб-разработка', filter: 'web' },
-                        { name: 'Мобильная разработка', filter: 'mobile' },
-                        { name: 'Дизайн', filter: 'design' }
-                    ];
-                }
-            } else {
-                // Если нет сохраненных, используем стандартные
-                portfolioCategories = [
-                    { name: 'Все работы', filter: 'all' },
-                    { name: 'Веб-разработка', filter: 'web' },
-                    { name: 'Мобильная разработка', filter: 'mobile' },
-                    { name: 'Дизайн', filter: 'design' }
-                ];
-            }
-            
-            // Убедимся, что массив существует
-            if (!Array.isArray(portfolioCategories)) {
-                portfolioCategories = [
-                    { name: 'Все работы', filter: 'all' },
-                    { name: 'Веб-разработка', filter: 'web' },
-                    { name: 'Мобильная разработка', filter: 'mobile' },
-                    { name: 'Дизайн', filter: 'design' }
-                ];
-            }
-            
-            // Обновляем фильтры на странице
-            updatePortfolioFilter();
-        }
-
-        // Инициализация при загрузке страницы
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+        // ============================================
+        
         document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненный контент
             loadSavedContent();
