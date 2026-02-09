@@ -863,6 +863,16 @@
             background: var(--secondary-green) !important;
         }
 
+        /* Стили для кнопки создания навыков */
+        .add-skill-btn {
+            transition: all 0.3s ease;
+        }
+
+        .add-skill-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-green) !important;
+        }
+
         /* Стили для блоков навыков */
         .skill-block {
             transition: all 0.3s ease;
@@ -1040,7 +1050,12 @@
                         
                         <div class="gradient-divider"></div>
                         
-                        <div class="row mt-4" id="skills-row">
+                        <div style="position: relative;">
+                            <button class="add-skill-btn" onclick="createNewSkill()" title="Добавить навык" style="position: absolute; top: -50px; right: 0; background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            
+                            <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
                                 <div class="skill-item skill-block" data-skill-index="0" style="position: relative; cursor: pointer;" onclick="editSkill(0)">
                                     <i class="fab fa-js-square skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
@@ -1116,11 +1131,18 @@
                 <div class="modal-body">
                     <form id="editAchievementForm">
                         <div class="mb-3">
-                            <label for="achievementTitle" class="form-label">Название достижения</label>
+                            <label for="elementType" class="form-label">Тип элемента</label>
+                            <select class="form-select" id="elementType">
+                                <option value="achievement">Достижение</option>
+                                <option value="skill">Навык</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="achievementTitle" class="form-label">Название</label>
                             <input type="text" class="form-control" id="achievementTitle" required>
                         </div>
                         <div class="mb-3">
-                            <label for="achievementDescription" class="form-label">Описание достижения</label>
+                            <label for="achievementDescription" class="form-label">Описание</label>
                             <textarea class="form-control" id="achievementDescription" rows="3" required></textarea>
                         </div>
                         <div class="mb-3">
@@ -1347,10 +1369,32 @@
         // Создание нового достижения
         function createNewAchievement() {
             currentEditingAchievementIndex = null;
+            currentEditingSkillIndex = null;
+            
+            document.getElementById('elementType').value = 'achievement';
             document.getElementById('achievementTitle').value = '';
             document.getElementById('achievementDescription').value = '';
             document.getElementById('currentIcon').className = 'fas fa-star me-3';
             document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            document.querySelector('#editAchievementModal .modal-title').textContent = 'Создать достижение';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
+            modal.show();
+        }
+
+        // Создание нового навыка
+        function createNewSkill() {
+            currentEditingAchievementIndex = null;
+            currentEditingSkillIndex = null;
+            
+            document.getElementById('elementType').value = 'skill';
+            document.getElementById('achievementTitle').value = '';
+            document.getElementById('achievementDescription').value = '';
+            document.getElementById('currentIcon').className = 'fas fa-code me-3';
+            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            document.querySelector('#editAchievementModal .modal-title').textContent = 'Создать навык';
             
             const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
             modal.show();
@@ -1359,16 +1403,20 @@
         // Редактирование достижения
         function editAchievement(index) {
             currentEditingAchievementIndex = index;
+            currentEditingSkillIndex = null;
             
             const achievementBlock = document.querySelector(`[data-achievement-index="${index}"]`);
             const title = achievementBlock.querySelector('.achievement-title').textContent;
             const description = achievementBlock.querySelector('.achievement-desc').textContent;
             const iconClass = achievementBlock.querySelector('.achievement-icon').className;
             
+            document.getElementById('elementType').value = 'achievement';
             document.getElementById('achievementTitle').value = title;
             document.getElementById('achievementDescription').value = description;
             document.getElementById('currentIcon').className = iconClass + ' me-3';
             document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать достижение';
             
             const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
             modal.show();
@@ -1379,6 +1427,7 @@
             const title = document.getElementById('achievementTitle').value.trim();
             const description = document.getElementById('achievementDescription').value.trim();
             const iconClass = document.getElementById('currentIcon').className.replace(' me-3', '');
+            const elementType = document.getElementById('elementType').value;
             
             if (!title || !description) {
                 showNotification('Пожалуйста, заполните все поля!', 'danger');
@@ -1394,30 +1443,8 @@
                 skillBlock.querySelector('.skill-desc').textContent = description;
                 
                 showNotification('Навык обновлен!');
-                
-                // Сохраняем навыки
                 saveAllSkills();
-            } else if (currentEditingAchievementIndex === null) {
-                // Создаем новое достижение
-                const newIndex = achievementCounter++;
-                const achievementsRow = document.getElementById('achievements-row');
-                
-                const achievementCol = document.createElement('div');
-                achievementCol.className = 'col-md-6 mb-4 achievement-item';
-                achievementCol.innerHTML = `
-                    <div class="skill-item achievement-block" data-achievement-index="${newIndex}" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
-                        <i class="${iconClass} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
-                        <h5 class="achievement-title">${title}</h5>
-                        <p class="achievement-desc">${description}</p>
-                    </div>
-                `;
-                
-                achievementsRow.appendChild(achievementCol);
-                showNotification('Новое достижение добавлено!');
-                
-                // Сохраняем достижения
-                saveAllAchievements();
-            } else {
+            } else if (currentEditingAchievementIndex !== null) {
                 // Обновляем существующее достижение
                 const achievementBlock = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`);
                 achievementBlock.querySelector('.achievement-icon').className = iconClass + ' achievement-icon';
@@ -1426,9 +1453,46 @@
                 achievementBlock.querySelector('.achievement-desc').textContent = description;
                 
                 showNotification('Достижение обновлено!');
-                
-                // Сохраняем достижения
                 saveAllAchievements();
+            } else {
+                // Создаем новый элемент на основе выбора типа
+                if (elementType === 'skill') {
+                    // Создаем новый навык
+                    const skillsRow = document.getElementById('skills-row');
+                    const skillIndex = skillsRow.children.length;
+                    
+                    const skillCol = document.createElement('div');
+                    skillCol.className = 'col-md-4 mb-4';
+                    skillCol.innerHTML = `
+                        <div class="skill-item skill-block" data-skill-index="${skillIndex}" style="position: relative; cursor: pointer;" onclick="editSkill(${skillIndex})">
+                            <i class="${iconClass} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="skill-title">${title}</h5>
+                            <p class="skill-desc">${description}</p>
+                        </div>
+                    `;
+                    
+                    skillsRow.appendChild(skillCol);
+                    showNotification('Новый навык добавлен!');
+                    saveAllSkills();
+                } else {
+                    // Создаем новое достижение
+                    const newIndex = achievementCounter++;
+                    const achievementsRow = document.getElementById('achievements-row');
+                    
+                    const achievementCol = document.createElement('div');
+                    achievementCol.className = 'col-md-6 mb-4 achievement-item';
+                    achievementCol.innerHTML = `
+                        <div class="skill-item achievement-block" data-achievement-index="${newIndex}" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
+                            <i class="${iconClass} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="achievement-title">${title}</h5>
+                            <p class="achievement-desc">${description}</p>
+                        </div>
+                    `;
+                    
+                    achievementsRow.appendChild(achievementCol);
+                    showNotification('Новое достижение добавлено!');
+                    saveAllAchievements();
+                }
             }
             
             // Закрываем модальное окно
@@ -1493,7 +1557,8 @@
             
             console.log('Данные навыка:', { title, description, iconClass });
             
-            // Временно используем модальное окно достижений для редактирования навыков
+            // Устанавливаем тип навык
+            document.getElementById('elementType').value = 'skill';
             document.getElementById('achievementTitle').value = title;
             document.getElementById('achievementDescription').value = description;
             document.getElementById('currentIcon').className = iconClass + ' me-3';
