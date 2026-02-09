@@ -853,6 +853,16 @@
             z-index: 1050;
         }
 
+        /* Стили для кнопки редактирования заголовка */
+        .edit-title-btn {
+            transition: all 0.3s ease;
+        }
+
+        .edit-title-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-green) !important;
+        }
+
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -964,11 +974,14 @@
                             Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
                         </p>
                         
-                        <h4 id="achievements-title" class="text-center mb-4 editable" data-field="achievements_title">Ключевые возможности и достижения</h4>
+                        <h4 id="achievements-title" class="text-center mb-4" data-field="achievements_title">Ключевые возможности и достижения</h4>
                         
                         <div style="position: relative;">
                             <button class="add-achievement-btn" onclick="createNewAchievement()" title="Добавить достижение">
                                 <i class="fas fa-plus"></i>
+                            </button>
+                            <button class="edit-title-btn" onclick="editAchievementsTitle()" title="Редактировать заголовок" style="position: absolute; top: -50px; left: 40px; background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                                <i class="fas fa-edit"></i>
                             </button>
                             
                             <div class="row mt-4" id="achievements-row">
@@ -1392,6 +1405,19 @@
             }
         }
 
+        // Редактирование заголовка достижений
+        function editAchievementsTitle() {
+            const titleElement = document.getElementById('achievements-title');
+            const currentTitle = titleElement.textContent;
+            
+            const newTitle = prompt('Редактировать заголовок достижений:', currentTitle);
+            if (newTitle !== null && newTitle.trim() !== '') {
+                titleElement.textContent = newTitle.trim();
+                showNotification('Заголовок обновлен!');
+                saveAllContent();
+            }
+        }
+
         // Сохранение всех достижений в localStorage
         function saveAllAchievements() {
             const achievementBlocks = document.querySelectorAll('.achievement-block');
@@ -1683,7 +1709,7 @@
         document.addEventListener('click', function(e) {
             // Проверяем, что кликнули именно на редактируемый элемент
             // Исключаем клики на блоки достижений и их дочерние элементы
-            if (e.target.closest('.achievement-block')) {
+            if (e.target.closest('.achievement-block') || e.target.closest('.achievement-item')) {
                 return; // Не обрабатываем клики на блоках достижений
             }
             
