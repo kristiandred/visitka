@@ -836,6 +836,23 @@
             margin: 0;
         }
 
+        /* Исправление z-index для модальных окон */
+        .modal {
+            z-index: 1050;
+        }
+
+        .modal-backdrop {
+            z-index: 1040;
+        }
+
+        #iconModal {
+            z-index: 1060;
+        }
+
+        #editAchievementModal {
+            z-index: 1050;
+        }
+
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -1397,12 +1414,16 @@
 
         function loadAchievements() {
             const savedAchievements = localStorage.getItem('achievements');
+            console.log('Загрузка достижений из localStorage:', savedAchievements);
+            
             if (savedAchievements) {
                 const achievements = JSON.parse(savedAchievements);
+                console.log('Парсенные достижения:', achievements);
                 const achievementsRow = document.getElementById('achievements-row');
                 achievementsRow.innerHTML = '';
                 
                 achievements.forEach((achievement, index) => {
+                    console.log(`Создание достижения ${index}:`, achievement);
                     const achievementCol = document.createElement('div');
                     achievementCol.className = 'col-md-6 mb-4 achievement-item';
                     achievementCol.innerHTML = `
@@ -1416,6 +1437,9 @@
                 });
                 
                 achievementCounter = achievements.length;
+                console.log('Загружено достижений:', achievements.length);
+            } else {
+                console.log('Сохраненных достижений не найдено, используем стандартные');
             }
         }
 
@@ -1451,8 +1475,11 @@
             iconElement.classList.add('selected');
 
             // Обновляем иконку в модальном окне редактирования
-            document.getElementById('currentIcon').className = iconClass + ' me-3';
-            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            const currentIconElement = document.getElementById('currentIcon');
+            currentIconElement.className = iconClass + ' me-3';
+            currentIconElement.style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            showNotification('Иконка выбрана!');
             
             // Закрываем модальное окно выбора иконок
             const modal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
@@ -1655,6 +1682,11 @@
         // Обработка клика на редактируемый элемент
         document.addEventListener('click', function(e) {
             // Проверяем, что кликнули именно на редактируемый элемент
+            // Исключаем клики на блоки достижений и их дочерние элементы
+            if (e.target.closest('.achievement-block')) {
+                return; // Не обрабатываем клики на блоках достижений
+            }
+            
             const editable = e.target.classList.contains('editable') ? e.target : e.target.closest('.editable');
             if (!editable || currentEditing) return;
             
