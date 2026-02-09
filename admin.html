@@ -811,6 +811,31 @@
             margin-top: 5px;
         }
 
+        /* Стили для блоков достижений */
+        .achievement-block {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .achievement-block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-green);
+        }
+
+        .achievement-block .achievement-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+
+        .achievement-block .achievement-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -925,33 +950,23 @@
                         <h4 id="achievements-title" class="text-center mb-4 editable" data-field="achievements_title">Ключевые возможности и достижения</h4>
                         
                         <div style="position: relative;">
-                            <button class="add-achievement-btn" onclick="addAchievement()" title="Добавить достижение">
+                            <button class="add-achievement-btn" onclick="createNewAchievement()" title="Добавить достижение">
                                 <i class="fas fa-plus"></i>
                             </button>
                             
                             <div class="row mt-4" id="achievements-row">
                                 <div class="col-md-6 mb-4 achievement-item">
-                                    <div class="skill-item editable" data-field="achievement_0_title" style="position: relative;">
-                                        <div class="achievement-controls">
-                                            <button class="btn btn-sm btn-danger" onclick="deleteAchievement(0)" title="Удалить достижение">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                        <i class="fas fa-medal achievement-icon" data-achievement-index="0" style="cursor: pointer;" title="Нажмите для изменения иконки"></i>
-                                        <h5 class="editable" data-field="achievement_0_title">Более 50 проектов</h5>
-                                        <p class="editable" data-field="achievement_0_desc">Успешно завершенных и запущенных</p>
+                                    <div class="skill-item achievement-block" data-achievement-index="0" style="position: relative; cursor: pointer;" onclick="editAchievement(0)">
+                                        <i class="fas fa-medal achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                                        <h5 class="achievement-title">Более 50 проектов</h5>
+                                        <p class="achievement-desc">Успешно завершенных и запущенных</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4 achievement-item">
-                                    <div class="skill-item editable" data-field="achievement_1_title" style="position: relative;">
-                                        <div class="achievement-controls">
-                                            <button class="btn btn-sm btn-danger" onclick="deleteAchievement(1)" title="Удалить достижение">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                        <i class="fas fa-users achievement-icon" data-achievement-index="1" style="cursor: pointer;" title="Нажмите для изменения иконки"></i>
-                                        <h5 class="editable" data-field="achievement_1_title">Командная работа</h5>
-                                        <p class="editable" data-field="achievement_1_desc">Опыт работы в Agile/Scrum командах</p>
+                                    <div class="skill-item achievement-block" data-achievement-index="1" style="position: relative; cursor: pointer;" onclick="editAchievement(1)">
+                                        <i class="fas fa-users achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                                        <h5 class="achievement-title">Командная работа</h5>
+                                        <p class="achievement-desc">Опыт работы в Agile/Scrum командах</p>
                                     </div>
                                 </div>
                             </div>
@@ -1017,6 +1032,48 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для редактирования достижения -->
+    <div class="modal fade" id="editAchievementModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать достижение</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAchievementForm">
+                        <div class="mb-3">
+                            <label for="achievementTitle" class="form-label">Название достижения</label>
+                            <input type="text" class="form-control" id="achievementTitle" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="achievementDescription" class="form-label">Описание достижения</label>
+                            <textarea class="form-control" id="achievementDescription" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Иконка</label>
+                            <div class="d-flex align-items-center">
+                                <i id="currentIcon" class="fas fa-star me-3" style="font-size: 2rem; color: var(--primary-green);"></i>
+                                <button type="button" class="btn btn-outline-primary" onclick="openIconModalFromEdit()">
+                                    <i class="fas fa-edit me-2"></i>Изменить иконку
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" onclick="deleteCurrentAchievement()">
+                        <i class="fas fa-trash me-2"></i>Удалить
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAchievementChanges()">
+                        <i class="fas fa-save me-2"></i>Сохранить
+                    </button>
                 </div>
             </div>
         </div>
@@ -1213,49 +1270,129 @@
 
         // Функции для управления достижениями
         let achievementCounter = 2; // Начинаем с 2, так как у нас уже есть 0 и 1
+        let currentEditingAchievementIndex = null;
 
-        function addAchievement() {
-            const achievementsRow = document.getElementById('achievements-row');
-            const newIndex = achievementCounter++;
+        // Создание нового достижения
+        function createNewAchievement() {
+            currentEditingAchievementIndex = null;
+            document.getElementById('achievementTitle').value = '';
+            document.getElementById('achievementDescription').value = '';
+            document.getElementById('currentIcon').className = 'fas fa-star me-3';
+            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
             
-            const achievementCol = document.createElement('div');
-            achievementCol.className = 'col-md-6 mb-4 achievement-item';
-            achievementCol.innerHTML = `
-                <div class="skill-item editable" data-field="achievement_${newIndex}_title" style="position: relative;">
-                    <div class="achievement-controls">
-                        <button class="btn btn-sm btn-danger" onclick="deleteAchievement(${newIndex})" title="Удалить достижение">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                    <i class="fas fa-star achievement-icon" data-achievement-index="${newIndex}" style="cursor: pointer;" title="Нажмите для изменения иконки"></i>
-                    <h5 class="editable" data-field="achievement_${newIndex}_title">Новое достижение</h5>
-                    <p class="editable" data-field="achievement_${newIndex}_desc">Описание достижения</p>
-                </div>
-            `;
-            
-            achievementsRow.appendChild(achievementCol);
-            
-            // Добавляем обработчик клика на иконку
-            const iconElement = achievementCol.querySelector('.achievement-icon');
-            iconElement.addEventListener('click', function() {
-                openIconModal(newIndex);
-            });
-            
-            showNotification('Новое достижение добавлено!');
+            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
+            modal.show();
         }
 
-        function deleteAchievement(index) {
-            if (confirm('Вы уверены, что хотите удалить это достижение?')) {
-                const achievementItems = document.querySelectorAll('.achievement-item');
-                achievementItems.forEach(item => {
-                    const titleElement = item.querySelector('[data-field*="achievement_"]');
-                    if (titleElement && titleElement.getAttribute('data-field') === `achievement_${index}_title`) {
-                        item.remove();
-                        showNotification('Достижение удалено!');
-                        return;
-                    }
-                });
+        // Редактирование достижения
+        function editAchievement(index) {
+            currentEditingAchievementIndex = index;
+            
+            const achievementBlock = document.querySelector(`[data-achievement-index="${index}"]`);
+            const title = achievementBlock.querySelector('.achievement-title').textContent;
+            const description = achievementBlock.querySelector('.achievement-desc').textContent;
+            const iconClass = achievementBlock.querySelector('.achievement-icon').className;
+            
+            document.getElementById('achievementTitle').value = title;
+            document.getElementById('achievementDescription').value = description;
+            document.getElementById('currentIcon').className = iconClass + ' me-3';
+            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
+            modal.show();
+        }
+
+        // Сохранение изменений достижения
+        function saveAchievementChanges() {
+            const title = document.getElementById('achievementTitle').value.trim();
+            const description = document.getElementById('achievementDescription').value.trim();
+            const iconClass = document.getElementById('currentIcon').className.replace(' me-3', '');
+            
+            if (!title || !description) {
+                showNotification('Пожалуйста, заполните все поля!', 'danger');
+                return;
             }
+            
+            if (currentEditingAchievementIndex === null) {
+                // Создаем новое достижение
+                const newIndex = achievementCounter++;
+                const achievementsRow = document.getElementById('achievements-row');
+                
+                const achievementCol = document.createElement('div');
+                achievementCol.className = 'col-md-6 mb-4 achievement-item';
+                achievementCol.innerHTML = `
+                    <div class="skill-item achievement-block" data-achievement-index="${newIndex}" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
+                        <i class="${iconClass} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                        <h5 class="achievement-title">${title}</h5>
+                        <p class="achievement-desc">${description}</p>
+                    </div>
+                `;
+                
+                achievementsRow.appendChild(achievementCol);
+                showNotification('Новое достижение добавлено!');
+            } else {
+                // Обновляем существующее достижение
+                const achievementBlock = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`);
+                achievementBlock.querySelector('.achievement-icon').className = iconClass + ' achievement-icon';
+                achievementBlock.querySelector('.achievement-icon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+                achievementBlock.querySelector('.achievement-title').textContent = title;
+                achievementBlock.querySelector('.achievement-desc').textContent = description;
+                
+                showNotification('Достижение обновлено!');
+            }
+            
+            // Сохраняем все достижения
+            saveAllAchievements();
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
+            if (modal) {
+                modal.hide();
+            }
+        }
+
+        // Удаление текущего достижения
+        function deleteCurrentAchievement() {
+            if (currentEditingAchievementIndex === null) {
+                showNotification('Нельзя удалить несуществующее достижение!', 'danger');
+                return;
+            }
+            
+            if (confirm('Вы уверены, что хотите удалить это достижение?')) {
+                const achievementItem = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`).closest('.achievement-item');
+                achievementItem.remove();
+                
+                showNotification('Достижение удалено!');
+                
+                // Сохраняем все достижения
+                saveAllAchievements();
+                
+                // Закрываем модальное окно
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            }
+        }
+
+        // Сохранение всех достижений в localStorage
+        function saveAllAchievements() {
+            const achievementBlocks = document.querySelectorAll('.achievement-block');
+            const achievements = [];
+            
+            achievementBlocks.forEach((block) => {
+                const title = block.querySelector('.achievement-title').textContent.trim();
+                const description = block.querySelector('.achievement-desc').textContent.trim();
+                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                
+                achievements.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass
+                });
+            });
+            
+            localStorage.setItem('achievements', JSON.stringify(achievements));
         }
 
         function loadAchievements() {
@@ -1269,50 +1406,59 @@
                     const achievementCol = document.createElement('div');
                     achievementCol.className = 'col-md-6 mb-4 achievement-item';
                     achievementCol.innerHTML = `
-                        <div class="skill-item editable" data-field="achievement_${index}_title" style="position: relative;">
-                            <div class="achievement-controls">
-                                <button class="btn btn-sm btn-danger" onclick="deleteAchievement(${index})" title="Удалить достижение">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                            <i class="${achievement.icon || 'fas fa-star'} achievement-icon" data-achievement-index="${index}" data-achievement-icon="${achievement.icon || 'fas fa-star'}" style="cursor: pointer;" title="Нажмите для изменения иконки"></i>
-                            <h5 class="editable" data-field="achievement_${index}_title">${achievement.title}</h5>
-                            <p class="editable" data-field="achievement_${index}_desc">${achievement.description}</p>
+                        <div class="skill-item achievement-block" data-achievement-index="${index}" style="position: relative; cursor: pointer;" onclick="editAchievement(${index})">
+                            <i class="${achievement.icon} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="achievement-title">${achievement.title}</h5>
+                            <p class="achievement-desc">${achievement.description}</p>
                         </div>
                     `;
                     achievementsRow.appendChild(achievementCol);
-                    
-                    // Добавляем обработчик клика на иконку
-                    const iconElement = achievementCol.querySelector('.achievement-icon');
-                    iconElement.addEventListener('click', function() {
-                        openIconModal(index);
-                    });
                 });
                 
                 achievementCounter = achievements.length;
             }
         }
 
-        function saveAchievements() {
-            const achievementItems = document.querySelectorAll('.achievement-item');
-            const achievements = [];
-            
-            achievementItems.forEach((item, index) => {
-                const titleElement = item.querySelector(`[data-field="achievement_${index}_title"]`);
-                const descElement = item.querySelector(`[data-field="achievement_${index}_desc"]`);
-                const iconElement = item.querySelector('.achievement-icon');
-                
-                if (titleElement && descElement) {
-                    const iconClass = iconElement ? iconElement.getAttribute('data-achievement-icon') : 'fas fa-star';
-                    achievements.push({
-                        title: titleElement.textContent.trim(),
-                        description: descElement.textContent.trim(),
-                        icon: iconClass
-                    });
-                }
+        // Открыть модальное окно выбора иконок из редактора
+        function openIconModalFromEdit() {
+            const iconGrid = document.getElementById('icon-grid');
+            iconGrid.innerHTML = '';
+
+            achievementIcons.forEach((icon, index) => {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'col-md-3 col-sm-4 col-6 mb-3';
+                iconItem.innerHTML = `
+                    <div class="icon-grid-item" data-icon="${icon.class}" onclick="selectIconFromEdit('${icon.class}', this)">
+                        <i class="${icon.class}"></i>
+                        <div class="icon-name">${icon.title}</div>
+                    </div>
+                `;
+                iconGrid.appendChild(iconItem);
             });
+
+            const modal = new bootstrap.Modal(document.getElementById('iconModal'));
+            modal.show();
+        }
+
+        // Выбор иконки из редактора
+        function selectIconFromEdit(iconClass, iconElement) {
+            // Удаляем предыдущий выбранный класс
+            document.querySelectorAll('.icon-grid-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Добавляем выбранный класс текущему элементу
+            iconElement.classList.add('selected');
+
+            // Обновляем иконку в модальном окне редактирования
+            document.getElementById('currentIcon').className = iconClass + ' me-3';
+            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
             
-            localStorage.setItem('achievements', JSON.stringify(achievements));
+            // Закрываем модальное окно выбора иконок
+            const modal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
+            if (modal) {
+                modal.hide();
+            }
         }
 
         // Коллекция иконок для достижений
@@ -1336,60 +1482,6 @@
             { name: 'check-circle', class: 'fas fa-check-circle', title: 'Галочка' },
             { name: 'thumbs-up', class: 'fas fa-thumbs-up', title: 'Большой палец' }
         ];
-
-        let currentAchievementIndex = null;
-
-        // Открыть модальное окно выбора иконок
-        function openIconModal(achievementIndex) {
-            currentAchievementIndex = achievementIndex;
-            const iconGrid = document.getElementById('icon-grid');
-            iconGrid.innerHTML = '';
-
-            achievementIcons.forEach((icon, index) => {
-                const iconItem = document.createElement('div');
-                iconItem.className = 'col-md-3 col-sm-4 col-6 mb-3';
-                iconItem.innerHTML = `
-                    <div class="icon-grid-item" data-icon="${icon.class}" onclick="selectIcon('${icon.class}', this)">
-                        <i class="${icon.class}"></i>
-                        <div class="icon-name">${icon.title}</div>
-                    </div>
-                `;
-                iconGrid.appendChild(iconItem);
-            });
-
-            const modal = new bootstrap.Modal(document.getElementById('iconModal'));
-            modal.show();
-        }
-
-        // Выбор иконки
-        function selectIcon(iconClass, iconElement) {
-            // Удаляем предыдущий выбранный класс
-            document.querySelectorAll('.icon-grid-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-
-            // Добавляем выбранный класс текущему элементу
-            iconElement.classList.add('selected');
-
-            // Находим элемент достижения и обновляем иконку
-            const achievementIcon = document.querySelector(`[data-achievement-index="${currentAchievementIndex}"]`);
-            if (achievementIcon) {
-                // Удаляем старые классы и добавляем новые
-                achievementIcon.className = `achievement-icon ${iconClass}`;
-                achievementIcon.setAttribute('data-achievement-icon', iconClass);
-                
-                showNotification('Иконка изменена!');
-                
-                // Закрываем модальное окно
-                const modal = bootstrap.Modal.getInstance(document.getElementById('iconModal'));
-                if (modal) {
-                    modal.hide();
-                }
-                
-                // Сохраняем изменения
-                saveAchievements();
-            }
-        }
 
         // Загрузка портфолио из localStorage
         function loadPortfolioFromStorage() {
@@ -1519,7 +1611,7 @@
             localStorage.setItem('mainPageContent', JSON.stringify(content));
             
             // Сохраняем достижения отдельно
-            saveAchievements();
+            saveAllAchievements();
             
             showNotification('Все изменения сохранены!');
         }
@@ -1701,14 +1793,6 @@
                 // Обработка выбора файла
                 avatarUpload.addEventListener('change', handleAvatarUpload);
             }
-            
-            // Добавляем обработчики клика на иконки достижений
-            document.querySelectorAll('.achievement-icon').forEach(icon => {
-                icon.addEventListener('click', function() {
-                    const achievementIndex = this.getAttribute('data-achievement-index');
-                    openIconModal(achievementIndex);
-                });
-            });
             
             // Анимации при прокрутке
             const elementsToAnimate = document.querySelectorAll('.fade-in-up');
