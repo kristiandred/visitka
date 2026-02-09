@@ -1032,10 +1032,23 @@
             categories.forEach(category => {
                 const button = document.createElement('button');
                 button.className = 'filter-btn';
-                button.setAttribute('data-filter', category === 'Все работы' ? 'all' : category.toLowerCase().replace(' ', '-'));
-                button.textContent = category;
                 
-                if (category === 'Все работы') {
+                // Handle both string and object formats
+                let categoryName, categoryFilter;
+                if (typeof category === 'string') {
+                    categoryName = category;
+                    categoryFilter = category === 'Все работы' ? 'all' : category.toLowerCase().replace(' ', '-');
+                } else if (category && category.name) {
+                    categoryName = category.name;
+                    categoryFilter = category.filter || (category.name === 'Все работы' ? 'all' : category.name.toLowerCase().replace(' ', '-'));
+                } else {
+                    return; // Skip invalid category
+                }
+                
+                button.setAttribute('data-filter', categoryFilter);
+                button.textContent = categoryName;
+                
+                if (categoryName === 'Все работы') {
                     button.classList.add('active');
                 }
                 
@@ -1080,7 +1093,15 @@
             projects.forEach(project => {
                 const projectCard = document.createElement('div');
                 projectCard.className = 'col-lg-4 col-md-6 mb-4';
-                projectCard.setAttribute('data-category', project.category.toLowerCase().replace(' ', '-'));
+                
+                // Handle both string and object category formats
+                let categoryValue = project.category;
+                if (typeof project.category === 'object' && project.category.name) {
+                    categoryValue = project.category.name;
+                }
+                
+                const categoryFilter = categoryValue === 'Все работы' ? 'all' : categoryValue.toLowerCase().replace(' ', '-');
+                projectCard.setAttribute('data-category', categoryFilter);
                 
                 projectCard.innerHTML = `
                     <div class="photo-card">
@@ -1088,7 +1109,7 @@
                         <div class="photo-card-body">
                             <h5 class="photo-title">${project.title}</h5>
                             <p class="photo-description">${project.description}</p>
-                            <span class="photo-category">${project.category}</span>
+                            <span class="photo-category">${categoryValue}</span>
                         </div>
                     </div>
                 `;
