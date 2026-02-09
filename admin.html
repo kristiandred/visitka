@@ -863,6 +863,31 @@
             background: var(--secondary-green) !important;
         }
 
+        /* Стили для блоков навыков */
+        .skill-block {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .skill-block:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            border-color: var(--primary-green);
+        }
+
+        .skill-block .skill-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-gray);
+        }
+
+        .skill-block .skill-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin: 0;
+        }
+
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -1004,24 +1029,24 @@
                         
                         <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
-                                <div class="skill-item">
-                                    <i class="fab fa-js-square"></i>
-                                    <h5>JavaScript</h5>
-                                    <p>React, Vue, Node.js, Express</p>
+                                <div class="skill-item skill-block" data-skill-index="0" style="position: relative; cursor: pointer;" onclick="editSkill(0)">
+                                    <i class="fab fa-js-square skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                                    <h5 class="skill-title">JavaScript</h5>
+                                    <p class="skill-desc">React, Vue, Node.js, Express</p>
                                 </div>
                             </div>
                             <div class="col-md-4 mb-4">
-                                <div class="skill-item">
-                                    <i class="fab fa-python"></i>
-                                    <h5>Python</h5>
-                                    <p>Django, Flask, Data Science</p>
+                                <div class="skill-item skill-block" data-skill-index="1" style="position: relative; cursor: pointer;" onclick="editSkill(1)">
+                                    <i class="fab fa-python skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                                    <h5 class="skill-title">Python</h5>
+                                    <p class="skill-desc">Django, Flask, Data Science</p>
                                 </div>
                             </div>
                             <div class="col-md-4 mb-4">
-                                <div class="skill-item">
-                                    <i class="fas fa-database"></i>
-                                    <h5>Базы данных</h5>
-                                    <p>MySQL, PostgreSQL, MongoDB</p>
+                                <div class="skill-item skill-block" data-skill-index="2" style="position: relative; cursor: pointer;" onclick="editSkill(2)">
+                                    <i class="fas fa-database skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                                    <h5 class="skill-title">Базы данных</h5>
+                                    <p class="skill-desc">MySQL, PostgreSQL, MongoDB</p>
                                 </div>
                             </div>
                         </div>
@@ -1418,6 +1443,40 @@
             }
         }
 
+        // Редактирование навыка
+        function editSkill(index) {
+            console.log('Вызвана функция editSkill с индексом:', index);
+            
+            const skillBlock = document.querySelector(`[data-skill-index="${index}"]`);
+            console.log('Найден блок навыка:', skillBlock);
+            
+            if (!skillBlock) {
+                console.error('Блок навыка не найден!');
+                return;
+            }
+            
+            const title = skillBlock.querySelector('.skill-title').textContent;
+            const description = skillBlock.querySelector('.skill-desc').textContent;
+            const iconClass = skillBlock.querySelector('.skill-icon').className;
+            
+            console.log('Данные навыка:', { title, description, iconClass });
+            
+            // Временно используем модальное окно достижений для редактирования навыков
+            document.getElementById('achievementTitle').value = title;
+            document.getElementById('achievementDescription').value = description;
+            document.getElementById('currentIcon').className = iconClass + ' me-3';
+            document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
+            
+            // Меняем заголовок модального окна
+            document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать навык';
+            
+            console.log('Заполнение формы редактирования завершено');
+            
+            const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
+            console.log('Попытка открыть модальное окно...');
+            modal.show();
+        }
+
         // Сохранение всех достижений в localStorage
         function saveAllAchievements() {
             const achievementBlocks = document.querySelectorAll('.achievement-block');
@@ -1708,9 +1767,10 @@
         // Обработка клика на редактируемый элемент
         document.addEventListener('click', function(e) {
             // Проверяем, что кликнули именно на редактируемый элемент
-            // Исключаем клики на блоки достижений и их дочерние элементы
-            if (e.target.closest('.achievement-block') || e.target.closest('.achievement-item')) {
-                return; // Не обрабатываем клики на блоках достижений
+            // Исключаем клики на блоки достижений, навыков и их дочерние элементы
+            if (e.target.closest('.achievement-block') || e.target.closest('.achievement-item') || 
+                e.target.closest('.skill-block') || e.target.closest('.skill-item')) {
+                return; // Не обрабатываем клики на блоках
             }
             
             const editable = e.target.classList.contains('editable') ? e.target : e.target.closest('.editable');
