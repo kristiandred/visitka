@@ -91,7 +91,7 @@
         /* Hero секция */
         .hero-section {
             background: linear-gradient(135deg, var(--dark-gray) 0%, var(--medium-gray) 100%);
-            position: relative;
+            position:relative;
             overflow: hidden;
             min-height: 70vh;
             display: flex;
@@ -375,7 +375,7 @@
             font-size: var(--font-size-sm);
         }
 
-        .contact-item a {
+        .contact-item a, .contact-item span {
             color: var(--text-light);
             text-decoration: none;
             transition: color 0.3s ease;
@@ -647,42 +647,6 @@
             border-radius: 5px;
         }
 
-        /* Стили для редактируемых элементов (скрытые в обычном режиме) */
-        .editable {
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .editable::after {
-            content: '✎';
-            position: absolute;
-            top: -5px;
-            right: -20px;
-            font-size: 12px;
-            color: var(--primary-green);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .editable:hover::after {
-            opacity: 1;
-        }
-
-        .editable:hover {
-            outline: 2px solid rgba(46, 204, 113, 0.3);
-            border-radius: 4px;
-        }
-
-        .editing {
-            background: var(--text-lighter) !important;
-            color: var(--dark-gray) !important;
-            outline: 2px solid var(--primary-green) !important;
-            z-index: 1000;
-            position: relative;
-        }
-
-        
         /* Модальные окна */
         .modal-content {
             background: var(--light-gray);
@@ -970,10 +934,10 @@
             <div class="row align-items-center">
                 <div class="col-lg-6">
                     <div class="hero-content">
-                        <h1 id="hero-title" class="hero-title mb-4 editable" data-field="hero-title">
+                        <h1 id="hero-title" class="hero-title mb-4">
                             Иван Петров
                         </h1>
-                        <p id="hero-description" class="hero-subtitle mb-4 editable" data-field="hero-description">
+                        <p id="hero-description" class="hero-subtitle mb-4">
                             Full Stack разработчик и UI/UX дизайнер
                         </p>
                         <div class="hero-buttons">
@@ -1003,13 +967,13 @@
                 <div class="col-lg-12">
                     <h2 class="section-title">О себе</h2>
                     <div class="about-content">
-                        <p id="about-text" class="lead text-center mb-4 editable" data-field="about_text">
+                        <p id="about-text" class="lead text-center mb-4">
                             Я профессиональный Full Stack разработчик с более чем 5-летним опытом работы в IT индустрии. 
                             Специализируюсь на создании современных веб-приложений с использованием передовых технологий. 
                             Моя страсть - создавать красивые и функциональные решения, которые помогают бизнесу расти и развиваться.
                         </p>
                         
-                        <h4 id="achievements-title" class="text-center mb-4" data-field="achievements_title">Ключевые возможности и достижения</h4>
+                        <h4 id="achievements-title" class="text-center mb-4">Ключевые возможности и достижения</h4>
                         
                         <div style="position: relative;">
                             <button class="add-achievement-btn" onclick="createNewAchievement()" title="Добавить достижение">
@@ -1302,6 +1266,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" onclick="saveContacts()">
+                        <i class="fas fa-save me-2"></i>Сохранить изменения
+                    </button>
                 </div>
             </div>
         </div>
@@ -1323,36 +1290,8 @@
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-8">
-                    <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <strong>Email:</strong>
-                            <a id="contact-email" href="mailto:ivan.petrov@example.com" class="editable" data-field="contact_email">ivan.petrov@example.com</a>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <strong>Телефон:</strong>
-                            <a id="contact-phone" href="tel:+79991234567" class="editable" data-field="contact_phone">+7 (999) 123-45-67</a>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <strong>Адрес:</strong>
-                            <span id="contact-address" class="editable" data-field="contact_address">Москва, Россия</span>
-                        </div>
-                        <div class="social-links">
-                            <a href="https://github.com/ivanpetrov" target="_blank" title="GitHub">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://linkedin.com/in/ivanpetrov" target="_blank" title="LinkedIn">
-                                <i class="fab fa-linkedin"></i>
-                            </a>
-                            <a href="https://telegram.me/ivanpetrov" target="_blank" title="Telegram">
-                                <i class="fab fa-telegram"></i>
-                            </a>
-                            <a href="https://instagram.com/ivanpetrov" target="_blank" title="Instagram">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                        </div>
+                    <div class="contact-info" id="contact-info">
+                        <!-- Контакты будут загружены динамически -->
                     </div>
                 </div>
             </div>
@@ -1399,6 +1338,13 @@
             { name: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/ivanpetrov' },
             { name: 'Telegram', icon: 'fab fa-telegram', url: 'https://telegram.me/ivanpetrov' },
             { name: 'Instagram', icon: 'fab fa-instagram', url: 'https://instagram.com/ivanpetrov' }
+        ];
+
+        // Контакты по умолчанию
+        const defaultContacts = [
+            { type: 'email', label: 'Email', value: 'ivan.petrov@example.com' },
+            { type: 'phone', label: 'Телефон', value: '+7 (999) 123-45-67' },
+            { type: 'address', label: 'Адрес', value: 'Москва, Россия' }
         ];
 
         // Доступные иконки для социальных сетей
@@ -1498,6 +1444,7 @@
 
         // Загрузка сохраненного контента
         function loadSavedContent() {
+            // Загружаем основное содержимое
             const savedContent = localStorage.getItem('mainPageContent');
             if (savedContent) {
                 const content = JSON.parse(savedContent);
@@ -1516,26 +1463,8 @@
                     document.getElementById('about-text').textContent = content.about_text;
                 }
                 
-                if (content.contact_email) {
-                    const emailElement = document.getElementById('contact-email');
-                    emailElement.textContent = content.contact_email;
-                    emailElement.href = `mailto:${content.contact_email}`;
-                }
-                
-                if (content.contact_phone) {
-                    const phoneElement = document.getElementById('contact-phone');
-                    phoneElement.textContent = content.contact_phone;
-                    phoneElement.href = `tel:${content.contact_phone.replace(/[^\d+]/g, '')}`;
-                }
-                
-                if (content.contact_address) {
-                    const addressElement = document.getElementById('contact-address');
-                    addressElement.textContent = content.contact_address;
-                }
-                
-                // Загружаем пользовательские поля
-                if (content['hero-title']) {
-                    document.getElementById('hero-title').textContent = content['hero-title'];
+                if (content.achievements_title) {
+                    document.getElementById('achievements-title').textContent = content.achievements_title;
                 }
             }
             
@@ -2465,7 +2394,7 @@
         // Загрузить контакты в список
         function loadContactsToList() {
             const savedContacts = localStorage.getItem('contacts');
-            const contacts = savedContacts ? JSON.parse(savedContacts) : getDefaultContacts();
+            const contacts = savedContacts ? JSON.parse(savedContacts) : defaultContacts;
             const contactsList = document.getElementById('contactsList');
             contactsList.innerHTML = '';
 
@@ -2475,17 +2404,17 @@
                 contactItem.innerHTML = `
                     <div class="row align-items-center">
                         <div class="col-md-3">
-                            <select class="form-select" id="contact-type-${index}">
+                            <select class="form-select contact-type-select" data-index="${index}">
                                 <option value="email" ${contact.type === 'email' ? 'selected' : ''}>Email</option>
                                 <option value="phone" ${contact.type === 'phone' ? 'selected' : ''}>Телефон</option>
                                 <option value="address" ${contact.type === 'address' ? 'selected' : ''}>Адрес</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control" id="contact-label-${index}" value="${contact.label}" placeholder="Название">
+                            <input type="text" class="form-control contact-label-input" data-index="${index}" value="${contact.label}" placeholder="Название">
                         </div>
                         <div class="col-md-4">
-                            <input type="text" class="form-control" id="contact-value-${index}" value="${contact.value}" placeholder="Значение">
+                            <input type="text" class="form-control contact-value-input" data-index="${index}" value="${contact.value}" placeholder="Значение">
                         </div>
                         <div class="col-md-1">
                             <button type="button" class="btn btn-danger btn-sm" onclick="deleteContact(${index})">
@@ -2498,19 +2427,10 @@
             });
         }
 
-        // Получить контакты по умолчанию
-        function getDefaultContacts() {
-            return [
-                { type: 'email', label: 'Email', value: 'ivan.petrov@example.com' },
-                { type: 'phone', label: 'Телефон', value: '+7 (999) 123-45-67' },
-                { type: 'address', label: 'Адрес', value: 'Москва, Россия' }
-            ];
-        }
-
         // Добавить новый контакт
         function addNewContact() {
             const savedContacts = localStorage.getItem('contacts');
-            const contacts = savedContacts ? JSON.parse(savedContacts) : getDefaultContacts();
+            const contacts = savedContacts ? JSON.parse(savedContacts) : defaultContacts;
 
             contacts.push({ type: 'email', label: 'Новый контакт', value: '' });
             localStorage.setItem('contacts', JSON.stringify(contacts));
@@ -2522,7 +2442,7 @@
         function deleteContact(index) {
             if (confirm('Вы уверены, что хотите удалить этот контакт?')) {
                 const savedContacts = localStorage.getItem('contacts');
-                const contacts = savedContacts ? JSON.parse(savedContacts) : getDefaultContacts();
+                const contacts = savedContacts ? JSON.parse(savedContacts) : defaultContacts;
 
                 contacts.splice(index, 1);
                 localStorage.setItem('contacts', JSON.stringify(contacts));
@@ -2535,32 +2455,55 @@
         // Сохранить контакты
         function saveContacts() {
             const savedContacts = localStorage.getItem('contacts');
-            const contacts = savedContacts ? JSON.parse(savedContacts) : getDefaultContacts();
+            const contacts = savedContacts ? JSON.parse(savedContacts) : defaultContacts;
 
-            contacts.forEach((contact, index) => {
-                const typeElement = document.getElementById(`contact-type-${index}`);
-                const labelElement = document.getElementById(`contact-label-${index}`);
-                const valueElement = document.getElementById(`contact-value-${index}`);
+            // Собираем данные из формы
+            const contactTypes = document.querySelectorAll('.contact-type-select');
+            const contactLabels = document.querySelectorAll('.contact-label-input');
+            const contactValues = document.querySelectorAll('.contact-value-input');
 
-                if (typeElement) contact.type = typeElement.value;
-                if (labelElement) contact.label = labelElement.value;
-                if (valueElement) contact.value = valueElement.value;
+            // Обновляем каждый контакт
+            contactTypes.forEach((select, index) => {
+                if (contacts[index]) {
+                    contacts[index].type = select.value;
+                }
             });
 
+            contactLabels.forEach((input, index) => {
+                if (contacts[index]) {
+                    contacts[index].label = input.value;
+                }
+            });
+
+            contactValues.forEach((input, index) => {
+                if (contacts[index]) {
+                    contacts[index].value = input.value;
+                }
+            });
+
+            // Сохраняем обновленные контакты
             localStorage.setItem('contacts', JSON.stringify(contacts));
+            
+            // Обновляем отображение контактов на странице
             updateContactsDisplay();
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('contactsModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
             showNotification('Контакты сохранены!');
         }
 
         // Обновить отображение контактов на странице
         function updateContactsDisplay() {
             const savedContacts = localStorage.getItem('contacts');
-            const contacts = savedContacts ? JSON.parse(savedContacts) : getDefaultContacts();
-            const contactInfo = document.querySelector('.contact-info');
-
-            // Сохраняем социальные ссылки
-            const socialLinks = contactInfo.querySelector('.social-links').outerHTML;
-
+            const contacts = savedContacts ? JSON.parse(savedContacts) : defaultContacts;
+            const contactInfo = document.getElementById('contact-info');
+            
+            if (!contactInfo) return;
+            
             contactInfo.innerHTML = '';
 
             contacts.forEach(contact => {
@@ -2569,37 +2512,44 @@
 
                 let icon = 'fas fa-info-circle';
                 let link = contact.value;
+                let displayElement;
 
                 if (contact.type === 'email') {
                     icon = 'fas fa-envelope';
                     link = `mailto:${contact.value}`;
+                    displayElement = document.createElement('a');
+                    displayElement.href = link;
+                    displayElement.textContent = contact.value;
                 } else if (contact.type === 'phone') {
                     icon = 'fas fa-phone';
                     link = `tel:${contact.value.replace(/[^\d+]/g, '')}`;
+                    displayElement = document.createElement('a');
+                    displayElement.href = link;
+                    displayElement.textContent = contact.value;
                 } else if (contact.type === 'address') {
                     icon = 'fas fa-map-marker-alt';
                     link = `https://maps.google.com/?q=${encodeURIComponent(contact.value)}`;
+                    displayElement = document.createElement('span');
+                    displayElement.textContent = contact.value;
                 }
 
-                if (contact.type === 'address') {
-                    contactItem.innerHTML = `
-                        <i class="${icon}"></i>
-                        <strong>${contact.label}:</strong>
-                        <span class="editable" data-field="contact_address">${contact.value}</span>
-                    `;
-                } else {
-                    contactItem.innerHTML = `
-                        <i class="${icon}"></i>
-                        <strong>${contact.label}:</strong>
-                        <a href="${link}" class="editable" data-field="contact_${contact.type}">${contact.value}</a>
-                    `;
-                }
-
+                contactItem.innerHTML = `
+                    <i class="${icon}"></i>
+                    <strong>${contact.label}:</strong>
+                `;
+                
+                contactItem.appendChild(displayElement);
                 contactInfo.appendChild(contactItem);
             });
 
-            // Добавляем социальные ссылки обратно
-            contactInfo.innerHTML += socialLinks;
+            // Добавляем социальные сети
+            const socialLinks = document.createElement('div');
+            socialLinks.className = 'social-links';
+            socialLinks.id = 'social-links';
+            contactInfo.appendChild(socialLinks);
+            
+            // Обновляем социальные сети
+            updateSocialNetworksDisplay();
         }
 
         // ============================================
@@ -2629,10 +2579,10 @@
                             <i class="${social.icon}" style="font-size: 1.5rem; color: var(--primary-green);"></i>
                         </div>
                         <div class="col-md-3">
-                            <input type="text" class="form-control" id="social-name-${index}" value="${social.name}" placeholder="Название сети">
+                            <input type="text" class="form-control social-name-input" data-index="${index}" value="${social.name}" placeholder="Название сети">
                         </div>
                         <div class="col-md-6">
-                            <input type="text" class="form-control" id="social-url-${index}" value="${social.url}" placeholder="URL адрес">
+                            <input type="text" class="form-control social-url-input" data-index="${index}" value="${social.url}" placeholder="URL адрес">
                         </div>
                         <div class="col-md-1">
                             <button type="button" class="btn btn-outline-primary btn-sm" onclick="openSocialIconModal(${index})" title="Изменить иконку">
@@ -2679,16 +2629,35 @@
             const savedSocials = localStorage.getItem('socialNetworks');
             const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
 
-            socials.forEach((social, index) => {
-                const nameElement = document.getElementById(`social-name-${index}`);
-                const urlElement = document.getElementById(`social-url-${index}`);
+            // Собираем данные из формы
+            const socialNames = document.querySelectorAll('.social-name-input');
+            const socialUrls = document.querySelectorAll('.social-url-input');
 
-                if (nameElement) social.name = nameElement.value;
-                if (urlElement) social.url = urlElement.value;
+            // Обновляем каждую социальную сеть
+            socialNames.forEach((input, index) => {
+                if (socials[index]) {
+                    socials[index].name = input.value;
+                }
             });
 
+            socialUrls.forEach((input, index) => {
+                if (socials[index]) {
+                    socials[index].url = input.value;
+                }
+            });
+
+            // Сохраняем обновленные социальные сети
             localStorage.setItem('socialNetworks', JSON.stringify(socials));
+            
+            // Обновляем отображение социальных сетей
             updateSocialNetworksDisplay();
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('socialNetworksModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
             showNotification('Социальные сети сохранены!');
         }
 
@@ -2696,8 +2665,10 @@
         function updateSocialNetworksDisplay() {
             const savedSocials = localStorage.getItem('socialNetworks');
             const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
-            const socialLinks = document.querySelector('.social-links');
-
+            const socialLinks = document.getElementById('social-links');
+            
+            if (!socialLinks) return;
+            
             socialLinks.innerHTML = '';
 
             socials.forEach(social => {
@@ -2724,18 +2695,6 @@
 
                 link.innerHTML = `<i class="${social.icon}"></i>`;
                 
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    if (e.ctrlKey || e.metaKey) {
-                        // Редактирование при Ctrl+клик
-                        e.stopPropagation();
-                        // Здесь можно добавить логику редактирования
-                    } else {
-                        // Обычный переход по ссылке
-                        window.open(social.url, '_blank');
-                    }
-                });
-
                 link.addEventListener('mouseenter', function() {
                     this.style.background = 'var(--primary-green)';
                     this.style.color = 'var(--dark-gray)';
@@ -2804,18 +2763,15 @@
             const content = {
                 site_title: document.getElementById('hero-title').textContent,
                 site_description: document.getElementById('hero-description').textContent,
-                'hero-title': document.getElementById('hero-title').textContent,
-                'hero-description': document.getElementById('hero-description').textContent,
                 about_text: document.getElementById('about-text').textContent,
-                contact_email: document.getElementById('contact-email').textContent,
-                contact_phone: document.getElementById('contact-phone').textContent,
-                contact_address: document.getElementById('contact-address').textContent
+                achievements_title: document.getElementById('achievements-title').textContent
             };
             
             localStorage.setItem('mainPageContent', JSON.stringify(content));
             
             // Сохраняем достижения отдельно
             saveAllAchievements();
+            saveAllSkills();
             
             showNotification('Все изменения сохранены!');
         }
@@ -2851,141 +2807,6 @@
                     }, 500);
                 }
             }, 3000);
-        }
-
-        // ============================================
-        // РЕДАКТИРОВАНИЕ ТЕКСТА
-        // ============================================
-        
-        let currentEditing = null;
-
-        // Обработка клика на редактируемый элемент
-        document.addEventListener('click', function(e) {
-            // Проверяем, что кликнули именно на редактируемый элемент
-            // Исключаем клики на блоки достижений, навыков и их дочерние элементы
-            if (e.target.closest('.achievement-block') || e.target.closest('.achievement-item') || 
-                e.target.closest('.skill-block') || e.target.closest('.skill-item')) {
-                return; // Не обрабатываем клики на блоках
-            }
-            
-            const editable = e.target.classList.contains('editable') ? e.target : e.target.closest('.editable');
-            if (!editable || currentEditing) return;
-            
-            startEdit(editable);
-        });
-
-        // Начало редактирования
-        function startEdit(element) {
-            if (currentEditing) {
-                cancelEdit();
-            }
-            
-            currentEditing = element;
-            const field = element.getAttribute('data-field');
-            const currentText = element.textContent;
-            
-            element.classList.add('editing');
-            
-            const input = document.createElement('textarea');
-            input.value = currentText;
-            input.style.cssText = `
-                width: 100%;
-                border: none;
-                background: transparent;
-                color: var(--dark-gray);
-                resize: vertical;
-                outline: none;
-                font-size: inherit;
-                font-family: inherit;
-                padding: 0;
-                margin: 0;
-                line-height: inherit;
-                min-height: 60px;
-            `;
-            
-            element.innerHTML = '';
-            element.appendChild(input);
-            
-            // Кнопки сохранения/отмены
-            const buttonsDiv = document.createElement('div');
-            buttonsDiv.style.cssText = 'position: absolute; top: -40px; right: 0; display: flex; gap: 8px; z-index: 1000;';
-            
-            const saveBtn = document.createElement('button');
-            saveBtn.innerHTML = '<i class="fas fa-check"></i>';
-            saveBtn.className = 'btn btn-sm btn-success';
-            saveBtn.style.cssText = 'padding: 4px 8px;';
-            saveBtn.onclick = saveEdit;
-            
-            const cancelBtn = document.createElement('button');
-            cancelBtn.innerHTML = '<i class="fas fa-times"></i>';
-            cancelBtn.className = 'btn btn-sm btn-secondary';
-            cancelBtn.style.cssText = 'padding: 4px 8px;';
-            cancelBtn.onclick = cancelEdit;
-            
-            buttonsDiv.appendChild(saveBtn);
-            buttonsDiv.appendChild(cancelBtn);
-            element.style.position = 'relative';
-            element.appendChild(buttonsDiv);
-            
-            input.focus();
-            input.select();
-            
-            // Сохранение по Enter
-            input.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && e.ctrlKey) {
-                    saveEdit();
-                } else if (e.key === 'Escape') {
-                    cancelEdit();
-                }
-            });
-        }
-
-        // Сохранение редактирования
-        function saveEdit() {
-            if (!currentEditing) return;
-            
-            const input = currentEditing.querySelector('textarea');
-            if (!input) return;
-            
-            const newValue = input.value;
-            const field = currentEditing.getAttribute('data-field');
-            
-            currentEditing.textContent = newValue;
-            currentEditing.classList.remove('editing');
-            currentEditing.style.position = '';
-            
-            // Сохраняем в localStorage
-            const content = localStorage.getItem('mainPageContent') || '{}';
-            const parsedContent = JSON.parse(content);
-            parsedContent[field] = newValue;
-            localStorage.setItem('mainPageContent', JSON.stringify(parsedContent));
-            
-            showNotification('Изменения сохранены!');
-            
-            currentEditing = null;
-        }
-
-        // Отмена редактирования
-        function cancelEdit() {
-            if (!currentEditing) return;
-            
-            const field = currentEditing.getAttribute('data-field');
-            const savedContent = localStorage.getItem('mainPageContent');
-            
-            if (savedContent) {
-                try {
-                    const content = JSON.parse(savedContent);
-                    const originalValue = content[field] || currentEditing.textContent;
-                    
-                    currentEditing.textContent = originalValue;
-                } catch (e) {
-                    console.error('Ошибка восстановления контента:', e);
-                }
-            }
-            
-            currentEditing.classList.remove('editing');
-            currentEditing.style.position = '';
-            currentEditing = null;
         }
 
         // ============================================
