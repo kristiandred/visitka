@@ -1596,20 +1596,24 @@
 
         // Фильтрация элементов портфолио
         function filterPortfolioItems(filter) {
-            const items = document.querySelectorAll('.photo-card').forEach(card => {
+            const items = document.querySelectorAll('.photo-card');
+            items.forEach(card => {
                 const parent = card.closest('[data-category]');
-                if (filter === 'all' || parent.getAttribute('data-category') === filter) {
-                    parent.style.display = 'block';
-                    setTimeout(() => {
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, 100);
-                } else {
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(20px)';
-                    setTimeout(() => {
-                        parent.style.display = 'none';
-                    }, 300);
+                if (parent) {
+                    const category = parent.getAttribute('data-category');
+                    if (filter === 'all' || category === filter) {
+                        parent.style.display = 'block';
+                        setTimeout(() => {
+                            card.style.opacity = '1';
+                            card.style.transform = 'translateY(0)';
+                        }, 100);
+                    } else {
+                        card.style.opacity = '0';
+                        card.style.transform = 'translateY(20px)';
+                        setTimeout(() => {
+                            parent.style.display = 'none';
+                        }, 300);
+                    }
                 }
             });
         }
@@ -2078,11 +2082,19 @@
             gallery.innerHTML = '';
             
             projects.forEach((project, index) => {
-                const categoryName = getCategoryName(project.category);
-                
                 const projectCard = document.createElement('div');
                 projectCard.className = 'col-lg-4 col-md-6 mb-4';
-                projectCard.setAttribute('data-category', project.category);
+                
+                // Handle both string and object category formats
+                let categoryValue = project.category;
+                let categoryName = project.category;
+                
+                if (typeof project.category === 'object' && project.category.name) {
+                    categoryValue = project.category.filter || project.category.name;
+                    categoryName = project.category.name;
+                }
+                
+                projectCard.setAttribute('data-category', categoryValue);
                 
                 projectCard.innerHTML = `
                     <div class="photo-card">
