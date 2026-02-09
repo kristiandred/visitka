@@ -863,6 +863,16 @@
             background: var(--secondary-green) !important;
         }
 
+        /* Стили для кнопки управления категориями */
+        .manage-categories-btn {
+            transition: all 0.3s ease;
+        }
+
+        .manage-categories-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-green) !important;
+        }
+
         /* Стили для блоков навыков */
         .skill-block {
             transition: all 0.3s ease;
@@ -1072,8 +1082,13 @@
     <!-- Портфолио с фотографиями -->
     <section id="portfolio" class="py-5">
         <div class="container">
-            <h2 class="section-title text-center">Портфолио</h2>
-            <div class="portfolio-filter">
+            <div style="position: relative;">
+                <h2 class="section-title text-center">Портфолио</h2>
+                <button class="manage-categories-btn" onclick="openCategoriesModal()" title="Управление категориями" style="position: absolute; top: -10px; right: 0; background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+            <div class="portfolio-filter" id="portfolio-filter">
                 <button class="filter-btn active" data-filter="all">Все работы</button>
                 <button class="filter-btn" data-filter="web">Веб-разработка</button>
                 <button class="filter-btn" data-filter="mobile">Мобильная разработка</button>
@@ -1149,6 +1164,38 @@
                     <button type="button" class="btn btn-primary" onclick="saveAchievementChanges()">
                         <i class="fas fa-save me-2"></i>Сохранить
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для управления категориями портфолио -->
+    <div class="modal fade" id="categoriesModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Управление категориями портфолио</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-4">
+                        <h6>Текущие категории:</h6>
+                        <div id="categoriesList" class="list-group">
+                            <!-- Категории будут загружены динамически -->
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newCategoryName" class="form-label">Добавить новую категорию:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="newCategoryName" placeholder="Название категории">
+                            <button type="button" class="btn btn-primary" onclick="addNewCategory()">
+                                <i class="fas fa-plus me-2"></i>Добавить
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
                 </div>
             </div>
         </div>
@@ -1344,6 +1391,195 @@
             } else {
                 showNotification('Пожалуйста, выберите изображение!', 'danger');
             }
+        }
+
+        // Функции для управления категориями портфолио
+        let portfolioCategories = [
+            { name: 'Все работы', filter: 'all' },
+            { name: 'Веб-разработка', filter: 'web' },
+            { name: 'Мобильная разработка', filter: 'mobile' },
+            { name: 'Дизайн', filter: 'design' }
+        ];
+
+        // Открыть модальное окно управления категориями
+        function openCategoriesModal() {
+            loadCategoriesToList();
+            const modal = new bootstrap.Modal(document.getElementById('categoriesModal'));
+            modal.show();
+        }
+
+        // Загрузить категории в список
+        function loadCategoriesToList() {
+            const categoriesList = document.getElementById('categoriesList');
+            categoriesList.innerHTML = '';
+            
+            // Загружаем сохраненные категории или используем стандартные
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            if (savedCategories) {
+                portfolioCategories = JSON.parse(savedCategories);
+            }
+            
+            portfolioCategories.forEach((category, index) => {
+                const categoryItem = document.createElement('div');
+                categoryItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                
+                // Категорию "Все работы" нельзя удалять
+                const canDelete = category.filter !== 'all';
+                
+                categoryItem.innerHTML = `
+                    <div>
+                        <strong>${category.name}</strong>
+                        <small class="text-muted ms-2">(${category.filter})</small>
+                    </div>
+                    <div>
+                        ${canDelete ? `
+                            <button class="btn btn-sm btn-outline-danger me-2" onclick="deleteCategory(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                `;
+                
+                categoriesList.appendChild(categoryItem);
+            });
+        }
+
+        // Добавить новую категорию
+        function addNewCategory() {
+            const categoryName = document.getElementById('newCategoryName').value.trim();
+            
+            if (!categoryName) {
+                showNotification('Пожалуйста, введите название категории!', 'danger');
+                return;
+            }
+            
+            // Проверяем на дубликаты
+            if (portfolioCategories.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())) {
+                showNotification('Такая категория уже существует!', 'danger');
+                return;
+            }
+            
+            // Создаем фильтр из названия (транслитерация и нижний регистр)
+            const filter = categoryName.toLowerCase()
+                .replace(/[^a-zа-яё0-9\s]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/[а-яё]/g, function(match) {
+                    const translit = {
+                        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+                        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                        'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ы': 'y',
+                        'э': 'e', 'ю': 'yu', 'я': 'ya'
+                    };
+                    return translit[match] || match;
+                });
+            
+            const newCategory = {
+                name: categoryName,
+                filter: filter || 'category-' + Date.now()
+            };
+            
+            portfolioCategories.push(newCategory);
+            savePortfolioCategories();
+            
+            // Очищаем поле ввода
+            document.getElementById('newCategoryName').value = '';
+            
+            // Обновляем список
+            loadCategoriesToList();
+            updatePortfolioFilter();
+            
+            showNotification('Категория добавлена!');
+        }
+
+        // Удалить категорию
+        function deleteCategory(index) {
+            const category = portfolioCategories[index];
+            
+            if (confirm(`Вы уверены, что хотите удалить категорию "${category.name}"?`)) {
+                portfolioCategories.splice(index, 1);
+                savePortfolioCategories();
+                loadCategoriesToList();
+                updatePortfolioFilter();
+                showNotification('Категория удалена!');
+            }
+        }
+
+        // Редактировать категорию
+        function editCategory(index) {
+            const category = portfolioCategories[index];
+            const newName = prompt('Редактировать название категории:', category.name);
+            
+            if (newName !== null && newName.trim() !== '' && newName.trim() !== category.name) {
+                // Проверяем на дубликаты
+                if (portfolioCategories.some((cat, i) => i !== index && cat.name.toLowerCase() === newName.trim().toLowerCase())) {
+                    showNotification('Такая категория уже существует!', 'danger');
+                    return;
+                }
+                
+                category.name = newName.trim();
+                savePortfolioCategories();
+                loadCategoriesToList();
+                updatePortfolioFilter();
+                showNotification('Категория обновлена!');
+            }
+        }
+
+        // Сохранить категории в localStorage
+        function savePortfolioCategories() {
+            localStorage.setItem('portfolioCategories', JSON.stringify(portfolioCategories));
+        }
+
+        // Обновить фильтры портфолио
+        function updatePortfolioFilter() {
+            const filterContainer = document.getElementById('portfolio-filter');
+            filterContainer.innerHTML = '';
+            
+            portfolioCategories.forEach((category, index) => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn';
+                if (index === 0) button.classList.add('active'); // Первая категория активна
+                button.setAttribute('data-filter', category.filter);
+                button.textContent = category.name;
+                
+                button.addEventListener('click', function() {
+                    // Удаляем активный класс у всех кнопок
+                    document.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Добавляем активный класс текущей кнопке
+                    this.classList.add('active');
+                    
+                    const filter = this.getAttribute('data-filter');
+                    filterPortfolioItems(filter);
+                });
+                
+                filterContainer.appendChild(button);
+            });
+        }
+
+        // Фильтрация элементов портфолио
+        function filterPortfolioItems(filter) {
+            const items = document.querySelectorAll('.photo-card').forEach(card => {
+                const parent = card.closest('[data-category]');
+                if (filter === 'all' || parent.getAttribute('data-category') === filter) {
+                    parent.style.display = 'block';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                } else {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        parent.style.display = 'none';
+                    }, 300);
+                }
+            });
         }
 
         // Функции для управления достижениями
@@ -2048,10 +2284,25 @@
             currentEditing = null;
         }
 
+        // Инициализация категорий портфолио
+        function initializePortfolioCategories() {
+            // Загружаем сохраненные категории или используем стандартные
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            if (savedCategories) {
+                portfolioCategories = JSON.parse(savedCategories);
+            }
+            
+            // Обновляем фильтры на странице
+            updatePortfolioFilter();
+        }
+
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненный контент
             loadSavedContent();
+            
+            // Инициализируем категории портфолио
+            initializePortfolioCategories();
             
             // Добавляем обработчики для загрузки аватарки
             const avatarImg = document.getElementById('hero-avatar');
