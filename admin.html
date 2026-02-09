@@ -1275,7 +1275,7 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
-                            <i class="${achievement.icon || 'fas fa-star'} achievement-icon" data-achievement-index="${index}" style="cursor: pointer;" title="Нажмите для изменения иконки"></i>
+                            <i class="${achievement.icon || 'fas fa-star'} achievement-icon" data-achievement-index="${index}" data-achievement-icon="${achievement.icon || 'fas fa-star'}" style="cursor: pointer;" title="Нажмите для изменения иконки"></i>
                             <h5 class="editable" data-field="achievement_${index}_title">${achievement.title}</h5>
                             <p class="editable" data-field="achievement_${index}_desc">${achievement.description}</p>
                         </div>
@@ -1303,10 +1303,11 @@
                 const iconElement = item.querySelector('.achievement-icon');
                 
                 if (titleElement && descElement) {
+                    const iconClass = iconElement ? iconElement.getAttribute('data-achievement-icon') : 'fas fa-star';
                     achievements.push({
                         title: titleElement.textContent.trim(),
                         description: descElement.textContent.trim(),
-                        icon: iconElement ? iconElement.getAttribute('data-achievement-icon') || 'fas fa-star' : 'fas fa-star'
+                        icon: iconClass
                     });
                 }
             });
@@ -1384,12 +1385,8 @@
                 if (modal) {
                     modal.hide();
                 }
-            }
-        }
-
-        // Сохранение иконки при закрытии модального окна
-        function saveIconChanges() {
-            if (currentAchievementIndex !== null) {
+                
+                // Сохраняем изменения
                 saveAchievements();
             }
         }
@@ -1565,7 +1562,8 @@
 
         // Обработка клика на редактируемый элемент
         document.addEventListener('click', function(e) {
-            const editable = e.target.closest('.editable');
+            // Проверяем, что кликнули именно на редактируемый элемент
+            const editable = e.target.classList.contains('editable') ? e.target : e.target.closest('.editable');
             if (!editable || currentEditing) return;
             
             startEdit(editable);
