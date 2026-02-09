@@ -1463,23 +1463,30 @@
             }
             
             // Создаем фильтр из названия (транслитерация и нижний регистр)
-            const filter = categoryName.toLowerCase()
+            let filter = categoryName.toLowerCase()
                 .replace(/[^a-zа-яё0-9\s]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/[а-яё]/g, function(match) {
-                    const translit = {
-                        'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
-                        'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
-                        'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
-                        'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ы': 'y',
-                        'э': 'e', 'ю': 'yu', 'я': 'ya'
-                    };
-                    return translit[match] || match;
-                });
+                .replace(/\s+/g, '-');
+            
+            // Транслитерация русских букв
+            filter = filter.replace(/[а-яё]/g, function(match) {
+                const translit = {
+                    'а': 'a', 'б': 'b', 'в': 'v', 'г': 'g', 'д': 'd', 'е': 'e', 'ё': 'yo',
+                    'ж': 'zh', 'з': 'z', 'и': 'i', 'й': 'y', 'к': 'k', 'л': 'l', 'м': 'm',
+                    'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+                    'ф': 'f', 'х': 'h', 'ц': 'c', 'ч': 'ch', 'ш': 'sh', 'щ': 'sch', 'ы': 'y',
+                    'э': 'e', 'ю': 'yu', 'я': 'ya'
+                };
+                return translit[match] || match;
+            });
+            
+            // Если после очистки фильтр пустой, создаем уникальный
+            if (!filter || filter === '-') {
+                filter = 'category-' + Date.now();
+            }
             
             const newCategory = {
                 name: categoryName,
-                filter: filter || 'category-' + Date.now()
+                filter: filter
             };
             
             portfolioCategories.push(newCategory);
