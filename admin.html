@@ -1402,6 +1402,7 @@
             document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
             
             document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать достижение';
+            document.querySelector('#editAchievementModal .btn-danger').innerHTML = '<i class="fas fa-trash me-2"></i>Удалить достижение';
             
             const modal = new bootstrap.Modal(document.getElementById('editAchievementModal'));
             modal.show();
@@ -1489,25 +1490,42 @@
 
         // Удаление текущего достижения
         function deleteCurrentAchievement() {
-            if (currentEditingAchievementIndex === null) {
-                showNotification('Нельзя удалить несуществующее достижение!', 'danger');
-                return;
-            }
-            
-            if (confirm('Вы уверены, что хотите удалить это достижение?')) {
-                const achievementItem = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`).closest('.achievement-item');
-                achievementItem.remove();
-                
-                showNotification('Достижение удалено!');
-                
-                // Сохраняем все достижения
-                saveAllAchievements();
-                
-                // Закрываем модальное окно
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
-                if (modal) {
-                    modal.hide();
+            if (currentEditingSkillIndex !== null) {
+                // Удаляем навык
+                if (confirm('Вы уверены, что хотите удалить этот навык?')) {
+                    const skillItem = document.querySelector(`[data-skill-index="${currentEditingSkillIndex}"]`).closest('.col-md-4');
+                    skillItem.remove();
+                    
+                    showNotification('Навык удален!');
+                    
+                    // Сохраняем все навыки
+                    saveAllSkills();
+                    
+                    // Закрываем модальное окно
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
                 }
+            } else if (currentEditingAchievementIndex !== null) {
+                // Удаляем достижение
+                if (confirm('Вы уверены, что хотите удалить это достижение?')) {
+                    const achievementItem = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`).closest('.achievement-item');
+                    achievementItem.remove();
+                    
+                    showNotification('Достижение удалено!');
+                    
+                    // Сохраняем все достижения
+                    saveAllAchievements();
+                    
+                    // Закрываем модальное окно
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                }
+            } else {
+                showNotification('Нельзя удалить несуществующий элемент!', 'danger');
             }
         }
 
@@ -1549,8 +1567,9 @@
             document.getElementById('currentIcon').className = iconClass + ' me-3';
             document.getElementById('currentIcon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
             
-            // Меняем заголовок модального окна
+            // Меняем заголовок модального окна и кнопку удаления
             document.querySelector('#editAchievementModal .modal-title').textContent = 'Редактировать навык';
+            document.querySelector('#editAchievementModal .btn-danger').innerHTML = '<i class="fas fa-trash me-2"></i>Удалить навык';
             
             // Сохраняем индекс редактируемого навыка
             currentEditingSkillIndex = index;
