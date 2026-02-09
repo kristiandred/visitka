@@ -1416,10 +1416,30 @@
             // Загружаем сохраненные категории или используем стандартные
             const savedCategories = localStorage.getItem('portfolioCategories');
             if (savedCategories) {
-                portfolioCategories = JSON.parse(savedCategories);
+                try {
+                    portfolioCategories = JSON.parse(savedCategories);
+                } catch (e) {
+                    console.error('Ошибка парсинга категорий:', e);
+                    portfolioCategories = [];
+                }
+            }
+            
+            // Убедимся, что массив существует и является массивом
+            if (!Array.isArray(portfolioCategories)) {
+                portfolioCategories = [
+                    { name: 'Все работы', filter: 'all' },
+                    { name: 'Веб-разработка', filter: 'web' },
+                    { name: 'Мобильная разработка', filter: 'mobile' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
             }
             
             portfolioCategories.forEach((category, index) => {
+                // Пропускаем некорректные элементы
+                if (!category || !category.name || !category.filter) {
+                    return;
+                }
+                
                 const categoryItem = document.createElement('div');
                 categoryItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                 
@@ -1456,8 +1476,8 @@
                 return;
             }
             
-            // Проверяем на дубликаты
-            if (portfolioCategories.some(cat => cat.name.toLowerCase() === categoryName.toLowerCase())) {
+            // Проверяем на дубликаты с защитой от undefined
+            if (portfolioCategories && portfolioCategories.some(cat => cat && cat.name && cat.name.toLowerCase() === categoryName.toLowerCase())) {
                 showNotification('Такая категория уже существует!', 'danger');
                 return;
             }
@@ -1488,6 +1508,11 @@
                 name: categoryName,
                 filter: filter
             };
+            
+            // Убедимся, что массив существует
+            if (!portfolioCategories) {
+                portfolioCategories = [];
+            }
             
             portfolioCategories.push(newCategory);
             savePortfolioCategories();
@@ -2296,7 +2321,35 @@
             // Загружаем сохраненные категории или используем стандартные
             const savedCategories = localStorage.getItem('portfolioCategories');
             if (savedCategories) {
-                portfolioCategories = JSON.parse(savedCategories);
+                try {
+                    portfolioCategories = JSON.parse(savedCategories);
+                } catch (e) {
+                    console.error('Ошибка загрузки категорий:', e);
+                    portfolioCategories = [
+                        { name: 'Все работы', filter: 'all' },
+                        { name: 'Веб-разработка', filter: 'web' },
+                        { name: 'Мобильная разработка', filter: 'mobile' },
+                        { name: 'Дизайн', filter: 'design' }
+                    ];
+                }
+            } else {
+                // Если нет сохраненных, используем стандартные
+                portfolioCategories = [
+                    { name: 'Все работы', filter: 'all' },
+                    { name: 'Веб-разработка', filter: 'web' },
+                    { name: 'Мобильная разработка', filter: 'mobile' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
+            }
+            
+            // Убедимся, что массив существует
+            if (!Array.isArray(portfolioCategories)) {
+                portfolioCategories = [
+                    { name: 'Все работы', filter: 'all' },
+                    { name: 'Веб-разработка', filter: 'web' },
+                    { name: 'Мобильная разработка', filter: 'mobile' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
             }
             
             // Обновляем фильтры на странице
