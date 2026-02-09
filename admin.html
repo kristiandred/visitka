@@ -898,17 +898,6 @@
             margin: 0;
         }
 
-        /* Зеленая градиентная полоска */
-        .gradient-divider {
-            height: 3px;
-            background: linear-gradient(90deg, 
-                rgba(46, 204, 113, 0.1) 0%, 
-                rgba(46, 204, 113, 0.8) 50%, 
-                rgba(46, 204, 113, 0.1) 100%);
-            margin: 3rem 0;
-            border-radius: 2px;
-        }
-
         /* Вернуть стандартный порядок для мобильных */
         @media (max-width: 991px) {
             .hero-section .row {
@@ -1245,6 +1234,54 @@
         </div>
     </div>
 
+    <!-- Модальное окно для управления социальными сетями -->
+    <div class="modal fade" id="socialNetworksModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Управление социальными сетями</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <button type="button" class="btn btn-primary" onclick="addNewSocialNetwork()">
+                            <i class="fas fa-plus me-2"></i>Добавить социальную сеть
+                        </button>
+                    </div>
+                    <div id="socialNetworksList">
+                        <!-- Социальные сети будут загружены динамически -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSocialNetworks()">
+                        <i class="fas fa-save me-2"></i>Сохранить изменения
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для выбора иконки социальной сети -->
+    <div class="modal fade" id="socialIconModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Выберите иконку</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row" id="social-icon-grid">
+                        <!-- Иконки будут добавлены через JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Модальное окно для управления контактами -->
     <div class="modal fade" id="contactsModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -1275,9 +1312,14 @@
         <div class="container">
             <div style="position: relative;">
                 <h2 class="section-title text-center">Контакты</h2>
-                <button class="manage-categories-btn" onclick="openContactsModal()" title="Управление контактами" style="position: absolute; top: -10px; right: 0; background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                    <i class="fas fa-cog"></i>
-                </button>
+                <div style="position: absolute; top: -10px; right: 0; display: flex; gap: 10px;">
+                    <button class="manage-categories-btn" onclick="openContactsModal()" title="Управление контактами" style="background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                    <button class="manage-categories-btn" onclick="openSocialNetworksModal()" title="Управление социальными сетями" style="background: var(--primary-green); color: var(--dark-gray); border: none; border-radius: 50%; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i class="fas fa-share-alt"></i>
+                    </button>
+                </div>
             </div>
             <div class="row justify-content-center">
                 <div class="col-lg-8">
@@ -1349,6 +1391,36 @@
         let currentEditingAchievementIndex = null;
         let currentEditingSkillIndex = null;
         let currentEditingProjectIndex = null;
+        let currentEditingSocialIndex = null;
+
+        // Социальные сети по умолчанию
+        const defaultSocialNetworks = [
+            { name: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/ivanpetrov' },
+            { name: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/ivanpetrov' },
+            { name: 'Telegram', icon: 'fab fa-telegram', url: 'https://telegram.me/ivanpetrov' },
+            { name: 'Instagram', icon: 'fab fa-instagram', url: 'https://instagram.com/ivanpetrov' }
+        ];
+
+        // Доступные иконки для социальных сетей
+        const socialIcons = [
+            { name: 'Facebook', class: 'fab fa-facebook' },
+            { name: 'Twitter', class: 'fab fa-twitter' },
+            { name: 'Instagram', class: 'fab fa-instagram' },
+            { name: 'LinkedIn', class: 'fab fa-linkedin' },
+            { name: 'GitHub', class: 'fab fa-github' },
+            { name: 'Telegram', class: 'fab fa-telegram' },
+            { name: 'WhatsApp', class: 'fab fa-whatsapp' },
+            { name: 'YouTube', class: 'fab fa-youtube' },
+            { name: 'VK', class: 'fab fa-vk' },
+            { name: 'TikTok', class: 'fab fa-tiktok' },
+            { name: 'Discord', class: 'fab fa-discord' },
+            { name: 'Pinterest', class: 'fab fa-pinterest' },
+            { name: 'Reddit', class: 'fab fa-reddit' },
+            { name: 'Snapchat', class: 'fab fa-snapchat' },
+            { name: 'Twitch', class: 'fab fa-twitch' },
+            { name: 'Steam', class: 'fab fa-steam' },
+            { name: 'Spotify', class: 'fab fa-spotify' }
+        ];
 
         // Коллекция иконок для достижений
         const achievementIcons = [
@@ -1484,6 +1556,9 @@
             
             // Обновляем отображение контактов
             updateContactsDisplay();
+            
+            // Обновляем отображение социальных сетей
+            updateSocialNetworksDisplay();
             
             // Инициализируем категории портфолио
             initializePortfolioCategories();
@@ -2525,6 +2600,199 @@
 
             // Добавляем социальные ссылки обратно
             contactInfo.innerHTML += socialLinks;
+        }
+
+        // ============================================
+        // УПРАВЛЕНИЕ СОЦИАЛЬНЫМИ СЕТЯМИ
+        // ============================================
+
+        // Открыть модальное окно управления социальными сетями
+        function openSocialNetworksModal() {
+            loadSocialNetworksToList();
+            const modal = new bootstrap.Modal(document.getElementById('socialNetworksModal'));
+            modal.show();
+        }
+
+        // Загрузить социальные сети в список
+        function loadSocialNetworksToList() {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
+            const socialsList = document.getElementById('socialNetworksList');
+            socialsList.innerHTML = '';
+
+            socials.forEach((social, index) => {
+                const socialItem = document.createElement('div');
+                socialItem.className = 'mb-3 p-3 border rounded';
+                socialItem.innerHTML = `
+                    <div class="row align-items-center">
+                        <div class="col-md-1">
+                            <i class="${social.icon}" style="font-size: 1.5rem; color: var(--primary-green);"></i>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="text" class="form-control" id="social-name-${index}" value="${social.name}" placeholder="Название сети">
+                        </div>
+                        <div class="col-md-6">
+                            <input type="text" class="form-control" id="social-url-${index}" value="${social.url}" placeholder="URL адрес">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openSocialIconModal(${index})" title="Изменить иконку">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSocialNetwork(${index})" title="Удалить">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                socialsList.appendChild(socialItem);
+            });
+        }
+
+        // Добавить новую социальную сеть
+        function addNewSocialNetwork() {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
+
+            socials.push({ name: 'Новая сеть', icon: 'fab fa-link', url: 'https://' });
+            localStorage.setItem('socialNetworks', JSON.stringify(socials));
+            loadSocialNetworksToList();
+        }
+
+        // Удалить социальную сеть
+        function deleteSocialNetwork(index) {
+            if (confirm('Вы уверены, что хотите удалить эту социальную сеть?')) {
+                const savedSocials = localStorage.getItem('socialNetworks');
+                const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
+
+                socials.splice(index, 1);
+                localStorage.setItem('socialNetworks', JSON.stringify(socials));
+                loadSocialNetworksToList();
+                updateSocialNetworksDisplay();
+                showNotification('Социальная сеть удалена!');
+            }
+        }
+
+        // Сохранить социальные сети
+        function saveSocialNetworks() {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
+
+            socials.forEach((social, index) => {
+                const nameElement = document.getElementById(`social-name-${index}`);
+                const urlElement = document.getElementById(`social-url-${index}`);
+
+                if (nameElement) social.name = nameElement.value;
+                if (urlElement) social.url = urlElement.value;
+            });
+
+            localStorage.setItem('socialNetworks', JSON.stringify(socials));
+            updateSocialNetworksDisplay();
+            showNotification('Социальные сети сохранены!');
+        }
+
+        // Обновить отображение социальных сетей на странице
+        function updateSocialNetworksDisplay() {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
+            const socialLinks = document.querySelector('.social-links');
+
+            socialLinks.innerHTML = '';
+
+            socials.forEach(social => {
+                const link = document.createElement('a');
+                link.href = social.url;
+                link.target = '_blank';
+                link.title = social.name;
+                link.className = 'social-link-item';
+                link.style.cssText = `
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    background: var(--light-gray);
+                    color: var(--primary-green);
+                    border-radius: 50%;
+                    font-size: 1rem;
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(46, 204, 113, 0.2);
+                    margin: 0 6px;
+                    cursor: pointer;
+                `;
+
+                link.innerHTML = `<i class="${social.icon}"></i>`;
+                
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (e.ctrlKey || e.metaKey) {
+                        // Редактирование при Ctrl+клик
+                        e.stopPropagation();
+                        // Здесь можно добавить логику редактирования
+                    } else {
+                        // Обычный переход по ссылке
+                        window.open(social.url, '_blank');
+                    }
+                });
+
+                link.addEventListener('mouseenter', function() {
+                    this.style.background = 'var(--primary-green)';
+                    this.style.color = 'var(--dark-gray)';
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 5px 15px rgba(46, 204, 113, 0.3)';
+                });
+
+                link.addEventListener('mouseleave', function() {
+                    this.style.background = 'var(--light-gray)';
+                    this.style.color = 'var(--primary-green)';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+
+                socialLinks.appendChild(link);
+            });
+        }
+
+        // Открыть модальное окно выбора иконки
+        function openSocialIconModal(index) {
+            currentEditingSocialIndex = index;
+            
+            const iconGrid = document.getElementById('social-icon-grid');
+            iconGrid.innerHTML = '';
+
+            socialIcons.forEach((icon, iconIndex) => {
+                const iconItem = document.createElement('div');
+                iconItem.className = 'col-md-2 col-sm-3 col-4 mb-3';
+                iconItem.innerHTML = `
+                    <div class="social-icon-select-item text-center p-3 border rounded" style="cursor: pointer; transition: all 0.3s ease;" onclick="selectSocialIcon('${icon.class}', '${icon.name}')">
+                        <i class="${icon.class}" style="font-size: 2rem; color: var(--primary-green);"></i>
+                        <div class="small mt-2">${icon.name}</div>
+                    </div>
+                `;
+                iconGrid.appendChild(iconItem);
+            });
+
+            const modal = new bootstrap.Modal(document.getElementById('socialIconModal'));
+            modal.show();
+        }
+
+        // Выбрать иконку для социальной сети
+        function selectSocialIcon(iconClass, iconName) {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : defaultSocialNetworks;
+
+            if (currentEditingSocialIndex !== null && socials[currentEditingSocialIndex]) {
+                socials[currentEditingSocialIndex].icon = iconClass;
+                localStorage.setItem('socialNetworks', JSON.stringify(socials));
+                loadSocialNetworksToList();
+            }
+
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('socialIconModal'));
+            if (modal) {
+                modal.hide();
+            }
         }
 
         // ============================================
