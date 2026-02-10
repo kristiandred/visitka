@@ -888,35 +888,7 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8">
                     <div class="contact-info">
-                        <div class="contact-item">
-                            <i class="fas fa-envelope"></i>
-                            <strong>Email:</strong>
-                            <a id="contact-email" href="mailto:ivan.petrov@example.com">ivan.petrov@example.com</a>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-phone"></i>
-                            <strong>Телефон:</strong>
-                            <a id="contact-phone" href="tel:+79991234567">+7 (999) 123-45-67</a>
-                        </div>
-                        <div class="contact-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <strong>Адрес:</strong>
-                            <span>Москва, Россия</span>
-                        </div>
-                        <div class="social-links">
-                            <a href="https://github.com/ivanpetrov" target="_blank" title="GitHub">
-                                <i class="fab fa-github"></i>
-                            </a>
-                            <a href="https://linkedin.com/in/ivanpetrov" target="_blank" title="LinkedIn">
-                                <i class="fab fa-linkedin"></i>
-                            </a>
-                            <a href="https://telegram.me/ivanpetrov" target="_blank" title="Telegram">
-                                <i class="fab fa-telegram"></i>
-                            </a>
-                            <a href="https://instagram.com/ivanpetrov" target="_blank" title="Instagram">
-                                <i class="fab fa-instagram"></i>
-                            </a>
-                        </div>
+                        <!-- Контакты будут загружены динамически -->
                     </div>
                 </div>
             </div>
@@ -1126,6 +1098,12 @@
             // Загружаем портфолио
             loadPortfolioFromStorage();
             
+            // Загружаем навыки
+            loadSkills();
+            
+            // Загружаем контакты
+            loadContacts();
+            
             // Добавляем классы для анимации
             const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
             elementsToAnimate.forEach(element => {
@@ -1220,11 +1198,6 @@
                 console.log('Сохраненная аватарка не найдена');
             }
             
-            // Загружаем достижения
-            loadAchievements();
-            
-            // Загружаем навыки
-            loadSkills();
         }
 
         function loadAchievements() {
@@ -1314,6 +1287,118 @@
                     </div>
                 `;
             }
+        }
+
+        // Загрузка контактов из localStorage
+        function loadContacts() {
+            const savedContacts = localStorage.getItem('contacts');
+            const contacts = savedContacts ? JSON.parse(savedContacts) : [
+                { type: 'email', label: 'Email', value: 'ivan.petrov@example.com' },
+                { type: 'phone', label: 'Телефон', value: '+7 (999) 123-45-67' },
+                { type: 'address', label: 'Адрес', value: 'Москва, Россия' }
+            ];
+            
+            const contactInfo = document.querySelector('.contact-info');
+            if (!contactInfo) return;
+            
+            // Очищаем существующие контакты, но оставляем социальные ссылки
+            const existingContacts = contactInfo.querySelectorAll('.contact-item');
+            existingContacts.forEach(item => item.remove());
+            
+            contacts.forEach(contact => {
+                const contactItem = document.createElement('div');
+                contactItem.className = 'contact-item';
+
+                let icon = 'fas fa-info-circle';
+                let link = contact.value;
+                let displayElement;
+
+                if (contact.type === 'email') {
+                    icon = 'fas fa-envelope';
+                    link = `mailto:${contact.value}`;
+                    displayElement = document.createElement('a');
+                    displayElement.href = link;
+                    displayElement.textContent = contact.value;
+                } else if (contact.type === 'phone') {
+                    icon = 'fas fa-phone';
+                    link = `tel:${contact.value.replace(/[^\d+]/g, '')}`;
+                    displayElement = document.createElement('a');
+                    displayElement.href = link;
+                    displayElement.textContent = contact.value;
+                } else if (contact.type === 'address') {
+                    icon = 'fas fa-map-marker-alt';
+                    link = `https://maps.google.com/?q=${encodeURIComponent(contact.value)}`;
+                    displayElement = document.createElement('span');
+                    displayElement.textContent = contact.value;
+                }
+
+                contactItem.innerHTML = `
+                    <i class="${icon}"></i>
+                    <strong>${contact.label}:</strong>
+                `;
+                
+                contactItem.appendChild(displayElement);
+                contactInfo.appendChild(contactItem);
+            });
+            
+            // Загружаем социальные сети
+            loadSocialNetworks();
+        }
+
+        // Загрузка социальных сетей из localStorage
+        function loadSocialNetworks() {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : [
+                { name: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/ivanpetrov' },
+                { name: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/ivanpetrov' },
+                { name: 'Telegram', icon: 'fab fa-telegram', url: 'https://telegram.me/ivanpetrov' }
+            ];
+            
+            const socialLinks = document.querySelector('.social-links');
+            if (!socialLinks) return;
+            
+            socialLinks.innerHTML = '';
+
+            socials.forEach(social => {
+                const link = document.createElement('a');
+                link.href = social.url;
+                link.target = '_blank';
+                link.title = social.name;
+                link.className = 'social-link-item';
+                link.style.cssText = `
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    background: var(--light-gray);
+                    color: var(--primary-green);
+                    border-radius: 50%;
+                    font-size: 1rem;
+                    transition: all 0.3s ease;
+                    border: 1px solid rgba(46, 204, 113, 0.2);
+                    margin: 0 6px;
+                    cursor: pointer;
+                `;
+
+                link.innerHTML = `<i class="${social.icon}"></i>`;
+                
+                link.addEventListener('mouseenter', function() {
+                    this.style.background = 'var(--primary-green)';
+                    this.style.color = 'var(--dark-gray)';
+                    this.style.transform = 'translateY(-3px)';
+                    this.style.boxShadow = '0 5px 15px rgba(46, 204, 113, 0.3)';
+                });
+
+                link.addEventListener('mouseleave', function() {
+                    this.style.background = 'var(--light-gray)';
+                    this.style.color = 'var(--primary-green)';
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+
+                socialLinks.appendChild(link);
+            });
         }
 
         // Функция для загрузки аватарки с компьютера
