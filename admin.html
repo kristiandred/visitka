@@ -1259,6 +1259,32 @@
         </div>
     </div>
 
+    <!-- Модальное окно для редактирования текста "О себе" -->
+    <div class="modal fade" id="editAboutModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать текст "О себе"</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editAboutForm">
+                        <div class="mb-3">
+                            <label for="aboutText" class="form-label">Текст о себе</label>
+                            <textarea class="form-control" id="aboutText" rows="6" placeholder="Расскажите о себе..." required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAboutText()">
+                        <i class="fas fa-save me-2"></i>Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Модальное окно для управления социальными сетями -->
     <div class="modal fade" id="socialNetworksModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -2116,11 +2142,30 @@
             const aboutElement = document.getElementById('about-text');
             const currentAbout = aboutElement.textContent.trim();
             
-            const newAbout = prompt('Редактировать текст "О себе":', currentAbout);
-            if (newAbout !== null && newAbout.trim() !== '') {
-                aboutElement.textContent = newAbout.trim();
+            // Заполняем модальное окно текущим текстом
+            document.getElementById('aboutText').value = currentAbout;
+            
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('editAboutModal'));
+            modal.show();
+        }
+
+        // Сохранение текста "О себе"
+        function saveAboutText() {
+            const newText = document.getElementById('aboutText').value.trim();
+            
+            if (newText !== '') {
+                document.getElementById('about-text').textContent = newText;
                 showNotification('Текст "О себе" обновлен!');
                 saveAllContent();
+                
+                // Закрываем модальное окно
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editAboutModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            } else {
+                showNotification('Текст не может быть пустым!', 'danger');
             }
         }
 
