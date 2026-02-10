@@ -1046,14 +1046,14 @@
                             
                             <div class="row mt-4" id="achievements-row">
                                 <div class="col-md-6 mb-4 achievement-item">
-                                    <div class="skill-item achievement-block" data-achievement-index="0" style="position: relative; cursor: pointer;" onclick="editAchievement(0)">
+                                    <div class="skill-item achievement-block" data-achievement-index="0" data-element-type="achievement" style="position: relative; cursor: pointer;" onclick="editAchievement(0)">
                                         <i class="fas fa-medal achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                                         <h5 class="achievement-title">Более 50 проектов</h5>
                                         <p class="achievement-desc">Успешно завершенных и запущенных</p>
                                     </div>
                                 </div>
                                 <div class="col-md-6 mb-4 achievement-item">
-                                    <div class="skill-item achievement-block" data-achievement-index="1" style="position: relative; cursor: pointer;" onclick="editAchievement(1)">
+                                    <div class="skill-item achievement-block" data-achievement-index="1" data-element-type="achievement" style="position: relative; cursor: pointer;" onclick="editAchievement(1)">
                                         <i class="fas fa-users achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                                         <h5 class="achievement-title">Командная работа</h5>
                                         <p class="achievement-desc">Опыт работы в Agile/Scrum командах</p>
@@ -1066,21 +1066,21 @@
                         
                         <div class="row mt-4" id="skills-row">
                             <div class="col-md-4 mb-4">
-                                <div class="skill-item skill-block" data-skill-index="0" style="position: relative; cursor: pointer;" onclick="editSkill(0)">
+                                <div class="skill-item skill-block" data-skill-index="0" data-element-type="skill" style="position: relative; cursor: pointer;" onclick="editSkill(0)">
                                     <i class="fab fa-js-square skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                                     <h5 class="skill-title">JavaScript</h5>
                                     <p class="skill-desc">React, Vue, Node.js, Express</p>
                                 </div>
                             </div>
                             <div class="col-md-4 mb-4">
-                                <div class="skill-item skill-block" data-skill-index="1" style="position: relative; cursor: pointer;" onclick="editSkill(1)">
+                                <div class="skill-item skill-block" data-skill-index="1" data-element-type="skill" style="position: relative; cursor: pointer;" onclick="editSkill(1)">
                                     <i class="fab fa-python skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                                     <h5 class="skill-title">Python</h5>
                                     <p class="skill-desc">Django, Flask, Data Science</p>
                                 </div>
                             </div>
                             <div class="col-md-4 mb-4">
-                                <div class="skill-item skill-block" data-skill-index="2" style="position: relative; cursor: pointer;" onclick="editSkill(2)">
+                                <div class="skill-item skill-block" data-skill-index="2" data-element-type="skill" style="position: relative; cursor: pointer;" onclick="editSkill(2)">
                                     <i class="fas fa-database skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                                     <h5 class="skill-title">Базы данных</h5>
                                     <p class="skill-desc">MySQL, PostgreSQL, MongoDB</p>
@@ -1990,12 +1990,13 @@
                 const title = block.querySelector('.achievement-title').textContent.trim();
                 const description = block.querySelector('.achievement-desc').textContent.trim();
                 const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                const elementType = block.getAttribute('data-element-type') || 'achievement';
                 
                 achievements.push({
                     title: title,
                     description: description,
                     icon: iconClass,
-                    type: 'achievement' // Сохраняем тип элемента
+                    type: elementType
                 });
             });
             
@@ -2011,12 +2012,13 @@
                 const title = block.querySelector('.skill-title').textContent.trim();
                 const description = block.querySelector('.skill-desc').textContent.trim();
                 const iconClass = block.querySelector('.skill-icon').className.replace(' skill-icon', '');
+                const elementType = block.getAttribute('data-element-type') || 'skill';
                 
                 skills.push({
                     title: title,
                     description: description,
                     icon: iconClass,
-                    type: 'skill' // Сохраняем тип элемента
+                    type: elementType
                 });
             });
             
@@ -2054,7 +2056,13 @@
             const description = achievementBlock.querySelector('.achievement-desc').textContent;
             const iconClass = achievementBlock.querySelector('.achievement-icon').className;
             
-            document.getElementById('elementType').value = 'achievement';
+            // Получаем тип элемента из атрибута или определяем по наличию класса
+            let elementType = achievementBlock.getAttribute('data-element-type');
+            if (!elementType) {
+                elementType = 'achievement'; // По умолчанию для достижений
+            }
+            
+            document.getElementById('elementType').value = elementType;
             document.getElementById('achievementTitle').value = title;
             document.getElementById('achievementDescription').value = description;
             document.getElementById('currentIcon').className = iconClass + ' me-3';
@@ -2080,8 +2088,14 @@
             const description = skillBlock.querySelector('.skill-desc').textContent;
             const iconClass = skillBlock.querySelector('.skill-icon').className;
             
+            // Получаем тип элемента из атрибута или определяем по умолчанию
+            let elementType = skillBlock.getAttribute('data-element-type');
+            if (!elementType) {
+                elementType = 'skill'; // По умолчанию для навыков
+            }
+            
             // Устанавливаем тип навык
-            document.getElementById('elementType').value = 'skill';
+            document.getElementById('elementType').value = elementType;
             document.getElementById('achievementTitle').value = title;
             document.getElementById('achievementDescription').value = description;
             document.getElementById('currentIcon').className = iconClass + ' me-3';
@@ -2114,25 +2128,117 @@
             if (currentEditingSkillIndex !== null) {
                 // Обновляем существующий навык
                 const skillBlock = document.querySelector(`[data-skill-index="${currentEditingSkillIndex}"]`);
-                skillBlock.querySelector('.skill-icon').className = iconClass + ' skill-icon';
-                skillBlock.querySelector('.skill-icon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
-                skillBlock.querySelector('.skill-title').textContent = title;
-                skillBlock.querySelector('.skill-desc').textContent = description;
-                skillBlock.setAttribute('data-element-type', 'skill'); // Обновляем тип элемента
+                const parentCol = skillBlock.closest('.col-md-4');
                 
+                // Определяем новый индекс в зависимости от типа
+                let newIndex;
+                if (elementType === 'skill') {
+                    newIndex = document.querySelectorAll('.skill-block').length;
+                } else {
+                    newIndex = achievementCounter++;
+                }
+                
+                // Создаем новый HTML в зависимости от типа
+                let newHtml;
+                if (elementType === 'skill') {
+                    newHtml = `
+                        <div class="skill-item skill-block" data-skill-index="${newIndex}" data-element-type="${elementType}" style="position: relative; cursor: pointer;" onclick="editSkill(${newIndex})">
+                            <i class="${iconClass} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="skill-title">${title}</h5>
+                            <p class="skill-desc">${description}</p>
+                        </div>
+                    `;
+                } else {
+                    // Создаем достижение
+                    const achievementsRow = document.getElementById('achievements-row');
+                    const achievementCol = document.createElement('div');
+                    achievementCol.className = 'col-md-6 mb-4 achievement-item';
+                    achievementCol.innerHTML = `
+                        <div class="skill-item achievement-block" data-achievement-index="${newIndex}" data-element-type="${elementType}" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
+                            <i class="${iconClass} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="achievement-title">${title}</h5>
+                            <p class="achievement-desc">${description}</p>
+                        </div>
+                    `;
+                    
+                    // Добавляем достижение в achievements row
+                    achievementsRow.appendChild(achievementCol);
+                    
+                    // Удаляем старый элемент навыка
+                    parentCol.remove();
+                    
+                    // Сохраняем достижения
+                    saveAllAchievements();
+                    showNotification('Элемент преобразован в достижение!');
+                    
+                    // Закрываем модальное окно
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('editAchievementModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                    
+                    currentEditingSkillIndex = null;
+                    return;
+                }
+                
+                // Обновляем HTML
+                skillBlock.outerHTML = newHtml;
                 showNotification('Навык обновлен!');
                 saveAllSkills();
+                
             } else if (currentEditingAchievementIndex !== null) {
                 // Обновляем существующее достижение
                 const achievementBlock = document.querySelector(`[data-achievement-index="${currentEditingAchievementIndex}"]`);
-                achievementBlock.querySelector('.achievement-icon').className = iconClass + ' achievement-icon';
-                achievementBlock.querySelector('.achievement-icon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
-                achievementBlock.querySelector('.achievement-title').textContent = title;
-                achievementBlock.querySelector('.achievement-desc').textContent = description;
-                achievementBlock.setAttribute('data-element-type', 'achievement'); // Обновляем тип элемента
+                const parentCol = achievementBlock.closest('.achievement-item');
                 
-                showNotification('Достижение обновлено!');
-                saveAllAchievements();
+                // Определяем новый индекс в зависимости от типа
+                let newIndex;
+                if (elementType === 'achievement') {
+                    newIndex = currentEditingAchievementIndex;
+                } else {
+                    newIndex = document.querySelectorAll('.skill-block').length;
+                }
+                
+                // Создаем новый HTML в зависимости от типа
+                let newHtml;
+                if (elementType === 'achievement') {
+                    newHtml = `
+                        <div class="skill-item achievement-block" data-achievement-index="${newIndex}" data-element-type="${elementType}" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
+                            <i class="${iconClass} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="achievement-title">${title}</h5>
+                            <p class="achievement-desc">${description}</p>
+                        </div>
+                    `;
+                    
+                    // Обновляем HTML
+                    achievementBlock.outerHTML = newHtml;
+                    showNotification('Достижение обновлено!');
+                    saveAllAchievements();
+                    
+                } else {
+                    // Создаем навык
+                    const skillsRow = document.getElementById('skills-row');
+                    const skillCol = document.createElement('div');
+                    skillCol.className = 'col-md-4 mb-4';
+                    skillCol.innerHTML = `
+                        <div class="skill-item skill-block" data-skill-index="${newIndex}" data-element-type="${elementType}" style="position: relative; cursor: pointer;" onclick="editSkill(${newIndex})">
+                            <i class="${iconClass} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="skill-title">${title}</h5>
+                            <p class="skill-desc">${description}</p>
+                        </div>
+                    `;
+                    
+                    // Добавляем навык в skills row
+                    skillsRow.appendChild(skillCol);
+                    
+                    // Удаляем старый элемент достижения
+                    parentCol.remove();
+                    
+                    // Сохраняем навыки
+                    saveAllSkills();
+                    showNotification('Элемент преобразован в навык!');
+                }
+                
             } else {
                 // Создание нового элемента на основе выбора типа
                 if (elementType === 'skill') {
@@ -2179,6 +2285,10 @@
             if (modal) {
                 modal.hide();
             }
+            
+            // Сбрасываем индексы редактирования
+            currentEditingSkillIndex = null;
+            currentEditingAchievementIndex = null;
         }
 
         // Удаление текущего достижения
@@ -2217,6 +2327,7 @@
                         modal.hide();
                     }
                 }
+            } else {
                 showNotification('Нельзя удалить несуществующий элемент!', 'danger');
             }
         }
@@ -2236,39 +2347,52 @@
 
         // Сохранение всех достижений и навыков в localStorage
         function saveAllContent() {
-            const achievementBlocks = document.querySelectorAll('.achievement-block');
+            const achievementBlocks = document.querySelectorAll('.achievement-block, .skill-block');
             const achievements = [];
-            const skillBlocks = document.querySelectorAll('.skill-block');
             const skills = [];
             
             achievementBlocks.forEach((block) => {
-                const title = block.querySelector('.achievement-title').textContent.trim();
-                const description = block.querySelector('.achievement-desc').textContent.trim();
-                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                const isAchievement = block.classList.contains('achievement-block');
+                const title = isAchievement ? 
+                    block.querySelector('.achievement-title').textContent.trim() : 
+                    block.querySelector('.skill-title').textContent.trim();
+                const description = isAchievement ? 
+                    block.querySelector('.achievement-desc').textContent.trim() : 
+                    block.querySelector('.skill-desc').textContent.trim();
+                const iconClass = isAchievement ? 
+                    block.querySelector('.achievement-icon').className.replace(' achievement-icon', '') : 
+                    block.querySelector('.skill-icon').className.replace(' skill-icon', '');
+                const elementType = block.getAttribute('data-element-type') || (isAchievement ? 'achievement' : 'skill');
                 
-                achievements.push({
-                    title: title,
-                    description: description,
-                    icon: iconClass,
-                    type: 'achievement' // Сохраняем тип элемента
-                });
-            });
-            
-            skillBlocks.forEach((block) => {
-                const title = block.querySelector('.skill-title').textContent.trim();
-                const description = block.querySelector('.skill-desc').textContent.trim();
-                const iconClass = block.querySelector('.skill-icon').className.replace(' skill-icon', '');
-                
-                skills.push({
-                    title: title,
-                    description: description,
-                    icon: iconClass,
-                    type: 'skill' // Сохраняем тип элемента
-                });
+                if (elementType === 'achievement') {
+                    achievements.push({
+                        title: title,
+                        description: description,
+                        icon: iconClass,
+                        type: elementType
+                    });
+                } else {
+                    skills.push({
+                        title: title,
+                        description: description,
+                        icon: iconClass,
+                        type: elementType
+                    });
+                }
             });
             
             localStorage.setItem('achievements', JSON.stringify(achievements));
             localStorage.setItem('skills', JSON.stringify(skills));
+            
+            // Также сохраняем основной контент
+            const content = {
+                site_title: document.getElementById('hero-title').textContent,
+                site_description: document.getElementById('hero-description').textContent,
+                about_text: document.getElementById('about-text').textContent,
+                achievements_title: document.getElementById('achievements-title').textContent
+            };
+            
+            localStorage.setItem('mainPageContent', JSON.stringify(content));
         }
 
         // Загрузка достижений
@@ -2281,13 +2405,26 @@
                 achievementsRow.innerHTML = '';
                 
                 achievements.forEach((achievement, index) => {
+                    const elementType = achievement.type || 'achievement';
                     const achievementCol = document.createElement('div');
                     achievementCol.className = 'col-md-6 mb-4 achievement-item';
+                    
+                    let iconClass = achievement.icon;
+                    let titleClass = elementType === 'achievement' ? 'achievement-title' : 'skill-title';
+                    let descClass = elementType === 'achievement' ? 'achievement-desc' : 'skill-desc';
+                    let iconSuffix = elementType === 'achievement' ? 'achievement-icon' : 'skill-icon';
+                    let onClickFunction = elementType === 'achievement' ? `editAchievement(${index})` : `editSkill(${index})`;
+                    let blockClass = elementType === 'achievement' ? 'achievement-block' : 'skill-block';
+                    
                     achievementCol.innerHTML = `
-                        <div class="skill-item achievement-block" data-achievement-index="${index}" data-element-type="achievement" style="position: relative; cursor: pointer;" onclick="editAchievement(${index})">
-                            <i class="${achievement.icon} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
-                            <h5 class="achievement-title">${achievement.title}</h5>
-                            <p class="achievement-desc">${achievement.description}</p>
+                        <div class="skill-item ${blockClass}" 
+                             data-${elementType === 'achievement' ? 'achievement' : 'skill'}-index="${index}" 
+                             data-element-type="${elementType}" 
+                             style="position: relative; cursor: pointer;" 
+                             onclick="${onClickFunction}">
+                            <i class="${iconClass} ${iconSuffix}" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="${titleClass}">${achievement.title}</h5>
+                            <p class="${descClass}">${achievement.description}</p>
                         </div>
                     `;
                     achievementsRow.appendChild(achievementCol);
@@ -2307,13 +2444,26 @@
                 skillsRow.innerHTML = '';
                 
                 skills.forEach((skill, index) => {
+                    const elementType = skill.type || 'skill';
                     const skillCol = document.createElement('div');
                     skillCol.className = 'col-md-4 mb-4';
+                    
+                    let iconClass = skill.icon;
+                    let titleClass = elementType === 'skill' ? 'skill-title' : 'achievement-title';
+                    let descClass = elementType === 'skill' ? 'skill-desc' : 'achievement-desc';
+                    let iconSuffix = elementType === 'skill' ? 'skill-icon' : 'achievement-icon';
+                    let onClickFunction = elementType === 'skill' ? `editSkill(${index})` : `editAchievement(${index})`;
+                    let blockClass = elementType === 'skill' ? 'skill-block' : 'achievement-block';
+                    
                     skillCol.innerHTML = `
-                        <div class="skill-item skill-block" data-skill-index="${index}" data-element-type="skill" style="position: relative; cursor: pointer;" onclick="editSkill(${index})">
-                            <i class="${skill.icon} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
-                            <h5 class="skill-title">${skill.title}</h5>
-                            <p class="skill-desc">${skill.description}</p>
+                        <div class="skill-item ${blockClass}" 
+                             data-${elementType === 'skill' ? 'skill' : 'achievement'}-index="${index}" 
+                             data-element-type="${elementType}" 
+                             style="position: relative; cursor: pointer;" 
+                             onclick="${onClickFunction}">
+                            <i class="${iconClass} ${iconSuffix}" style="font-size: 2rem; color: var(--primary-green);"></i>
+                            <h5 class="${titleClass}">${skill.title}</h5>
+                            <p class="${descClass}">${skill.description}</p>
                         </div>
                     `;
                     skillsRow.appendChild(skillCol);
@@ -2982,24 +3132,6 @@
         // ============================================
         // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
         // ============================================
-
-        // Сохранить весь контент
-        function saveAllContent() {
-            const content = {
-                site_title: document.getElementById('hero-title').textContent,
-                site_description: document.getElementById('hero-description').textContent,
-                about_text: document.getElementById('about-text').textContent,
-                achievements_title: document.getElementById('achievements-title').textContent
-            };
-            
-            localStorage.setItem('mainPageContent', JSON.stringify(content));
-            
-            // Сохраняем достижения отдельно
-            saveAllAchievements();
-            saveAllSkills();
-            
-            showNotification('Все изменения сохранены!');
-        }
 
         // Показать уведомление
         function showNotification(message, type = 'success') {
