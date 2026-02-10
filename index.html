@@ -1097,6 +1097,9 @@
             // Загружаем портфолио
             loadPortfolioFromStorage();
             
+            // Загружаем достижения
+            loadAchievements();
+            
             // Загружаем навыки
             loadSkills();
             
@@ -1416,34 +1419,6 @@
                 socialLinks.appendChild(link);
             });
         }
-
-        // Инициализация при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            // Загружаем сохраненный контент
-            loadSavedContent();
-            
-            // Загружаем портфолио
-            loadPortfolioFromStorage();
-            
-            // Загружаем навыки
-            loadSkills();
-            
-            // Загружаем контакты
-            loadContacts();
-            
-            // Добавляем классы для анимации
-            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
-            elementsToAnimate.forEach(element => {
-                element.classList.add('fade-in-up');
-                element.style.opacity = '0';
-                element.style.transform = 'translateY(30px)';
-                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-            });
-            
-            // Запускаем анимацию при прокрутке
-            window.addEventListener('scroll', animateOnScroll);
-            animateOnScroll();
-        });
 </script>
 </body>
 </html>
