@@ -958,6 +958,39 @@
             margin: 3rem 0;
             border-radius: 2px;
         }
+
+        /* Стили для заголовка портфолио с кнопками */
+        .portfolio-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .portfolio-header .section-title {
+            margin-bottom: 0;
+        }
+
+        .portfolio-control-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .portfolio-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .portfolio-control-buttons {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1091,6 +1124,26 @@
                 </div>
             </div>
         </div>
+    </section>
+
+    <!-- Портфолио с фотографиями -->
+    <section id="portfolio" class="py-5">
+        <div class="container">
+            <div class="portfolio-header">
+                <h2 class="section-title">Портфолио</h2>
+                <div class="portfolio-control-buttons">
+                    <button class="btn btn-primary" onclick="addNewProject()" title="Добавить новый проект">
+                        <i class="fas fa-plus me-2"></i>Добавить проект
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="openCategoriesModal()" title="Управление категориями">
+                        <i class="fas fa-cog me-2"></i>Настройки
+                    </button>
+                </div>
+            </div>
+            <div class="portfolio-filter" id="portfolio-filter">
+                <!-- Фильтры будут загружены динамически -->
+            </div>
+            <div class="row" id="photos-gallery">
                 <!-- Проекты будут загружены динамически -->
             </div>
         </div>
@@ -1238,6 +1291,50 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                     <button type="button" class="btn btn-primary" onclick="saveProjectChanges()">
                         <i class="fas fa-save me-2"></i>Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления нового проекта -->
+    <div class="modal fade" id="addProjectModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Добавить новый проект</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addProjectForm">
+                        <div class="mb-3">
+                            <label for="newProjectTitle" class="form-label">Название проекта</label>
+                            <input type="text" class="form-control" id="newProjectTitle" required placeholder="Введите название проекта">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newProjectDescription" class="form-label">Описание проекта</label>
+                            <textarea class="form-control" id="newProjectDescription" rows="3" required placeholder="Введите описание проекта"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newProjectCategory" class="form-label">Категория</label>
+                            <select class="form-select" id="newProjectCategory">
+                                <!-- Категории будут загружены динамически -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newProjectImage" class="form-label">URL изображения</label>
+                            <input type="text" class="form-control" id="newProjectImage" placeholder="https://example.com/image.jpg">
+                            <div class="mt-2">
+                                <input type="file" class="form-control" id="newProjectImageUpload" accept="image/*">
+                                <small class="text-muted">Или загрузите изображение с компьютера</small>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveNewProject()">
+                        <i class="fas fa-save me-2"></i>Сохранить проект
                     </button>
                 </div>
             </div>
@@ -2614,6 +2711,79 @@
             return category ? category.name : filter;
         }
 
+        // Добавить новый проект
+        function addNewProject() {
+            currentEditingProjectIndex = null;
+            
+            // Инициализируем категории портфолио
+            initializePortfolioCategories();
+            
+            // Очищаем форму
+            document.getElementById('newProjectTitle').value = '';
+            document.getElementById('newProjectDescription').value = '';
+            
+            // Заполняем категории
+            const categorySelect = document.getElementById('newProjectCategory');
+            categorySelect.innerHTML = '';
+            
+            // Добавляем только категории кроме "Все работы"
+            portfolioCategories.forEach(category => {
+                if (category && category.name && category.filter && category.filter !== 'all') {
+                    const option = document.createElement('option');
+                    option.value = category.filter;
+                    option.textContent = category.name;
+                    categorySelect.appendChild(option);
+                }
+            });
+            
+            // Выбираем первую категорию по умолчанию
+            if (categorySelect.options.length > 0) {
+                categorySelect.selectedIndex = 0;
+            }
+            
+            document.getElementById('newProjectImage').value = '';
+            
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('addProjectModal'));
+            modal.show();
+        }
+
+        // Сохранить новый проект
+        function saveNewProject() {
+            const title = document.getElementById('newProjectTitle').value.trim();
+            const description = document.getElementById('newProjectDescription').value.trim();
+            const category = document.getElementById('newProjectCategory').value;
+            const image = document.getElementById('newProjectImage').value.trim();
+            
+            if (!title || !description) {
+                showNotification('Пожалуйста, заполните название и описание!', 'danger');
+                return;
+            }
+            
+            const savedProjects = localStorage.getItem('portfolioProjects');
+            const projects = savedProjects ? JSON.parse(savedProjects) : [];
+            
+            // Создаем новый проект
+            const newProject = {
+                title: title,
+                description: description,
+                category: category,
+                image: image || `https://picsum.photos/seed/project${Date.now()}/400/300.jpg`
+            };
+            
+            projects.push(newProject);
+            localStorage.setItem('portfolioProjects', JSON.stringify(projects));
+            updatePortfolioGallery(projects);
+            
+            // Закрываем модальное окно
+            const modal = bootstrap.Modal.getInstance(document.getElementById('addProjectModal'));
+            if (modal) {
+                modal.hide();
+            }
+            
+            showNotification('Новый проект добавлен!');
+        }
+
         // Удаление проекта
         function deleteProject(index) {
             if (confirm('Вы уверены, что хотите удалить этот проект?')) {
@@ -2626,38 +2796,6 @@
                 updatePortfolioGallery(projects);
                 showNotification('Проект удален!');
             }
-        }
-
-        // Создание нового проекта
-        function createNewProject() {
-            currentEditingProjectIndex = null;
-            
-            // Инициализируем категории портфолио
-            initializePortfolioCategories();
-            
-            // Очищаем форму
-            document.getElementById('projectTitle').value = '';
-            document.getElementById('projectDescription').value = '';
-            document.getElementById('projectImage').value = '';
-            
-            // Устанавливаем категорию по умолчанию
-            const categorySelect = document.getElementById('projectCategory');
-            if (categorySelect.options.length > 0) {
-                categorySelect.selectedIndex = 0;
-            }
-            
-            // Обновляем заголовок модального окна
-            document.querySelector('#editProjectModal .modal-title').textContent = 'Добавить новый проект';
-            
-            // Скрываем кнопку удаления (для нового проекта ее не должно быть)
-            const deleteBtn = document.querySelector('#editProjectModal .btn-danger');
-            if (deleteBtn) {
-                deleteBtn.style.display = 'none';
-            }
-            
-            // Показываем модальное окно
-            const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
-            modal.show();
         }
 
         // Редактирование проекта
@@ -2706,12 +2844,6 @@
             // Обновляем заголовок модального окна
             document.querySelector('#editProjectModal .modal-title').textContent = 'Редактировать проект';
             
-            // Показываем кнопку удаления
-            const deleteBtn = document.querySelector('#editProjectModal .btn-danger');
-            if (deleteBtn) {
-                deleteBtn.style.display = 'inline-block';
-            }
-            
             // Показываем модальное окно
             const modal = new bootstrap.Modal(document.getElementById('editProjectModal'));
             modal.show();
@@ -2719,6 +2851,8 @@
 
         // Сохранение изменений проекта
         function saveProjectChanges() {
+            if (currentEditingProjectIndex === null) return;
+            
             const title = document.getElementById('projectTitle').value.trim();
             const description = document.getElementById('projectDescription').value.trim();
             const category = document.getElementById('projectCategory').value;
@@ -2732,27 +2866,13 @@
             const savedProjects = localStorage.getItem('portfolioProjects');
             const projects = savedProjects ? JSON.parse(savedProjects) : [];
             
-            if (currentEditingProjectIndex === null) {
-                // Создаем новый проект
-                const newProject = {
-                    title: title,
-                    description: description,
-                    category: category,
-                    image: image || `https://picsum.photos/seed/project${projects.length}/400/300.jpg`
-                };
-                
-                projects.push(newProject);
-                showNotification('Новый проект добавлен!');
-            } else {
-                // Обновляем существующий проект
-                projects[currentEditingProjectIndex] = {
-                    title: title,
-                    description: description,
-                    category: category,
-                    image: image || `https://picsum.photos/seed/project${currentEditingProjectIndex}/400/300.jpg`
-                };
-                showNotification('Проект успешно обновлен!');
-            }
+            // Обновляем проект
+            projects[currentEditingProjectIndex] = {
+                title: title,
+                description: description,
+                category: category,
+                image: image || `https://picsum.photos/seed/project${currentEditingProjectIndex}/400/300.jpg`
+            };
             
             localStorage.setItem('portfolioProjects', JSON.stringify(projects));
             updatePortfolioGallery(projects);
@@ -2764,6 +2884,7 @@
             }
             
             currentEditingProjectIndex = null;
+            showNotification('Проект успешно обновлен!');
         }
 
         // Удаление текущего проекта
@@ -3228,6 +3349,22 @@
                         const reader = new FileReader();
                         reader.onload = function(event) {
                             document.getElementById('projectImage').value = event.target.result;
+                            showNotification('Изображение загружено!');
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+            
+            // Обработка загрузки изображения для нового проекта
+            const newProjectImageUpload = document.getElementById('newProjectImageUpload');
+            if (newProjectImageUpload) {
+                newProjectImageUpload.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file && file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            document.getElementById('newProjectImage').value = event.target.result;
                             showNotification('Изображение загружено!');
                         };
                         reader.readAsDataURL(file);
