@@ -810,72 +810,10 @@
         <div class="container">
             <h2 class="section-title text-center">Портфолио</h2>
             <div class="portfolio-filter">
-                <button class="filter-btn active" data-filter="all">Все работы</button>
-                <button class="filter-btn" data-filter="web">Веб-разработка</button>
-                <button class="filter-btn" data-filter="mobile">Мобильная разработка</button>
-                <button class="filter-btn" data-filter="design">Дизайн</button>
+                <!-- Кнопки фильтров будут загружены динамически -->
             </div>
             <div class="row" id="photos-gallery">
-                <div class="col-lg-4 col-md-6 mb-4" data-category="web">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project1/400/300.jpg" alt="Проект 1" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">E-commerce платформа</h5>
-                            <p class="photo-description">Современный интернет-магазин с панелью администратора</p>
-                            <span class="photo-category">Веб-разработка</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="mobile">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project2/400/300.jpg" alt="Проект 2" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Мобильное приложение</h5>
-                            <p class="photo-description">React Native приложение для доставки еды</p>
-                            <span class="photo-category">Мобильная разработка</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="design">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project3/400/300.jpg" alt="Проект 3" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Корпоративный сайт</h5>
-                            <p class="photo-description">Дизайн и разработка сайта для IT компании</p>
-                            <span class="photo-category">Дизайн</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="web">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project4/400/300.jpg" alt="Проект 4" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">SaaS платформа</h5>
-                            <p class="photo-description">Облачная CRM система для малого бизнеса</p>
-                            <span class="photo-category">Веб-разработка</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="design">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project5/400/300.jpg" alt="Проект 5" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Landing page</h5>
-                            <p class="photo-description">Продающая страница для стартапа</p>
-                            <span class="photo-category">Дизайн</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6 mb-4" data-category="web">
-                    <div class="photo-card">
-                        <img src="https://picsum.photos/seed/project6/400/300.jpg" alt="Проект 6" class="img-fluid">
-                        <div class="photo-card-body">
-                            <h5 class="photo-title">Блог платформа</h5>
-                            <p class="photo-description">Система управления контентом с CMS</p>
-                            <span class="photo-category">Веб-разработка</span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Проекты будут загружены динамически -->
             </div>
         </div>
     </section>
@@ -994,6 +932,14 @@
             }
         }
 
+        // Функция для получения русского названия категории по фильтру
+        function getCategoryNameByFilter(filter, categories) {
+            if (!categories || !Array.isArray(categories)) return filter;
+            
+            const category = categories.find(cat => cat.filter === filter);
+            return category ? category.name : filter;
+        }
+
         function updatePortfolioFilters(categories) {
             const filterContainer = document.querySelector('.portfolio-filter');
             if (!filterContainer) return;
@@ -1059,6 +1005,10 @@
             const gallery = document.getElementById('photos-gallery');
             if (!gallery) return;
             
+            // Загружаем категории для получения русских названий
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            const categories = savedCategories ? JSON.parse(savedCategories) : [];
+            
             gallery.innerHTML = '';
             
             projects.forEach(project => {
@@ -1066,12 +1016,14 @@
                 projectCard.className = 'col-lg-4 col-md-6 mb-4';
                 
                 // Handle both string and object category formats
-                let categoryValue = project.category;
-                if (typeof project.category === 'object' && project.category.name) {
-                    categoryValue = project.category.name;
+                let categoryFilter = project.category;
+                if (typeof project.category === 'object' && project.category.filter) {
+                    categoryFilter = project.category.filter;
                 }
                 
-                const categoryFilter = categoryValue === 'Все работы' ? 'all' : categoryValue.toLowerCase().replace(' ', '-');
+                // Получаем русское название категории
+                const categoryName = getCategoryNameByFilter(categoryFilter, categories);
+                
                 projectCard.setAttribute('data-category', categoryFilter);
                 
                 projectCard.innerHTML = `
@@ -1080,7 +1032,7 @@
                         <div class="photo-card-body">
                             <h5 class="photo-title">${project.title}</h5>
                             <p class="photo-description">${project.description}</p>
-                            <span class="photo-category">${categoryValue}</span>
+                            <span class="photo-category">${categoryName}</span>
                         </div>
                     </div>
                 `;
