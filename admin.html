@@ -1978,9 +1978,55 @@
         }
 
         // ============================================
+        // ФУНКЦИИ СОХРАНЕНИЯ (определены до использования)
+        // ============================================
+
+        // Сохранение всех достижений в localStorage
+        function saveAllAchievements() {
+            const achievementBlocks = document.querySelectorAll('.achievement-block');
+            const achievements = [];
+            
+            achievementBlocks.forEach((block) => {
+                const title = block.querySelector('.achievement-title').textContent.trim();
+                const description = block.querySelector('.achievement-desc').textContent.trim();
+                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                
+                achievements.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass,
+                    type: 'achievement' // Сохраняем тип элемента
+                });
+            });
+            
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
+        // Сохранение всех навыков в localStorage
+        function saveAllSkills() {
+            const skillBlocks = document.querySelectorAll('.skill-block');
+            const skills = [];
+            
+            skillBlocks.forEach((block) => {
+                const title = block.querySelector('.skill-title').textContent.trim();
+                const description = block.querySelector('.skill-desc').textContent.trim();
+                const iconClass = block.querySelector('.skill-icon').className.replace(' skill-icon', '');
+                
+                skills.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass,
+                    type: 'skill' // Сохраняем тип элемента
+                });
+            });
+            
+            localStorage.setItem('skills', JSON.stringify(skills));
+        }
+
+        // ============================================
         // УПРАВЛЕНИЕ ДОСТИЖЕНИЯМИ И НАВЫКАМИ
         // ============================================
-        
+
         // Создание нового достижения
         function createNewAchievement() {
             currentEditingAchievementIndex = null;
@@ -2186,10 +2232,12 @@
             }
         }
 
-        // Сохранение всех достижений в localStorage
-        function saveAllAchievements() {
+        // Сохранение всех достижений и навыков в localStorage
+        function saveAllContent() {
             const achievementBlocks = document.querySelectorAll('.achievement-block');
             const achievements = [];
+            const skillBlocks = document.querySelectorAll('.skill-block');
+            const skills = [];
             
             achievementBlocks.forEach((block) => {
                 const title = block.querySelector('.achievement-title').textContent.trim();
@@ -2204,14 +2252,6 @@
                 });
             });
             
-            localStorage.setItem('achievements', JSON.stringify(achievements));
-        }
-
-        // Сохранение всех навыков в localStorage
-        function saveAllSkills() {
-            const skillBlocks = document.querySelectorAll('.skill-block');
-            const skills = [];
-            
             skillBlocks.forEach((block) => {
                 const title = block.querySelector('.skill-title').textContent.trim();
                 const description = block.querySelector('.skill-desc').textContent.trim();
@@ -2225,6 +2265,7 @@
                 });
             });
             
+            localStorage.setItem('achievements', JSON.stringify(achievements));
             localStorage.setItem('skills', JSON.stringify(skills));
         }
 
