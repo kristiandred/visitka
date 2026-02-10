@@ -2080,6 +2080,32 @@
             }
         }
 
+        // Редактирование заголовка hero-секции
+        function editHeroTitle() {
+            const titleElement = document.getElementById('hero-title');
+            const currentTitle = titleElement.textContent.trim();
+            
+            const newTitle = prompt('Редактировать заголовок:', currentTitle);
+            if (newTitle !== null && newTitle.trim() !== '') {
+                titleElement.textContent = newTitle.trim();
+                showNotification('Заголовок обновлен!');
+                saveAllContent();
+            }
+        }
+
+        // Редактирование описания hero-секции
+        function editHeroDescription() {
+            const descElement = document.getElementById('hero-description');
+            const currentDesc = descElement.textContent.trim();
+            
+            const newDesc = prompt('Редактировать описание:', currentDesc);
+            if (newDesc !== null && newDesc.trim() !== '') {
+                descElement.textContent = newDesc.trim();
+                showNotification('Описание обновлено!');
+                saveAllContent();
+            }
+        }
+
         // Сохранение всех навыков в localStorage
         function saveAllSkills() {
             const skillBlocks = document.querySelectorAll('.skill-block');
