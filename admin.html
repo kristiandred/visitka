@@ -897,6 +897,56 @@
                 margin: 0 !important;
             }
         }
+
+        /* Стили для выравнивания иконок социальных сетей */
+        .social-icon-select-item {
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border: 2px solid rgba(46, 204, 113, 0.2);
+            border-radius: 8px;
+            background: var(--light-gray);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            overflow: hidden;
+            padding: 10px !important;
+        }
+
+        .social-icon-select-item:hover {
+            border-color: var(--primary-green);
+            background: rgba(46, 204, 113, 0.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.2);
+        }
+
+        .social-icon-select-item i {
+            font-size: 1.8rem !important;
+            color: var(--primary-green);
+            margin-bottom: 5px;
+            line-height: 1;
+        }
+
+        .social-icon-select-item .small {
+            font-size: 0.7rem !important;
+            color: var(--text-light);
+            margin: 0;
+            line-height: 1.2;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            max-width: 100%;
+        }
+
+        /* Дополнительные стили для колонок иконок */
+        #social-icon-grid .col-md-2,
+        #social-icon-grid .col-sm-3,
+        #social-icon-grid .col-4 {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+        }
     </style>
 </head>
 <body>
@@ -2417,7 +2467,7 @@
                             <input type="text" class="form-control contact-value-input" data-index="${index}" value="${contact.value}" placeholder="Значение">
                         </div>
                         <div class="col-md-1">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteContact(${index})">
+                            <button type="button" class="btn btn-danger" onclick="deleteContact(${index})" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -2585,12 +2635,12 @@
                             <input type="text" class="form-control social-url-input" data-index="${index}" value="${social.url}" placeholder="URL адрес">
                         </div>
                         <div class="col-md-1">
-                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="openSocialIconModal(${index})" title="Изменить иконку">
+                            <button type="button" class="btn btn-outline-primary" onclick="openSocialIconModal(${index})" title="Изменить иконку" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1;">
                                 <i class="fas fa-edit"></i>
                             </button>
                         </div>
                         <div class="col-md-1">
-                            <button type="button" class="btn btn-danger btn-sm" onclick="deleteSocialNetwork(${index})" title="Удалить">
+                            <button type="button" class="btn btn-danger" onclick="deleteSocialNetwork(${index})" title="Удалить" style="padding: 0.25rem 0.5rem; font-size: 0.75rem; line-height: 1;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -2724,9 +2774,9 @@
                 const iconItem = document.createElement('div');
                 iconItem.className = 'col-md-2 col-sm-3 col-4 mb-3';
                 iconItem.innerHTML = `
-                    <div class="social-icon-select-item text-center p-3 border rounded" style="cursor: pointer; transition: all 0.3s ease;" onclick="selectSocialIcon('${icon.class}', '${icon.name}')">
-                        <i class="${icon.class}" style="font-size: 2rem; color: var(--primary-green);"></i>
-                        <div class="small mt-2">${icon.name}</div>
+                    <div class="social-icon-select-item" onclick="selectSocialIcon('${icon.class}', '${icon.name}')">
+                        <i class="${icon.class}"></i>
+                        <div class="small">${icon.name}</div>
                     </div>
                 `;
                 iconGrid.appendChild(iconItem);
