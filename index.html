@@ -918,16 +918,22 @@
 
         // Загрузка портфолио из localStorage
         function loadPortfolioFromStorage() {
+            console.log('loadPortfolioFromStorage вызвана');
             const savedCategories = localStorage.getItem('portfolioCategories');
             const savedProjects = localStorage.getItem('portfolioProjects');
             
+            console.log('Сохраненные категории:', savedCategories);
+            console.log('Сохраненные проекты:', savedProjects);
+            
             if (savedCategories) {
                 const categories = JSON.parse(savedCategories);
+                console.log('Категории загружены, вызываем updatePortfolioFilters');
                 updatePortfolioFilters(categories);
             }
             
             if (savedProjects) {
                 const projects = JSON.parse(savedProjects);
+                console.log('Проекты загружены, вызываем updatePortfolioGallery');
                 updatePortfolioGallery(projects);
             }
         }
@@ -941,12 +947,15 @@
         }
 
         function updatePortfolioFilters(categories) {
+            console.log('updatePortfolioFilters вызвана с категориями:', categories);
             const filterContainer = document.querySelector('.portfolio-filter');
             if (!filterContainer) return;
             
             filterContainer.innerHTML = '';
+            console.log('Контейнер фильтров очищен');
             
             categories.forEach(category => {
+                console.log('Обработка категории:', category);
                 const button = document.createElement('button');
                 button.className = 'filter-btn';
                 
@@ -962,6 +971,7 @@
                     return; // Skip invalid category
                 }
                 
+                console.log('Создание кнопки:', categoryName, categoryFilter);
                 button.setAttribute('data-filter', categoryFilter);
                 button.textContent = categoryName;
                 
@@ -998,7 +1008,10 @@
                 });
                 
                 filterContainer.appendChild(button);
+                console.log('Кнопка добавлена в контейнер');
             });
+            
+            console.log('Всего кнопок в контейнере:', filterContainer.children.length);
         }
 
         function updatePortfolioGallery(projects) {
