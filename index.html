@@ -1299,10 +1299,10 @@
             const contactInfo = document.querySelector('.contact-info');
             if (!contactInfo) return;
             
-            // Очищаем существующие контакты, но оставляем социальные ссылки
-            const existingContacts = contactInfo.querySelectorAll('.contact-item');
-            existingContacts.forEach(item => item.remove());
+            // Полностью очищаем контейнер контактов
+            contactInfo.innerHTML = '';
             
+            // Создаем все контакты
             contacts.forEach(contact => {
                 const contactItem = document.createElement('div');
                 contactItem.className = 'contact-item';
