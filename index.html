@@ -1341,6 +1341,11 @@
                 contactInfo.appendChild(contactItem);
             });
             
+            // Добавляем социальные сети
+            const socialLinks = document.createElement('div');
+            socialLinks.className = 'social-links';
+            contactInfo.appendChild(socialLinks);
+            
             // Загружаем социальные сети
             loadSocialNetworks();
         }
