@@ -954,22 +954,21 @@
             filterContainer.innerHTML = '';
             console.log('Контейнер фильтров очищен');
             
-            categories.forEach(category => {
+            // Фильтруем только корректные объекты категорий
+            const validCategories = categories.filter(category => {
+                // Пропускаем только объекты с name и filter
+                return category && typeof category === 'object' && category.name && category.filter;
+            });
+            
+            console.log('Корректные категории после фильтрации:', validCategories);
+            
+            validCategories.forEach(category => {
                 console.log('Обработка категории:', category);
                 const button = document.createElement('button');
                 button.className = 'filter-btn';
                 
-                // Handle both string and object formats
-                let categoryName, categoryFilter;
-                if (typeof category === 'string') {
-                    categoryName = category;
-                    categoryFilter = category === 'Все работы' ? 'all' : category.toLowerCase().replace(' ', '-');
-                } else if (category && category.name) {
-                    categoryName = category.name;
-                    categoryFilter = category.filter || (category.name === 'Все работы' ? 'all' : category.name.toLowerCase().replace(' ', '-'));
-                } else {
-                    return; // Skip invalid category
-                }
+                const categoryName = category.name;
+                const categoryFilter = category.filter;
                 
                 console.log('Создание кнопки:', categoryName, categoryFilter);
                 button.setAttribute('data-filter', categoryFilter);
