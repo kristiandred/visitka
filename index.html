@@ -1202,10 +1202,20 @@
         }
 
         function loadAchievements() {
+            console.log('Загрузка достижений...');
             const savedAchievements = localStorage.getItem('achievements');
+            console.log('Сохраненные достижения:', savedAchievements);
+            
             if (savedAchievements) {
                 const achievements = JSON.parse(savedAchievements);
                 const achievementsRow = document.getElementById('achievements-row');
+                console.log('Контейнер достижений:', achievementsRow);
+                
+                if (!achievementsRow) {
+                    console.error('Контейнер achievements-row не найден!');
+                    return;
+                }
+                
                 achievementsRow.innerHTML = '';
                 
                 achievements.forEach((achievement, index) => {
@@ -1220,25 +1230,29 @@
                     `;
                     achievementsRow.appendChild(achievementCol);
                 });
+                console.log('Достижения загружены:', achievements.length);
             } else {
+                console.log('Сохраненных достижений не найдено, показываем стандартные');
                 // Если нет сохраненных достижений, показываем стандартные
                 const achievementsRow = document.getElementById('achievements-row');
-                achievementsRow.innerHTML = `
-                    <div class="col-md-6 mb-4">
-                        <div class="skill-item">
-                            <i class="fas fa-medal"></i>
-                            <h5>Более 50 проектов</h5>
-                            <p>Успешно завершенных и запущенных</p>
+                if (achievementsRow) {
+                    achievementsRow.innerHTML = `
+                        <div class="col-md-6 mb-4">
+                            <div class="skill-item">
+                                <i class="fas fa-medal"></i>
+                                <h5>Более 50 проектов</h5>
+                                <p>Успешно завершенных и запущенных</p>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="skill-item">
-                            <i class="fas fa-users"></i>
-                            <h5>Командная работа</h5>
-                            <p>Опыт работы в Agile/Scrum командах</p>
+                        <div class="col-md-6 mb-4">
+                            <div class="skill-item">
+                                <i class="fas fa-users"></i>
+                                <h5>Командная работа</h5>
+                                <p>Опыт работы в Agile/Scrum командах</p>
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
             }
         }
 
