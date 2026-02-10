@@ -2169,6 +2169,26 @@
             }
         }
 
+        // Сохранение всех достижений в localStorage
+        function saveAllAchievements() {
+            const achievementBlocks = document.querySelectorAll('.achievement-block');
+            const achievements = [];
+            
+            achievementBlocks.forEach((block) => {
+                const title = block.querySelector('.achievement-title').textContent.trim();
+                const description = block.querySelector('.achievement-desc').textContent.trim();
+                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                
+                achievements.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass
+                });
+            });
+            
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
         // Сохранение всех навыков в localStorage
         function saveAllSkills() {
             const skillBlocks = document.querySelectorAll('.skill-block');
