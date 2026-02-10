@@ -2118,6 +2118,7 @@
                 skillBlock.querySelector('.skill-icon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
                 skillBlock.querySelector('.skill-title').textContent = title;
                 skillBlock.querySelector('.skill-desc').textContent = description;
+                skillBlock.setAttribute('data-element-type', 'skill'); // Обновляем тип элемента
                 
                 showNotification('Навык обновлен!');
                 saveAllSkills();
@@ -2128,6 +2129,7 @@
                 achievementBlock.querySelector('.achievement-icon').style.cssText = 'font-size: 2rem; color: var(--primary-green);';
                 achievementBlock.querySelector('.achievement-title').textContent = title;
                 achievementBlock.querySelector('.achievement-desc').textContent = description;
+                achievementBlock.setAttribute('data-element-type', 'achievement'); // Обновляем тип элемента
                 
                 showNotification('Достижение обновлено!');
                 saveAllAchievements();
