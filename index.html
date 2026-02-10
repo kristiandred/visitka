@@ -1174,11 +1174,28 @@
                         phoneElement.href = `tel:${content.contact_phone.replace(/[^\d+]/g, '')}`;
                     }
                 }
+                
+                console.log('Контент загружен:', content);
+            } else {
+                console.log('Сохраненный контент не найден');
+            }
             
-            console.log('Контент загружен:', content);
-        } else {
-            console.log('Сохраненный контент не найден');
-        }
+            // Загружаем аватарку (только отображение, без возможности изменения)
+            const savedAvatar = localStorage.getItem('avatar_url');
+            if (savedAvatar) {
+                const avatarElement = document.getElementById('hero-avatar');
+                if (avatarElement) {
+                    avatarElement.src = savedAvatar;
+                    avatarElement.onerror = function() {
+                        // Если изображение не загрузилось, возвращаем стандартное
+                        console.log('Ошибка загрузки аватарки, используем стандартную');
+                        this.src = 'https://picsum.photos/seed/profile/400/400.jpg';
+                    };
+                    console.log('Аватарка загружена:', savedAvatar.substring(0, 50) + '...');
+                }
+            } else {
+                console.log('Сохраненная аватарка не найдена');
+            }
         }
 
         function loadAchievements() {
