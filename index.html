@@ -749,7 +749,6 @@
                 <div class="col-lg-6">
                     <div class="hero-image text-center float-animation">
                         <img id="hero-avatar" src="https://picsum.photos/seed/profile/400/400.jpg" alt="Profile" class="img-fluid">
-                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
                     </div>
                 </div>
             </div>
@@ -1175,29 +1174,11 @@
                         phoneElement.href = `tel:${content.contact_phone.replace(/[^\d+]/g, '')}`;
                     }
                 }
-                
-                console.log('Контент загружен:', content);
-            } else {
-                console.log('Сохраненный контент не найден');
-            }
             
-            // Загружаем аватарку
-            const savedAvatar = localStorage.getItem('avatar_url');
-            if (savedAvatar) {
-                const avatarElement = document.getElementById('hero-avatar');
-                if (avatarElement) {
-                    avatarElement.src = savedAvatar;
-                    avatarElement.onerror = function() {
-                        // Если изображение не загрузилось, возвращаем стандартное
-                        console.log('Ошибка загрузки аватарки, используем стандартную');
-                        this.src = 'https://picsum.photos/seed/profile/400/400.jpg';
-                    };
-                    console.log('Аватарка загружена:', savedAvatar.substring(0, 50) + '...');
-                }
-            } else {
-                console.log('Сохраненная аватарка не найдена');
-            }
-            
+            console.log('Контент загружен:', content);
+        } else {
+            console.log('Сохраненный контент не найден');
+        }
         }
 
         function loadAchievements() {
@@ -1406,45 +1387,32 @@
             });
         }
 
-        // Функция для загрузки аватарки с компьютера
-        function handleAvatarUpload(event) {
-            const file = event.target.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const imageData = e.target.result;
-                    
-                    // Сохраняем в localStorage
-                    localStorage.setItem('avatar_url', imageData);
-                    
-                    // Обновляем аватарку на текущей странице
-                    document.getElementById('hero-avatar').src = imageData;
-                    
-                    console.log('Аватарка успешно обновлена!');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                console.log('Пожалуйста, выберите изображение!');
-            }
-        }
         // Инициализация при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             // Загружаем сохраненный контент
             loadSavedContent();
             
-            // Добавляем обработчики для загрузки аватарки
-            const avatarImg = document.getElementById('hero-avatar');
-            const avatarUpload = document.getElementById('avatar-upload');
+            // Загружаем портфолио
+            loadPortfolioFromStorage();
             
-            if (avatarImg && avatarUpload) {
-                // Клик на аватарку открывает выбор файла
-                avatarImg.addEventListener('click', function() {
-                    avatarUpload.click();
-                });
-                
-                // Обработка выбора файла
-                avatarUpload.addEventListener('change', handleAvatarUpload);
-            }
+            // Загружаем навыки
+            loadSkills();
+            
+            // Загружаем контакты
+            loadContacts();
+            
+            // Добавляем классы для анимации
+            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
+            elementsToAnimate.forEach(element => {
+                element.classList.add('fade-in-up');
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(30px)';
+                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            });
+            
+            // Запускаем анимацию при прокрутке
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll();
         });
 </script>
 </body>
