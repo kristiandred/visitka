@@ -1478,9 +1478,84 @@
         ];
 
         // ============================================
+        // ФУНКЦИИ РЕДАКТИРОВАНИЯ (определены в начале для доступа из HTML)
+        // ============================================
+
+        // Редактирование заголовка hero-секции
+        function editHeroTitle() {
+            const titleElement = document.getElementById('hero-title');
+            const currentTitle = titleElement.textContent.trim();
+
+            const newTitle = prompt('Редактировать заголовок:', currentTitle);
+            if (newTitle !== null && newTitle.trim() !== '') {
+                titleElement.textContent = newTitle.trim();
+                showNotification('Заголовок обновлен!');
+                saveAllContent();
+            }
+        }
+
+        // Редактирование описания hero-секции
+        function editHeroDescription() {
+            const descElement = document.getElementById('hero-description');
+            const currentDesc = descElement.textContent.trim();
+
+            const newDesc = prompt('Редактировать описание:', currentDesc);
+            if (newDesc !== null && newDesc.trim() !== '') {
+                descElement.textContent = newDesc.trim();
+                showNotification('Описание обновлено!');
+                saveAllContent();
+            }
+        }
+
+        // Редактирование текста "О себе"
+        function editAboutText() {
+            const aboutElement = document.getElementById('about-text');
+            const currentAbout = aboutElement.textContent.trim();
+
+            // Заполняем модальное окно текущим текстом
+            document.getElementById('aboutText').value = currentAbout;
+
+            // Показываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('editAboutModal'));
+            modal.show();
+        }
+
+        // Сохранение текста "О себе"
+        function saveAboutText() {
+            const newText = document.getElementById('aboutText').value.trim();
+
+            if (newText !== '') {
+                document.getElementById('about-text').textContent = newText;
+                showNotification('Текст "О себе" обновлен!');
+                saveAllContent();
+
+                // Закрываем модальное окно
+                const modal = bootstrap.Modal.getInstance(document.getElementById('editAboutModal'));
+                if (modal) {
+                    modal.hide();
+                }
+            } else {
+                showNotification('Текст не может быть пустым!', 'danger');
+            }
+        }
+
+        // Редактирование заголовка достижений
+        function editAchievementsTitle() {
+            const titleElement = document.getElementById('achievements-title');
+            const currentTitle = titleElement.textContent;
+
+            const newTitle = prompt('Редактировать заголовок достижений:', currentTitle);
+            if (newTitle !== null && newTitle.trim() !== '') {
+                titleElement.textContent = newTitle.trim();
+                showNotification('Заголовок обновлен!');
+                saveAllContent();
+            }
+        }
+
+        // ============================================
         // ОСНОВНЫЕ ФУНКЦИИ ИНИЦИАЛИЗАЦИИ
         // ============================================
-        
+
         // Эффект прокрутки для навбара
         window.addEventListener('scroll', function() {
             const navbar = document.querySelector('.navbar');
@@ -2109,84 +2184,6 @@
                 showNotification('Заголовок обновлен!');
                 saveAllContent();
             }
-        }
-
-        // Редактирование заголовка hero-секции
-        function editHeroTitle() {
-            const titleElement = document.getElementById('hero-title');
-            const currentTitle = titleElement.textContent.trim();
-            
-            const newTitle = prompt('Редактировать заголовок:', currentTitle);
-            if (newTitle !== null && newTitle.trim() !== '') {
-                titleElement.textContent = newTitle.trim();
-                showNotification('Заголовок обновлен!');
-                saveAllContent();
-            }
-        }
-
-        // Редактирование описания hero-секции
-        function editHeroDescription() {
-            const descElement = document.getElementById('hero-description');
-            const currentDesc = descElement.textContent.trim();
-            
-            const newDesc = prompt('Редактировать описание:', currentDesc);
-            if (newDesc !== null && newDesc.trim() !== '') {
-                descElement.textContent = newDesc.trim();
-                showNotification('Описание обновлено!');
-                saveAllContent();
-            }
-        }
-
-        // Редактирование текста "О себе"
-        function editAboutText() {
-            const aboutElement = document.getElementById('about-text');
-            const currentAbout = aboutElement.textContent.trim();
-            
-            // Заполняем модальное окно текущим текстом
-            document.getElementById('aboutText').value = currentAbout;
-            
-            // Показываем модальное окно
-            const modal = new bootstrap.Modal(document.getElementById('editAboutModal'));
-            modal.show();
-        }
-
-        // Сохранение текста "О себе"
-        function saveAboutText() {
-            const newText = document.getElementById('aboutText').value.trim();
-            
-            if (newText !== '') {
-                document.getElementById('about-text').textContent = newText;
-                showNotification('Текст "О себе" обновлен!');
-                saveAllContent();
-                
-                // Закрываем модальное окно
-                const modal = bootstrap.Modal.getInstance(document.getElementById('editAboutModal'));
-                if (modal) {
-                    modal.hide();
-                }
-            } else {
-                showNotification('Текст не может быть пустым!', 'danger');
-            }
-        }
-
-        // Сохранение всех достижений в localStorage
-        function saveAllAchievements() {
-            const achievementBlocks = document.querySelectorAll('.achievement-block');
-            const achievements = [];
-            
-            achievementBlocks.forEach((block) => {
-                const title = block.querySelector('.achievement-title').textContent.trim();
-                const description = block.querySelector('.achievement-desc').textContent.trim();
-                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
-                
-                achievements.push({
-                    title: title,
-                    description: description,
-                    icon: iconClass
-                });
-            });
-            
-            localStorage.setItem('achievements', JSON.stringify(achievements));
         }
 
         // Сохранение всех навыков в localStorage
