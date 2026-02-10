@@ -2086,7 +2086,7 @@
                 showNotification('Достижение обновлено!');
                 saveAllAchievements();
             } else {
-                // Создаем новый элемент на основе выбора типа
+                // Создание нового элемента на основе выбора типа
                 if (elementType === 'skill') {
                     // Создаем новый навык
                     const skillsRow = document.getElementById('skills-row');
@@ -2095,7 +2095,7 @@
                     const skillCol = document.createElement('div');
                     skillCol.className = 'col-md-4 mb-4';
                     skillCol.innerHTML = `
-                        <div class="skill-item skill-block" data-skill-index="${skillIndex}" style="position: relative; cursor: pointer;" onclick="editSkill(${skillIndex})">
+                        <div class="skill-item skill-block" data-skill-index="${skillIndex}" data-element-type="skill" style="position: relative; cursor: pointer;" onclick="editSkill(${skillIndex})">
                             <i class="${iconClass} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                             <h5 class="skill-title">${title}</h5>
                             <p class="skill-desc">${description}</p>
@@ -2113,7 +2113,7 @@
                     const achievementCol = document.createElement('div');
                     achievementCol.className = 'col-md-6 mb-4 achievement-item';
                     achievementCol.innerHTML = `
-                        <div class="skill-item achievement-block" data-achievement-index="${newIndex}" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
+                        <div class="skill-item achievement-block" data-achievement-index="${newIndex}" data-element-type="achievement" style="position: relative; cursor: pointer;" onclick="editAchievement(${newIndex})">
                             <i class="${iconClass} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                             <h5 class="achievement-title">${title}</h5>
                             <p class="achievement-desc">${description}</p>
@@ -2186,6 +2186,27 @@
             }
         }
 
+        // Сохранение всех достижений в localStorage
+        function saveAllAchievements() {
+            const achievementBlocks = document.querySelectorAll('.achievement-block');
+            const achievements = [];
+            
+            achievementBlocks.forEach((block) => {
+                const title = block.querySelector('.achievement-title').textContent.trim();
+                const description = block.querySelector('.achievement-desc').textContent.trim();
+                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                
+                achievements.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass,
+                    type: 'achievement' // Сохраняем тип элемента
+                });
+            });
+            
+            localStorage.setItem('achievements', JSON.stringify(achievements));
+        }
+
         // Сохранение всех навыков в localStorage
         function saveAllSkills() {
             const skillBlocks = document.querySelectorAll('.skill-block');
@@ -2199,7 +2220,8 @@
                 skills.push({
                     title: title,
                     description: description,
-                    icon: iconClass
+                    icon: iconClass,
+                    type: 'skill' // Сохраняем тип элемента
                 });
             });
             
@@ -2219,7 +2241,7 @@
                     const achievementCol = document.createElement('div');
                     achievementCol.className = 'col-md-6 mb-4 achievement-item';
                     achievementCol.innerHTML = `
-                        <div class="skill-item achievement-block" data-achievement-index="${index}" style="position: relative; cursor: pointer;" onclick="editAchievement(${index})">
+                        <div class="skill-item achievement-block" data-achievement-index="${index}" data-element-type="achievement" style="position: relative; cursor: pointer;" onclick="editAchievement(${index})">
                             <i class="${achievement.icon} achievement-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                             <h5 class="achievement-title">${achievement.title}</h5>
                             <p class="achievement-desc">${achievement.description}</p>
@@ -2245,7 +2267,7 @@
                     const skillCol = document.createElement('div');
                     skillCol.className = 'col-md-4 mb-4';
                     skillCol.innerHTML = `
-                        <div class="skill-item skill-block" data-skill-index="${index}" style="position: relative; cursor: pointer;" onclick="editSkill(${index})">
+                        <div class="skill-item skill-block" data-skill-index="${index}" data-element-type="skill" style="position: relative; cursor: pointer;" onclick="editSkill(${index})">
                             <i class="${skill.icon} skill-icon" style="font-size: 2rem; color: var(--primary-green);"></i>
                             <h5 class="skill-title">${skill.title}</h5>
                             <p class="skill-desc">${skill.description}</p>
