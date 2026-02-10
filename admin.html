@@ -2279,6 +2279,9 @@
                 if (typeof project.category === 'object' && project.category.name) {
                     categoryValue = project.category.filter || project.category.name;
                     categoryName = project.category.name;
+                } else {
+                    // Если категория - это строка, получаем русское название
+                    categoryName = getCategoryNameByFilter(project.category);
                 }
                 
                 projectCard.setAttribute('data-category', categoryValue);
@@ -2302,6 +2305,17 @@
                 
                 gallery.appendChild(projectCard);
             });
+        }
+
+        // Функция для получения русского названия категории по фильтру
+        function getCategoryNameByFilter(filter) {
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            const categories = savedCategories ? JSON.parse(savedCategories) : [];
+            
+            if (!Array.isArray(categories)) return filter;
+            
+            const category = categories.find(cat => cat.filter === filter);
+            return category ? category.name : filter;
         }
 
         // Удаление проекта
