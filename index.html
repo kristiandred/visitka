@@ -1339,9 +1339,22 @@
                 contactInfo.appendChild(contactItem);
             });
             
+            // Добавляем разделитель перед социальными сетями
+            const divider = document.createElement('hr');
+            divider.style.cssText = `
+                margin: 20px 0;
+                border: none;
+                border-top: 1px solid rgba(46, 204, 113, 0.2);
+            `;
+            contactInfo.appendChild(divider);
+            
             // Добавляем социальные сети
             const socialLinks = document.createElement('div');
             socialLinks.className = 'social-links';
+            socialLinks.style.cssText = `
+                text-align: center;
+                margin-top: 20px;
+            `;
             contactInfo.appendChild(socialLinks);
             
             // Загружаем социальные сети
