@@ -1642,9 +1642,18 @@
             
             filterContainer.innerHTML = '';
             
-            // Убедимся, что portfolioCategories существует
-            if (!portfolioCategories || !Array.isArray(portfolioCategories) || portfolioCategories.length === 0) {
-                // Если массив пустой, добавляем стандартные категории
+            // Фильтруем только корректные объекты категорий
+            const validCategories = portfolioCategories.filter(category => {
+                return category && 
+                       typeof category === 'object' && 
+                       category.name && 
+                       category.filter &&
+                       category.name.trim() !== '' &&
+                       category.filter.trim() !== '';
+            });
+            
+            // Если нет корректных категорий, используем стандартные
+            if (validCategories.length === 0) {
                 portfolioCategories = [
                     { name: 'Все работы', filter: 'all' },
                     { name: 'Веб-разработка', filter: 'web' },
@@ -1652,15 +1661,11 @@
                     { name: 'Дизайн', filter: 'design' }
                 ];
                 savePortfolioCategories();
+            } else {
+                portfolioCategories = validCategories;
             }
             
             portfolioCategories.forEach((category, index) => {
-                // Проверяем, что категория существует
-                if (!category || !category.name || !category.filter) {
-                    console.warn('Пропущена некорректная категория:', category);
-                    return;
-                }
-                
                 const button = document.createElement('button');
                 button.className = 'filter-btn';
                 if (index === 0) button.classList.add('active'); // Первая категория активна
@@ -2104,6 +2109,26 @@
                 showNotification('Описание обновлено!');
                 saveAllContent();
             }
+        }
+
+        // Сохранение всех достижений в localStorage
+        function saveAllAchievements() {
+            const achievementBlocks = document.querySelectorAll('.achievement-block');
+            const achievements = [];
+            
+            achievementBlocks.forEach((block) => {
+                const title = block.querySelector('.achievement-title').textContent.trim();
+                const description = block.querySelector('.achievement-desc').textContent.trim();
+                const iconClass = block.querySelector('.achievement-icon').className.replace(' achievement-icon', '');
+                
+                achievements.push({
+                    title: title,
+                    description: description,
+                    icon: iconClass
+                });
+            });
+            
+            localStorage.setItem('achievements', JSON.stringify(achievements));
         }
 
         // Сохранение всех навыков в localStorage
