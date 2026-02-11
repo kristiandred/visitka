@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Мой Сайт-Визитка</title>
+    <title>Админ-панель | Мой Сайт-Визитка</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -991,6 +991,83 @@
                 justify-content: flex-start;
             }
         }
+
+        /* Стили для сообщений об ошибках в модальных окнах */
+        .alert-auth {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: #e74c3c;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .alert-auth.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .alert-success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: #2ecc71;
+            border-radius: 8px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .alert-success.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Стили для валидации полей */
+        .form-control.is-invalid {
+            border-color: #e74c3c;
+        }
+
+        .form-control.is-valid {
+            border-color: #2ecc71;
+        }
+
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #e74c3c;
+        }
+
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .form-control.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+
+        /* Стили для необязательных полей */
+        .optional-field {
+            position: relative;
+        }
+
+        .optional-field label::after {
+            content: " (необязательно)";
+            font-size: 0.8em;
+            color: var(--text-light);
+            opacity: 0.7;
+            font-weight: normal;
+        }
+
+        .optional-field .form-text {
+            color: var(--text-light);
+            opacity: 0.7;
+            font-size: 0.85em;
+        }
     </style>
 </head>
 <body>
@@ -998,7 +1075,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand" href="index.html">
-                <i class="fas fa-code me-2"></i>Портфолио
+                <i class="fas fa-code me-2"></i>Админ-панель
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -1016,6 +1093,14 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">Контакты</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="openChangePasswordModal()" title="Сменить пароль">
+                            <i class="fas fa-key me-1"></i>Сменить пароль
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html" title="Админ-панель">Выйти из Админ-панели</a>
                     </li>
                 </ul>
             </div>
@@ -1443,6 +1528,65 @@
         </div>
     </div>
 
+    <!-- Модальное окно для смены пароля и почты -->
+    <div class="modal fade" id="changePasswordModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Смена пароля и почты администратора</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="changePasswordForm" novalidate>
+                        <div class="mb-3">
+                            <label for="adminEmail" class="form-label">Текущая почта</label>
+                            <input type="email" class="form-control" id="adminEmail" required>
+                            <div class="invalid-feedback">Пожалуйста, введите корректный email адрес</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="currentPassword" class="form-label">Текущий пароль</label>
+                            <input type="password" class="form-control" id="currentPassword" required>
+                            <div class="invalid-feedback">Пожалуйста, введите текущий пароль</div>
+                        </div>
+                        
+                        <hr class="my-4" style="border-color: rgba(46, 204, 113, 0.2);">
+                        <h6 class="mb-3">Изменить данные (необязательно)</h6>
+                        
+                        <div class="mb-3 optional-field">
+                            <label for="newEmail" class="form-label">Новая почта</label>
+                            <input type="email" class="form-control" id="newEmail">
+                            <div class="form-text">Оставьте пустым, если не хотите менять почту</div>
+                            <div class="invalid-feedback">Пожалуйста, введите корректный email адрес</div>
+                        </div>
+                        <div class="mb-3 optional-field">
+                            <label for="newPassword" class="form-label">Новый пароль</label>
+                            <input type="password" class="form-control" id="newPassword" minlength="6">
+                            <div class="form-text">Оставьте пустым, если не хотите менять пароль. Минимум 6 символов</div>
+                            <div class="invalid-feedback">Пароль должен содержать минимум 6 символов</div>
+                        </div>
+                        <div class="mb-3 optional-field">
+                            <label for="confirmPassword" class="form-label">Подтвердите новый пароль</label>
+                            <input type="password" class="form-control" id="confirmPassword">
+                            <div class="form-text">Повторите новый пароль для подтверждения</div>
+                            <div class="invalid-feedback">Пароли не совпадают</div>
+                        </div>
+                        
+                        <div class="alert alert-auth" id="changePasswordError" style="display: none;">
+                            Неверная почта или пароль
+                        </div>
+                        <div class="alert alert-success" id="changePasswordSuccess" style="display: none;">
+                            Данные успешно обновлены!
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="saveAdminCredentials()">Сохранить изменения</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Контакты -->
     <section id="contact" class="py-5">
         <div class="container">
@@ -1467,24 +1611,16 @@
         </div>
     </section>
 
-    <!-- Футер -->
-    <footer class="py-4">
-        <div class="container">
-            <div class="text-center">
-                <p>&copy; 2024 Иван Петров. Все права защищены.</p>
-                <a href="index.html" class="small">
-                    <i class="fas fa-external-link-alt me-1"></i>Перейти в режим просмотра
-                </a>
-            </div>
-        </div>
-    </footer>
-    
     <!-- Скрипты -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // ============================================
         // ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И ИНИЦИАЛИЗАЦИЯ
         // ============================================
+        
+        // Константы для хранения данных администратора
+        const ADMIN_STORAGE_KEY = 'portfolio_admin_credentials';
+        const ADMIN_EMAIL_KEY = 'portfolio_admin_email';
         
         // Категории портфолио (гарантированно инициализированы)
         let portfolioCategories = [
@@ -1558,6 +1694,245 @@
             { name: 'check-circle', class: 'fas fa-check-circle', title: 'Галочка' },
             { name: 'thumbs-up', class: 'fas fa-thumbs-up', title: 'Большой палец' }
         ];
+
+        // ============================================
+        // ФУНКЦИИ ДЛЯ РАБОТЫ С УЧЕТНЫМИ ДАННЫМИ АДМИНИСТРАТОРА
+        // ============================================
+
+        // Инициализация данных администратора
+        function initializeAdminCredentials() {
+            const savedCredentials = localStorage.getItem(ADMIN_STORAGE_KEY);
+            if (!savedCredentials) {
+                // Создаем учетные данные по умолчанию
+                const defaultCredentials = {
+                    login: 'admin',
+                    password: 'admin123'
+                };
+                localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(defaultCredentials));
+            }
+            
+            // Инициализация email администратора
+            const savedEmail = localStorage.getItem(ADMIN_EMAIL_KEY);
+            if (!savedEmail) {
+                localStorage.setItem(ADMIN_EMAIL_KEY, 'admin@example.com');
+            }
+        }
+
+        // Получение данных администратора
+        function getAdminCredentials() {
+            const savedCredentials = localStorage.getItem(ADMIN_STORAGE_KEY);
+            if (savedCredentials) {
+                return JSON.parse(savedCredentials);
+            }
+            return { login: 'admin', password: 'admin123' };
+        }
+
+        // Получение email администратора
+        function getAdminEmail() {
+            const savedEmail = localStorage.getItem(ADMIN_EMAIL_KEY);
+            return savedEmail || 'admin@example.com';
+        }
+
+        // Проверка текущих учетных данных
+        function verifyCurrentCredentials(email, password) {
+            const adminEmail = getAdminEmail();
+            const adminCredentials = getAdminCredentials();
+            
+            return email === adminEmail && password === adminCredentials.password;
+        }
+
+        // Обновление учетных данных администратора
+        function updateAdminCredentials(newEmail, newPassword) {
+            const adminCredentials = getAdminCredentials();
+            
+            // Обновляем email если указан новый
+            if (newEmail && newEmail.trim() !== '') {
+                localStorage.setItem(ADMIN_EMAIL_KEY, newEmail.trim());
+            }
+            
+            // Обновляем пароль если указан новый
+            if (newPassword && newPassword.trim() !== '') {
+                adminCredentials.password = newPassword.trim();
+                localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminCredentials));
+            }
+            
+            return true;
+        }
+
+        // Открытие модального окна смены пароля
+        function openChangePasswordModal() {
+            // Сбрасываем форму и сообщения
+            document.getElementById('changePasswordForm').reset();
+            document.getElementById('changePasswordError').style.display = 'none';
+            document.getElementById('changePasswordSuccess').style.display = 'none';
+            
+            // Удаляем классы валидации
+            const formInputs = document.querySelectorAll('#changePasswordForm input');
+            formInputs.forEach(input => {
+                input.classList.remove('is-invalid', 'is-valid');
+            });
+            
+            // Заполняем текущий email
+            const currentEmail = getAdminEmail();
+            document.getElementById('adminEmail').value = currentEmail;
+            
+            // Очищаем необязательные поля
+            document.getElementById('newEmail').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            // Открываем модальное окно
+            const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+            modal.show();
+            
+            // Фокус на поле текущего пароля
+            setTimeout(() => {
+                document.getElementById('currentPassword').focus();
+            }, 500);
+        }
+
+        // Сохранение новых учетных данных
+        function saveAdminCredentials() {
+            const form = document.getElementById('changePasswordForm');
+            const adminEmail = document.getElementById('adminEmail').value.trim();
+            const currentPassword = document.getElementById('currentPassword').value.trim();
+            const newEmail = document.getElementById('newEmail').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+            
+            // Сбрасываем сообщения об ошибках
+            document.getElementById('changePasswordError').style.display = 'none';
+            document.getElementById('changePasswordSuccess').style.display = 'none';
+            
+            // Проверяем обязательные поля
+            if (!adminEmail || !currentPassword) {
+                showNotification('Пожалуйста, заполните обязательные поля!', 'danger');
+                return;
+            }
+            
+            // Проверяем текущие учетные данные
+            if (!verifyCurrentCredentials(adminEmail, currentPassword)) {
+                document.getElementById('changePasswordError').style.display = 'block';
+                document.getElementById('adminEmail').classList.add('is-invalid');
+                document.getElementById('currentPassword').classList.add('is-invalid');
+                return;
+            }
+            
+            // Проверяем валидность нового email если он указан
+            if (newEmail && !isValidEmail(newEmail)) {
+                document.getElementById('newEmail').classList.add('is-invalid');
+                showNotification('Пожалуйста, введите корректный email адрес', 'danger');
+                return;
+            }
+            
+            // Проверяем длину нового пароля если он указан
+            if (newPassword && newPassword.length < 6) {
+                document.getElementById('newPassword').classList.add('is-invalid');
+                showNotification('Новый пароль должен содержать минимум 6 символов', 'danger');
+                return;
+            }
+            
+            // Проверяем совпадение паролей если указан новый пароль
+            if (newPassword && newPassword !== confirmPassword) {
+                document.getElementById('confirmPassword').classList.add('is-invalid');
+                showNotification('Пароли не совпадают', 'danger');
+                return;
+            }
+            
+            // Обновляем учетные данные
+            const success = updateAdminCredentials(newEmail, newPassword);
+            
+            if (success) {
+                // Показываем сообщение об успехе
+                document.getElementById('changePasswordSuccess').style.display = 'block';
+                
+                // Обновляем поле текущего email в форме
+                const updatedEmail = newEmail || adminEmail;
+                document.getElementById('adminEmail').value = updatedEmail;
+                
+                // Очищаем необязательные поля
+                document.getElementById('newEmail').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                // Очищаем поле текущего пароля
+                document.getElementById('currentPassword').value = '';
+                
+                showNotification('Данные администратора успешно обновлены!');
+                
+                // Закрываем модальное окно через 2 секунды
+                setTimeout(() => {
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                    if (modal) {
+                        modal.hide();
+                    }
+                }, 2000);
+            }
+        }
+
+        // Проверка валидности email
+        function isValidEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(email);
+        }
+
+        // Обработка нажатия Enter в форме смены пароля
+        document.getElementById('changePasswordForm').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                saveAdminCredentials();
+            }
+        });
+
+        // Валидация паролей в реальном времени
+        document.getElementById('newPassword').addEventListener('input', function() {
+            const confirmPassword = document.getElementById('confirmPassword');
+            const newPassword = this.value;
+            
+            if (newPassword && confirmPassword.value) {
+                if (newPassword !== confirmPassword.value) {
+                    confirmPassword.classList.add('is-invalid');
+                    confirmPassword.classList.remove('is-valid');
+                } else {
+                    confirmPassword.classList.remove('is-invalid');
+                    confirmPassword.classList.add('is-valid');
+                }
+            }
+            
+            // Проверка длины пароля
+            if (newPassword && newPassword.length < 6) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (newPassword) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        document.getElementById('confirmPassword').addEventListener('input', function() {
+            const newPassword = document.getElementById('newPassword').value;
+            
+            if (this.value && newPassword !== this.value) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (this.value) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
+
+        // Валидация email в реальном времени
+        document.getElementById('newEmail').addEventListener('input', function() {
+            const email = this.value.trim();
+            
+            if (email && !isValidEmail(email)) {
+                this.classList.add('is-invalid');
+                this.classList.remove('is-valid');
+            } else if (email) {
+                this.classList.remove('is-invalid');
+                this.classList.add('is-valid');
+            }
+        });
 
         // ============================================
         // ФУНКЦИИ РЕДАКТИРОВАНИЯ (определены в начале для доступа из HTML)
@@ -2411,19 +2786,6 @@
                 }
             } else {
                 showNotification('Нельзя удалить несуществующий элемент!', 'danger');
-            }
-        }
-
-        // Редактирование заголовка достижений
-        function editAchievementsTitle() {
-            const titleElement = document.getElementById('achievements-title');
-            const currentTitle = titleElement.textContent;
-            
-            const newTitle = prompt('Редактировать заголовок достижений:', currentTitle);
-            if (newTitle !== null && newTitle.trim() !== '') {
-                titleElement.textContent = newTitle.trim();
-                showNotification('Заголовок обновлен!');
-                saveAllContent();
             }
         }
 
@@ -3327,6 +3689,9 @@
 
         // Обработка загрузки аватарки
         document.addEventListener('DOMContentLoaded', function() {
+            // Инициализируем данные администратора
+            initializeAdminCredentials();
+            
             const avatarUpload = document.getElementById('avatar-upload');
             const heroAvatar = document.getElementById('hero-avatar');
             
