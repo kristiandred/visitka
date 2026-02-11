@@ -1085,35 +1085,26 @@
 
         // Фильтрация портфолио
         function setupPortfolioFilter() {
-            document.querySelectorAll('.filter-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Удаляем активный класс у всех кнопок
-                    document.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    
-                    // Добавляем активный класс текущей кнопке
-                    this.classList.add('active');
-                    
-                    const filter = this.getAttribute('data-filter');
-                    const items = document.querySelectorAll('.photo-card').forEach(card => {
-                        const parent = card.closest('[data-category]');
-                        if (filter === 'all' || parent.getAttribute('data-category') === filter) {
-                            parent.style.display = 'block';
-                            setTimeout(() => {
-                                card.style.opacity = '1';
-                                card.style.transform = 'translateY(0)';
-                            }, 100);
-                        } else {
-                            card.style.opacity = '0';
-                            card.style.transform = 'translateY(20px)';
-                            setTimeout(() => {
-                                parent.style.display = 'none';
-                            }, 300);
-                        }
-                    });
-                });
+           // Плавная прокрутка к секциям
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        
+        // Пропускаем пустые ссылки и ссылки только с '#'
+        if (!href || href === '#' || href === '#!') {
+            return;
+        }
+        
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
             });
+        }
+    });
+});
         }
 
         // Анимация при прокрутке
