@@ -892,13 +892,6 @@
         </div>
     </section>
 
-    <!-- Футер -->
-    <footer class="text-center py-3">
-        <div class="container">
-            <p>&copy; 2024 Мой Сайт-Визитка. Все права защищены.</p>
-            <p><a href="#" onclick="openAuthModal()">Вход для администратора</a></p>
-        </div>
-    </footer>
 
     <!-- Модальное окно авторизации -->
     <div class="modal fade auth-modal" id="authModal" tabindex="-1" aria-hidden="true">
@@ -1166,17 +1159,24 @@
             // ОЧИЩАЕМ контейнер перед добавлением новых кнопок (только один раз)
             filterContainer.innerHTML = '';
             
-            // Создаем кнопку "Все работы" по умолчанию
-            const allButton = document.createElement('button');
-            allButton.className = 'filter-btn active';
-            allButton.setAttribute('data-filter', 'all');
-            allButton.textContent = 'Все работы';
-            filterContainer.appendChild(allButton);
-            
             // Фильтруем только корректные объекты категорий
             const validCategories = Array.isArray(categories) ? categories.filter(category => {
                 return category && typeof category === 'object' && category.name && category.filter;
             }) : [];
+            
+            // Проверяем, есть ли уже категория "Все работы" в массиве
+            const hasAllCategory = validCategories.some(cat => 
+                cat.filter === 'all' || cat.name.toLowerCase().includes('все работы')
+            );
+            
+            // Создаем кнопку "Все работы" только если ее нет в массиве категорий
+            if (!hasAllCategory) {
+                const allButton = document.createElement('button');
+                allButton.className = 'filter-btn active';
+                allButton.setAttribute('data-filter', 'all');
+                allButton.textContent = 'Все работы';
+                filterContainer.appendChild(allButton);
+            }
             
             validCategories.forEach(category => {
                 const button = document.createElement('button');
@@ -1187,6 +1187,11 @@
                 
                 button.setAttribute('data-filter', categoryFilter);
                 button.textContent = categoryName;
+                
+                // Если это категория "Все работы", делаем ее активной
+                if (categoryFilter === 'all' || categoryName.toLowerCase().includes('все работы')) {
+                    button.classList.add('active');
+                }
                 
                 filterContainer.appendChild(button);
             });
