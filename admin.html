@@ -6,6 +6,7 @@
     <title>Админ-панель | Мой Сайт-Визитка</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         /* Глобальные стили */
         :root {
@@ -1580,8 +1581,15 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary" onclick="saveAdminCredentials()">Сохранить изменения</button>
+                    <div class="d-flex justify-content-between w-100">
+                        <button type="button" class="btn btn-outline-primary" onclick="sendPasswordResetFromAdmin()">
+                            <i class="fas fa-paper-plane me-2"></i>Отправить пароль на почту
+                        </button>
+                        <div>
+                            <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Отмена</button>
+                            <button type="button" class="btn btn-primary" onclick="saveAdminCredentials()">Сохранить изменения</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -3689,6 +3697,103 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                     }, 500);
                 }
             }, 3000);
+        }
+
+        // ============================================
+        // ФУНКЦИИ ВОССТАНОВЛЕНИЯ ПАРОЛЯ (EMAILJS)
+        // ============================================
+
+        // Инициализация EmailJS
+        (function() {
+            try {
+                emailjs.init("zf0UaDME61mz-awpq");
+                console.log('EmailJS успешно инициализирован');
+            } catch (error) {
+                console.error('Ошибка инициализации EmailJS:', error);
+            }
+        })();
+
+        // Генерация случайного пароля
+        function generateRandomPassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 12; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        // Отправка восстановления пароля из админ-панели
+        function sendPasswordResetFromAdmin() {
+            const adminEmail = getAdminEmail();
+            const errorElement = document.getElementById('changePasswordError');
+            const successElement = document.getElementById('changePasswordSuccess');
+            
+            // Сбрасываем сообщения
+            errorElement.style.display = 'none';
+            successElement.style.display = 'none';
+            
+            // Генерируем новый пароль
+            const newPassword = generateRandomPassword();
+            
+            // Получаем текущие данные администратора
+            const adminCredentials = getAdminCredentials();
+            
+            // Обновляем пароль
+            adminCredentials.password = newPassword;
+            localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminCredentials));
+            
+            // Подготавливаем данные для email - используем точные имена переменных из шаблона
+            const templateParams = {
+                to_email: adminEmail,
+                password: newPassword,
+                site_name: 'Мой Сайт-Визитка',
+                date: new Date().toLocaleDateString('ru-RU'),
+                time: new Date().toLocaleTimeString('ru-RU'),
+                year: new Date().getFullYear(),
+                // Добавляем дополнительные параметры которые могут ожидаться шаблоном
+                from_name: 'Система восстановления пароля',
+                message: 'Вы запросили восстановление пароля для админ-панели'
+            };
+            
+            console.log('Отправка email с параметрами:', templateParams);
+            console.log('Service ID: service_s97poiv');
+            console.log('Template ID: template_oiik4ea');
+            
+            // Показываем уведомление об отправке
+            showNotification('Отправка пароля на почту...');
+            
+            // Отправляем email
+            emailjs.send('service_s97poiv', 'template_oiik4ea', templateParams)
+                .then(function(response) {
+                    console.log('Email успешно отправлен!', response.status, response.text);
+                    showNotification('Пароль успешно отправлен на ' + adminEmail);
+                    
+                    // Закрываем модальное окно через 2 секунды
+                    setTimeout(() => {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                        if (modal) {
+                            modal.hide();
+                        }
+                    }, 2000);
+                })
+                .catch(function(error) {
+                    console.error('Ошибка отправки email:', error);
+                    console.error('Детали ошибки:', JSON.stringify(error, null, 2));
+                    
+                    // Показываем детальную ошибку
+                    let errorMessage = 'Ошибка при отправке email. ';
+                    if (error.text) {
+                        errorMessage += 'Код ошибки: ' + error.text;
+                    } else if (error.status) {
+                        errorMessage += 'Статус: ' + error.status;
+                    } else {
+                        errorMessage += 'Проверьте настройки EmailJS.';
+                    }
+                    
+                    errorElement.textContent = errorMessage;
+                    errorElement.style.display = 'block';
+                });
         }
 
         // ============================================
