@@ -1171,6 +1171,9 @@ function updatePortfolioFilters(categories) {
     if (!filterContainer) return;
     
     filterContainer.innerHTML = '';
+
+     // ОЧИЩАЕМ контейнер перед добавлением новых кнопок
+    filterContainer.innerHTML = '';
     
     // Создаем кнопку "Все работы" по умолчанию
     const allButton = document.createElement('button');
