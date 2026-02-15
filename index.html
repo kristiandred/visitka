@@ -6,6 +6,7 @@
     <title>Мой Сайт-Визитка</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         /* Глобальные стили */
         :root {
@@ -928,11 +929,49 @@
                         <div class="alert alert-auth" id="authError">
                             Неверный логин или пароль
                         </div>
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-link p-0 text-decoration-none" onclick="openResetPasswordModal()" style="color: var(--primary-green);">
+                                <i class="fas fa-key me-1"></i>Забыли пароль?
+                            </button>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
                     <button type="button" class="btn btn-primary" onclick="loginAdmin()">Войти</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно восстановления пароля -->
+    <div class="modal fade auth-modal" id="resetPasswordModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Восстановление пароля</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="resetPasswordForm">
+                        <div class="mb-3">
+                            <label for="resetEmail" class="form-label">Email для восстановления</label>
+                            <input type="email" class="form-control" id="resetEmail" placeholder="Введите ваш email" required>
+                            <div class="form-text">Пароль будет отправлен на указанный email</div>
+                        </div>
+                        <div class="alert alert-auth" id="resetPasswordError">
+                            Ошибка при отправке пароля
+                        </div>
+                        <div class="alert alert-success" id="resetPasswordSuccess">
+                            Пароль успешно отправлен на ваш email
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" onclick="sendPasswordReset()">
+                        <i class="fas fa-paper-plane me-2"></i>Отправить пароль
+                    </button>
                 </div>
             </div>
         </div>
@@ -1060,6 +1099,181 @@
                 loginAdmin();
             }
         });
+
+        // ============================================
+        // ФУНКЦИИ ВОССТАНОВЛЕНИЯ ПАРОЛЯ (EMAILJS)
+        // ============================================
+
+        // Инициализация EmailJS
+        (function() {
+            try {
+                emailjs.init("zf0UaDME61mz-awpq");
+                console.log('EmailJS успешно инициализирован');
+            } catch (error) {
+                console.error('Ошибка инициализации EmailJS:', error);
+            }
+        })();
+
+        // Открытие модального окна восстановления пароля
+        function openResetPasswordModal() {
+            // Закрываем модальное окно авторизации если открыто
+            const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+            if (authModal) {
+                authModal.hide();
+            }
+            
+            // Сбрасываем форму и сообщения
+            document.getElementById('resetPasswordForm').reset();
+            document.getElementById('resetPasswordError').classList.remove('show');
+            document.getElementById('resetPasswordSuccess').classList.remove('show');
+            
+            // Открываем модальное окно восстановления
+            setTimeout(() => {
+                const resetModal = new bootstrap.Modal(document.getElementById('resetPasswordModal'));
+                resetModal.show();
+                
+                // Фокус на поле email
+                setTimeout(() => {
+                    document.getElementById('resetEmail').focus();
+                }, 500);
+            }, 300);
+        }
+
+        // Генерация случайного пароля
+        function generateRandomPassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+            let password = '';
+            for (let i = 0; i < 12; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return password;
+        }
+
+        // Отправка восстановления пароля
+        function sendPasswordReset() {
+            const email = document.getElementById('resetEmail').value.trim();
+            const errorElement = document.getElementById('resetPasswordError');
+            const successElement = document.getElementById('resetPasswordSuccess');
+            
+            // Сбрасываем сообщения
+            errorElement.classList.remove('show');
+            successElement.classList.remove('show');
+            
+            // Проверяем email
+            if (!email) {
+                errorElement.textContent = 'Пожалуйста, введите email';
+                errorElement.classList.add('show');
+                return;
+            }
+            
+            // Проверяем что email совпадает с email администратора
+            const adminEmail = localStorage.getItem(ADMIN_EMAIL_KEY) || 'admin@example.com';
+            if (email !== adminEmail) {
+                errorElement.textContent = 'Указанный email не найден в системе';
+                errorElement.classList.add('show');
+                return;
+            }
+            
+            // Генерируем новый пароль
+            const newPassword = generateRandomPassword();
+            
+            // Получаем текущие данные администратора
+            const adminCredentials = JSON.parse(localStorage.getItem(ADMIN_STORAGE_KEY) || '{}');
+            
+            // Обновляем пароль
+            adminCredentials.password = newPassword;
+            localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(adminCredentials));
+            
+            // Подготавливаем данные для email - используем точные имена переменных из шаблона
+            const templateParams = {
+                to_email: email,
+                password: newPassword,
+                site_name: 'Мой Сайт-Визитка',
+                date: new Date().toLocaleDateString('ru-RU'),
+                time: new Date().toLocaleTimeString('ru-RU'),
+                year: new Date().getFullYear(),
+                // Добавляем дополнительные параметры которые могут ожидаться шаблоном
+                from_name: 'Система восстановления пароля',
+                message: 'Вы запросили восстановление пароля для админ-панели'
+            };
+            
+            console.log('Отправка email с параметрами:', templateParams);
+            console.log('Service ID: service_s97poiv');
+            console.log('Template ID: template_oiik4ea');
+            
+            // Показываем индикатор загрузки
+            const sendButton = event.target;
+            const originalText = sendButton.innerHTML;
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Отправка...';
+            sendButton.disabled = true;
+            
+            // Отправляем email
+            emailjs.send('service_s97poiv', 'template_oiik4ea', templateParams)
+                .then(function(response) {
+                    console.log('Email успешно отправлен!', response.status, response.text);
+                    successElement.classList.add('show');
+                    
+                    // Восстанавливаем кнопку
+                    sendButton.innerHTML = originalText;
+                    sendButton.disabled = false;
+                    
+                    // Закрываем модальное окно через 3 секунды
+                    setTimeout(() => {
+                        const resetModal = bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal'));
+                        if (resetModal) {
+                            resetModal.hide();
+                        }
+                    }, 3000);
+                })
+                .catch(function(error) {
+                    console.error('Ошибка отправки email:', error);
+                    console.error('Детали ошибки:', JSON.stringify(error, null, 2));
+                    
+                    // Восстанавливаем кнопку
+                    sendButton.innerHTML = originalText;
+                    sendButton.disabled = false;
+                    
+                    // Показываем детальную ошибку
+                    let errorMessage = 'Ошибка при отправке email. ';
+                    if (error.text) {
+                        errorMessage += 'Код ошибки: ' + error.text;
+                    } else if (error.status) {
+                        errorMessage += 'Статус: ' + error.status;
+                    } else {
+                        errorMessage += 'Проверьте настройки EmailJS.';
+                    }
+                    
+                    errorElement.textContent = errorMessage;
+                    errorElement.classList.add('show');
+                });
+        }
+
+        // Тестовая функция для проверки EmailJS (можно вызвать в консоли)
+        function testEmailJS() {
+            console.log('Тест EmailJS...');
+            console.log('Public Key: zf0UaDME61mz-awpq');
+            console.log('Service ID: service_s97poiv');
+            console.log('Template ID: template_oiik4ea');
+            
+            const testParams = {
+                to_email: 'test@example.com',
+                password: 'test123',
+                site_name: 'Тестовый сайт',
+                date: new Date().toLocaleDateString('ru-RU'),
+                time: new Date().toLocaleTimeString('ru-RU'),
+                year: new Date().getFullYear(),
+                from_name: 'Тест',
+                message: 'Тестовое сообщение'
+            };
+            
+            emailjs.send('service_s97poiv', 'template_oiik4ea', testParams)
+                .then(function(response) {
+                    console.log('✅ Тест успешен:', response);
+                })
+                .catch(function(error) {
+                    console.error('❌ Тест провален:', error);
+                });
+        }
 
         // ============================================
         // ОСНОВНОЙ КОД СТРАНИЦЫ
