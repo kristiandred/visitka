@@ -918,8 +918,8 @@
                 <div class="modal-body">
                     <form id="authForm">
                         <div class="mb-3">
-                            <label for="adminLogin" class="form-label">Логин</label>
-                            <input type="text" class="form-control" id="adminLogin" required>
+                            <label for="adminLogin" class="form-label">Логин или Email</label>
+                            <input type="text" class="form-control" id="adminLogin" placeholder="admin или ваш email" required>
                         </div>
                         <div class="mb-3">
                             <label for="adminPassword" class="form-label">Пароль</label>
@@ -946,6 +946,7 @@
 
         // Ключ для хранения данных администратора в localStorage
         const ADMIN_STORAGE_KEY = 'portfolio_admin_credentials';
+        const ADMIN_EMAIL_KEY = 'portfolio_admin_email';
 
         // Данные администратора по умолчанию (при первом запуске)
         const DEFAULT_ADMIN_CREDENTIALS = {
@@ -960,6 +961,13 @@
                 // Сохраняем данные по умолчанию при первом запуске
                 localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(DEFAULT_ADMIN_CREDENTIALS));
                 console.log('Созданы учетные данные администратора по умолчанию');
+            }
+            
+            // Инициализация email администратора
+            const savedEmail = localStorage.getItem(ADMIN_EMAIL_KEY);
+            if (!savedEmail) {
+                localStorage.setItem(ADMIN_EMAIL_KEY, 'admin@example.com');
+                console.log('Создан email администратора по умолчанию');
             }
         }
 
@@ -1016,9 +1024,10 @@
             
             // Получаем сохраненные данные администратора
             const adminCredentials = getAdminCredentials();
+            const adminEmail = localStorage.getItem(ADMIN_EMAIL_KEY) || 'admin@example.com';
             
-            // Проверяем логин и пароль
-            if (login === adminCredentials.login && password === adminCredentials.password) {
+            // Проверяем логин/email и пароль (допускаем вход как по логину, так и по email)
+            if ((login === adminCredentials.login || login === adminEmail) && password === adminCredentials.password) {
                 // Успешная авторизация
                 console.log('Авторизация успешна');
                 
@@ -1030,7 +1039,7 @@
                 window.location.href = 'admin.html';
             } else {
                 // Неверные данные
-                authError.textContent = 'Неверный логин или пароль';
+                authError.textContent = 'Неверный логин/email или пароль';
                 authError.classList.add('show');
                 
                 // Анимация ошибки
