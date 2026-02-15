@@ -98,7 +98,6 @@
             align-items: center;
         }
 
-
         .hero-section .row {
             --bs-gutter-x: -20rem;
         }
@@ -652,11 +651,6 @@
             border-radius: 5px;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-green);
-            border-radius: 5px;
-        }
-
         .hero-section .row {
             --bs-gutter-x: -20rem;
         }
@@ -758,7 +752,6 @@
         .nav-link-lock:hover {
             color: var(--hover-green) !important;
         }
-
     </style>
 </head>
 <body>
@@ -940,655 +933,656 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-       // ============================================
-// СИСТЕМА АВТОРИЗАЦИИ АДМИНИСТРАТОРА
-// ============================================
+        // ============================================
+        // СИСТЕМА АВТОРИЗАЦИИ АДМИНИСТРАТОРА
+        // ============================================
 
-// Ключ для хранения данных администратора в localStorage
-const ADMIN_STORAGE_KEY = 'portfolio_admin_credentials';
-const ADMIN_EMAIL_KEY = 'portfolio_admin_email';
+        // Ключ для хранения данных администратора в localStorage
+        const ADMIN_STORAGE_KEY = 'portfolio_admin_credentials';
+        const ADMIN_EMAIL_KEY = 'portfolio_admin_email';
 
-// Данные администратора по умолчанию (при первом запуске)
-const DEFAULT_ADMIN_CREDENTIALS = {
-    login: 'admin',
-    password: 'admin123'
-};
+        // Данные администратора по умолчанию (при первом запуске)
+        const DEFAULT_ADMIN_CREDENTIALS = {
+            login: 'admin',
+            password: 'admin123'
+        };
 
-// Инициализация данных администратора
-function initializeAdminCredentials() {
-    const savedCredentials = localStorage.getItem(ADMIN_STORAGE_KEY);
-    if (!savedCredentials) {
-        // Сохраняем данные по умолчанию при первом запуске
-        localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(DEFAULT_ADMIN_CREDENTIALS));
-        console.log('Созданы учетные данные администратора по умолчанию');
-    }
-    
-    // Инициализация email администратора
-    const savedEmail = localStorage.getItem(ADMIN_EMAIL_KEY);
-    if (!savedEmail) {
-        localStorage.setItem(ADMIN_EMAIL_KEY, 'admin@example.com');
-        console.log('Создан email администратора по умолчанию');
-    }
-}
-
-// Получение данных администратора
-function getAdminCredentials() {
-    const savedCredentials = localStorage.getItem(ADMIN_STORAGE_KEY);
-    if (savedCredentials) {
-        return JSON.parse(savedCredentials);
-    }
-    return DEFAULT_ADMIN_CREDENTIALS;
-}
-
-// Обновление данных администратора
-function updateAdminCredentials(newLogin, newPassword) {
-    const credentials = {
-        login: newLogin,
-        password: newPassword
-    };
-    localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(credentials));
-    console.log('Учетные данные администратора обновлены');
-}
-
-// Открытие модального окна авторизации
-function openAuthModal() {
-    // Сбрасываем форму и ошибки
-    document.getElementById('authForm').reset();
-    document.getElementById('authError').classList.remove('show');
-    
-    // Открываем модальное окно
-    const authModal = new bootstrap.Modal(document.getElementById('authModal'));
-    authModal.show();
-    
-    // Фокус на поле логина
-    setTimeout(() => {
-        document.getElementById('adminLogin').focus();
-    }, 500);
-}
-
-// Авторизация администратора
-function loginAdmin() {
-    const login = document.getElementById('adminLogin').value.trim();
-    const password = document.getElementById('adminPassword').value.trim();
-    const authError = document.getElementById('authError');
-    
-    // Сбрасываем ошибку
-    authError.classList.remove('show');
-    
-    // Проверяем введенные данные
-    if (!login || !password) {
-        authError.textContent = 'Пожалуйста, заполните все поля';
-        authError.classList.add('show');
-        return;
-    }
-    
-    // Получаем сохраненные данные администратора
-    const adminCredentials = getAdminCredentials();
-    const adminEmail = localStorage.getItem(ADMIN_EMAIL_KEY) || 'admin@example.com';
-    
-    // Проверяем логин/email и пароль (допускаем вход как по логину, так и по email)
-    if ((login === adminCredentials.login || login === adminEmail) && password === adminCredentials.password) {
-        // Успешная авторизация
-        console.log('Авторизация успешна');
-        
-        // Закрываем модальное окно
-        const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
-        authModal.hide();
-        
-        // Переходим в админ-панель
-        window.location.href = 'admin.html';
-    } else {
-        // Неверные данные
-        authError.textContent = 'Неверный логин/email или пароль';
-        authError.classList.add('show');
-        
-        // Анимация ошибки
-        document.getElementById('adminLogin').classList.add('is-invalid');
-        document.getElementById('adminPassword').classList.add('is-invalid');
-        
-        setTimeout(() => {
-            document.getElementById('adminLogin').classList.remove('is-invalid');
-            document.getElementById('adminPassword').classList.remove('is-invalid');
-        }, 1000);
-    }
-}
-
-// ============================================
-// ОСНОВНОЙ КОД СТРАНИЦЫ
-// ============================================
-
-// Добавляем стили для анимации фильтрации
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: scale(0.9);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1);
-        }
-    }
-    
-    .portfolio-item {
-        transition: all 0.3s ease;
-        animation: fadeIn 0.5s ease;
-    }
-`;
-document.head.appendChild(style);
-
-// Эффект прокрутки для навбара
-window.addEventListener('scroll', function() {
-    const navbar = document.querySelector('.navbar');
-    if (window.scrollY > 50) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-});
-
-// Плавная прокрутка к секциям
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        const href = this.getAttribute('href');
-        
-        // Пропускаем пустые ссылки, ссылки только с '#' и ссылки с вызовом функций
-        if (!href || href === '#' || href === '#!' || this.getAttribute('onclick')) {
-            return;
-        }
-        
-        e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-        }
-    });
-});
-
-// ============================================
-// ФИЛЬТРАЦИЯ ПОРТФОЛИО (ИСПРАВЛЕННАЯ ВЕРСИЯ)
-// ============================================
-
-// Функция для фильтрации проектов
-function setupPortfolioFilter() {
-    const filterButtons = document.querySelectorAll('.filter-btn');
-    const projectItems = document.querySelectorAll('#photos-gallery .col-lg-4, #photos-gallery .portfolio-item');
-    
-    if (filterButtons.length === 0 || projectItems.length === 0) {
-        console.log('Кнопки фильтров или проекты не найдены');
-        return;
-    }
-    
-    filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            // Убираем активный класс у всех кнопок
-            filterButtons.forEach(btn => btn.classList.remove('active'));
+        // Инициализация данных администратора
+        function initializeAdminCredentials() {
+            const savedCredentials = localStorage.getItem(ADMIN_STORAGE_KEY);
+            if (!savedCredentials) {
+                // Сохраняем данные по умолчанию при первом запуске
+                localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(DEFAULT_ADMIN_CREDENTIALS));
+                console.log('Созданы учетные данные администратора по умолчанию');
+            }
             
-            // Добавляем активный класс нажатой кнопке
-            this.classList.add('active');
+            // Инициализация email администратора
+            const savedEmail = localStorage.getItem(ADMIN_EMAIL_KEY);
+            if (!savedEmail) {
+                localStorage.setItem(ADMIN_EMAIL_KEY, 'admin@example.com');
+                console.log('Создан email администратора по умолчанию');
+            }
+        }
+
+        // Получение данных администратора
+        function getAdminCredentials() {
+            const savedCredentials = localStorage.getItem(ADMIN_STORAGE_KEY);
+            if (savedCredentials) {
+                return JSON.parse(savedCredentials);
+            }
+            return DEFAULT_ADMIN_CREDENTIALS;
+        }
+
+        // Обновление данных администратора
+        function updateAdminCredentials(newLogin, newPassword) {
+            const credentials = {
+                login: newLogin,
+                password: newPassword
+            };
+            localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(credentials));
+            console.log('Учетные данные администратора обновлены');
+        }
+
+        // Открытие модального окна авторизации
+        function openAuthModal() {
+            // Сбрасываем форму и ошибки
+            document.getElementById('authForm').reset();
+            document.getElementById('authError').classList.remove('show');
             
-            // Получаем значение фильтра
-            const filterValue = this.getAttribute('data-filter');
+            // Открываем модальное окно
+            const authModal = new bootstrap.Modal(document.getElementById('authModal'));
+            authModal.show();
             
-            // Фильтруем проекты
-            projectItems.forEach(item => {
-                if (filterValue === 'all' || filterValue === 'Все работы') {
-                    // Показываем все проекты
-                    item.style.display = 'block';
-                    item.style.animation = 'fadeIn 0.5s ease';
-                } else {
-                    // Проверяем категорию проекта
-                    const category = item.getAttribute('data-category');
-                    if (category && category === filterValue) {
-                        item.style.display = 'block';
-                        item.style.animation = 'fadeIn 0.5s ease';
-                    } else {
-                        item.style.display = 'none';
-                    }
+            // Фокус на поле логина
+            setTimeout(() => {
+                document.getElementById('adminLogin').focus();
+            }, 500);
+        }
+
+        // Авторизация администратора
+        function loginAdmin() {
+            const login = document.getElementById('adminLogin').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const authError = document.getElementById('authError');
+            
+            // Сбрасываем ошибку
+            authError.classList.remove('show');
+            
+            // Проверяем введенные данные
+            if (!login || !password) {
+                authError.textContent = 'Пожалуйста, заполните все поля';
+                authError.classList.add('show');
+                return;
+            }
+            
+            // Получаем сохраненные данные администратора
+            const adminCredentials = getAdminCredentials();
+            const adminEmail = localStorage.getItem(ADMIN_EMAIL_KEY) || 'admin@example.com';
+            
+            // Проверяем логин/email и пароль (допускаем вход как по логину, так и по email)
+            if ((login === adminCredentials.login || login === adminEmail) && password === adminCredentials.password) {
+                // Успешная авторизация
+                console.log('Авторизация успешна');
+                
+                // Закрываем модальное окно
+                const authModal = bootstrap.Modal.getInstance(document.getElementById('authModal'));
+                authModal.hide();
+                
+                // Переходим в админ-панель
+                window.location.href = 'admin.html';
+            } else {
+                // Неверные данные
+                authError.textContent = 'Неверный логин/email или пароль';
+                authError.classList.add('show');
+                
+                // Анимация ошибки
+                document.getElementById('adminLogin').classList.add('is-invalid');
+                document.getElementById('adminPassword').classList.add('is-invalid');
+                
+                setTimeout(() => {
+                    document.getElementById('adminLogin').classList.remove('is-invalid');
+                    document.getElementById('adminPassword').classList.remove('is-invalid');
+                }, 1000);
+            }
+        }
+
+        // ============================================
+        // ОСНОВНОЙ КОД СТРАНИЦЫ
+        // ============================================
+
+        // Добавляем стили для анимации фильтрации
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.9);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+            
+            .portfolio-item {
+                transition: all 0.3s ease;
+                animation: fadeIn 0.5s ease;
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Эффект прокрутки для навбара
+        window.addEventListener('scroll', function() {
+            const navbar = document.querySelector('.navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Плавная прокрутка к секциям
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                
+                // Пропускаем пустые ссылки, ссылки только с '#' и ссылки с вызовом функций
+                if (!href || href === '#' || href === '#!' || this.getAttribute('onclick')) {
+                    return;
+                }
+                
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
             });
         });
-    });
-    
-    console.log('Фильтры портфолио настроены');
-}
 
-// Функция для получения русского названия категории по фильтру
-function getCategoryNameByFilter(filter, categories) {
-    if (!categories || !Array.isArray(categories)) return filter;
-    
-    const category = categories.find(cat => cat.filter === filter);
-    return category ? category.name : filter;
-}
+        // ============================================
+        // ФИЛЬТРАЦИЯ ПОРТФОЛИО
+        // ============================================
 
-// Обновление фильтров портфолио
-function updatePortfolioFilters(categories) {
-    const filterContainer = document.querySelector('.portfolio-filter');
-    if (!filterContainer) return;
-    
-    filterContainer.innerHTML = '';
-    
-    // Создаем кнопку "Все работы" по умолчанию
-    const allButton = document.createElement('button');
-    allButton.className = 'filter-btn active';
-    allButton.setAttribute('data-filter', 'all');
-    allButton.textContent = 'Все работы';
-    filterContainer.appendChild(allButton);
-    
-    // Фильтруем только корректные объекты категорий
-    const validCategories = Array.isArray(categories) ? categories.filter(category => {
-        return category && typeof category === 'object' && category.name && category.filter;
-    }) : [];
-    
-    validCategories.forEach(category => {
-        const button = document.createElement('button');
-        button.className = 'filter-btn';
-        
-        const categoryName = category.name;
-        const categoryFilter = category.filter;
-        
-        button.setAttribute('data-filter', categoryFilter);
-        button.textContent = categoryName;
-        
-        filterContainer.appendChild(button);
-    });
-    
-    // Настраиваем обработчики событий для фильтров
-    setTimeout(setupPortfolioFilter, 100);
-}
-
-// Обновление галереи портфолио
-function updatePortfolioGallery(projects) {
-    const gallery = document.getElementById('photos-gallery');
-    if (!gallery) return;
-    
-    // Загружаем категории для получения названий
-    const savedCategories = localStorage.getItem('portfolioCategories');
-    const categories = savedCategories ? JSON.parse(savedCategories) : [];
-    
-    gallery.innerHTML = '';
-    
-    if (!projects || projects.length === 0) {
-        // Если нет проектов, показываем заглушку
-        gallery.innerHTML = '<div class="col-12 text-center"><p class="text-muted">Проекты еще не добавлены</p></div>';
-        return;
-    }
-    
-    projects.forEach(project => {
-        const projectCard = document.createElement('div');
-        projectCard.className = 'col-lg-4 col-md-6 mb-4 portfolio-item';
-        
-        // Получаем фильтр категории
-        let categoryFilter = project.category;
-        if (typeof project.category === 'object' && project.category.filter) {
-            categoryFilter = project.category.filter;
-        }
-        
-        // Устанавливаем data-category для фильтрации
-        projectCard.setAttribute('data-category', categoryFilter || '');
-        
-        // Получаем название категории
-        const categoryName = getCategoryNameByFilter(categoryFilter, categories) || categoryFilter || 'Без категории';
-        
-        projectCard.innerHTML = `
-            <div class="photo-card">
-                <img src="${project.image || 'https://via.placeholder.com/600x400'}" alt="${project.title || 'Проект'}" class="img-fluid" onerror="this.src='https://via.placeholder.com/600x400'">
-                <div class="photo-card-body">
-                    <h5 class="photo-title">${project.title || 'Без названия'}</h5>
-                    <p class="photo-description">${project.description || 'Нет описания'}</p>
-                    <span class="photo-category">${categoryName}</span>
-                </div>
-            </div>
-        `;
-        
-        gallery.appendChild(projectCard);
-    });
-    
-    // После загрузки проектов обновляем фильтры
-    setTimeout(setupPortfolioFilter, 100);
-}
-
-// Загрузка портфолио из localStorage
-function loadPortfolioFromStorage() {
-    // Загружаем тестовые данные, если в localStorage ничего нет
-    if (!localStorage.getItem('portfolioCategories')) {
-        // Категории по умолчанию
-        const defaultCategories = [
-            { name: 'Сайты', filter: 'websites' },
-            { name: 'Веб-приложения', filter: 'apps' },
-            { name: 'Дизайн', filter: 'design' }
-        ];
-        localStorage.setItem('portfolioCategories', JSON.stringify(defaultCategories));
-    }
-    
-    if (!localStorage.getItem('portfolioProjects')) {
-        // Проекты по умолчанию
-        const defaultProjects = [
-            {
-                title: 'Интернет-магазин "Urban Style"',
-                description: 'Стильный интернет-магазин для бренда одежды',
-                image: 'https://images.unsplash.com/photo-1441984904996-69e494c0c4cb?w=600',
-                category: 'websites'
-            },
-            {
-                title: 'Finance Tracker',
-                description: 'Приложение для учета личных финансов',
-                image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600',
-                category: 'apps'
-            },
-            {
-                title: 'Дизайн кофейни "Bean"',
-                description: 'Современный дизайн для уютной кофейни',
-                image: 'https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=600',
-                category: 'design'
-            },
-            {
-                title: 'Корпоративный сайт "СтройИнвест"',
-                description: 'Сайт для строительной компании',
-                image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600',
-                category: 'websites'
-            },
-            {
-                title: 'TaskFlow',
-                description: 'Канбан-доска для управления задачами',
-                image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600',
-                category: 'apps'
-            },
-            {
-                title: 'Мобильное приложение "FitLife"',
-                description: 'Дизайн UI/UX для фитнес приложения',
-                image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600',
-                category: 'design'
+        // Функция для фильтрации проектов
+        function setupPortfolioFilter() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const projectItems = document.querySelectorAll('#photos-gallery .col-lg-4, #photos-gallery .portfolio-item');
+            
+            if (filterButtons.length === 0 || projectItems.length === 0) {
+                console.log('Кнопки фильтров или проекты не найдены');
+                return;
             }
-        ];
-        localStorage.setItem('portfolioProjects', JSON.stringify(defaultProjects));
-    }
-    
-    const savedCategories = localStorage.getItem('portfolioCategories');
-    const savedProjects = localStorage.getItem('portfolioProjects');
-    
-    if (savedCategories) {
-        const categories = JSON.parse(savedCategories);
-        updatePortfolioFilters(categories);
-    }
-    
-    if (savedProjects) {
-        const projects = JSON.parse(savedProjects);
-        updatePortfolioGallery(projects);
-    }
-}
-
-// ============================================
-// ЗАГРУЗКА ОСТАЛЬНОГО КОНТЕНТА
-// ============================================
-
-// Анимация при прокрутке
-function animateOnScroll() {
-    const elements = document.querySelectorAll('.fade-in-up');
-    
-    elements.forEach(element => {
-        const elementTop = element.getBoundingClientRect().top;
-        const elementBottom = element.getBoundingClientRect().bottom;
-        
-        if (elementTop < window.innerHeight && elementBottom > 0) {
-            element.style.opacity = '1';
-            element.style.transform = 'translateY(0)';
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Убираем активный класс у всех кнопок
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Добавляем активный класс нажатой кнопке
+                    this.classList.add('active');
+                    
+                    // Получаем значение фильтра
+                    const filterValue = this.getAttribute('data-filter');
+                    
+                    // Фильтруем проекты
+                    projectItems.forEach(item => {
+                        if (filterValue === 'all' || filterValue === 'Все работы') {
+                            // Показываем все проекты
+                            item.style.display = 'block';
+                            item.style.animation = 'fadeIn 0.5s ease';
+                        } else {
+                            // Проверяем категорию проекта
+                            const category = item.getAttribute('data-category');
+                            if (category && category === filterValue) {
+                                item.style.display = 'block';
+                                item.style.animation = 'fadeIn 0.5s ease';
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    });
+                });
+            });
+            
+            console.log('Фильтры портфолио настроены');
         }
-    });
-}
 
-// Загрузка сохраненного контента
-function loadSavedContent() {
-    const savedContent = localStorage.getItem('mainPageContent');
-    if (savedContent) {
-        const content = JSON.parse(savedContent);
-        
-        if (content['hero-title']) {
-            const heroTitle = document.getElementById('hero-title');
-            if (heroTitle) {
-                heroTitle.textContent = content['hero-title'];
+        // Функция для получения русского названия категории по фильтру
+        function getCategoryNameByFilter(filter, categories) {
+            if (!categories || !Array.isArray(categories)) return filter;
+            
+            const category = categories.find(cat => cat.filter === filter);
+            return category ? category.name : filter;
+        }
+
+        // Обновление фильтров портфолио
+        function updatePortfolioFilters(categories) {
+            const filterContainer = document.querySelector('.portfolio-filter');
+            if (!filterContainer) return;
+            
+            // ОЧИЩАЕМ контейнер перед добавлением новых кнопок (только один раз)
+            filterContainer.innerHTML = '';
+            
+            // Создаем кнопку "Все работы" по умолчанию
+            const allButton = document.createElement('button');
+            allButton.className = 'filter-btn active';
+            allButton.setAttribute('data-filter', 'all');
+            allButton.textContent = 'Все работы';
+            filterContainer.appendChild(allButton);
+            
+            // Фильтруем только корректные объекты категорий
+            const validCategories = Array.isArray(categories) ? categories.filter(category => {
+                return category && typeof category === 'object' && category.name && category.filter;
+            }) : [];
+            
+            validCategories.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'filter-btn';
+                
+                const categoryName = category.name;
+                const categoryFilter = category.filter;
+                
+                button.setAttribute('data-filter', categoryFilter);
+                button.textContent = categoryName;
+                
+                filterContainer.appendChild(button);
+            });
+            
+            // Настраиваем обработчики событий для фильтров
+            setTimeout(setupPortfolioFilter, 100);
+        }
+
+        // Обновление галереи портфолио
+        function updatePortfolioGallery(projects) {
+            const gallery = document.getElementById('photos-gallery');
+            if (!gallery) return;
+            
+            // Загружаем категории для получения названий
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            const categories = savedCategories ? JSON.parse(savedCategories) : [];
+            
+            gallery.innerHTML = '';
+            
+            if (!projects || projects.length === 0) {
+                // Если нет проектов, показываем заглушку
+                gallery.innerHTML = '<div class="col-12 text-center"><p class="text-muted">Проекты еще не добавлены</p></div>';
+                return;
             }
+            
+            projects.forEach(project => {
+                const projectCard = document.createElement('div');
+                projectCard.className = 'col-lg-4 col-md-6 mb-4 portfolio-item';
+                
+                // Получаем фильтр категории
+                let categoryFilter = project.category;
+                if (typeof project.category === 'object' && project.category.filter) {
+                    categoryFilter = project.category.filter;
+                }
+                
+                // Устанавливаем data-category для фильтрации
+                projectCard.setAttribute('data-category', categoryFilter || '');
+                
+                // Получаем название категории
+                const categoryName = getCategoryNameByFilter(categoryFilter, categories) || categoryFilter || 'Без категории';
+                
+                projectCard.innerHTML = `
+                    <div class="photo-card">
+                        <img src="${project.image || 'https://via.placeholder.com/600x400'}" alt="${project.title || 'Проект'}" class="img-fluid" onerror="this.src='https://via.placeholder.com/600x400'">
+                        <div class="photo-card-body">
+                            <h5 class="photo-title">${project.title || 'Без названия'}</h5>
+                            <p class="photo-description">${project.description || 'Нет описания'}</p>
+                            <span class="photo-category">${categoryName}</span>
+                        </div>
+                    </div>
+                `;
+                
+                gallery.appendChild(projectCard);
+            });
+            
+            // После загрузки проектов обновляем фильтры
+            setTimeout(setupPortfolioFilter, 100);
         }
-        
-        if (content['hero-description']) {
-            const heroDesc = document.getElementById('hero-description');
-            if (heroDesc) {
-                heroDesc.textContent = content['hero-description'];
+
+        // Загрузка портфолио из localStorage
+        function loadPortfolioFromStorage() {
+            // Загружаем тестовые данные, если в localStorage ничего нет
+            if (!localStorage.getItem('portfolioCategories')) {
+                // Категории по умолчанию
+                const defaultCategories = [
+                    { name: 'Сайты', filter: 'websites' },
+                    { name: 'Веб-приложения', filter: 'apps' },
+                    { name: 'Дизайн', filter: 'design' }
+                ];
+                localStorage.setItem('portfolioCategories', JSON.stringify(defaultCategories));
             }
-        }
-        
-        if (content.site_title) {
-            document.title = content.site_title;
-            const heroTitle = document.getElementById('hero-title');
-            if (heroTitle) {
-                heroTitle.textContent = content.site_title;
+            
+            if (!localStorage.getItem('portfolioProjects')) {
+                // Проекты по умолчанию
+                const defaultProjects = [
+                    {
+                        title: 'Интернет-магазин "Urban Style"',
+                        description: 'Стильный интернет-магазин для бренда одежды',
+                        image: 'https://images.unsplash.com/photo-1441984904996-69e494c0c4cb?w=600',
+                        category: 'websites'
+                    },
+                    {
+                        title: 'Finance Tracker',
+                        description: 'Приложение для учета личных финансов',
+                        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600',
+                        category: 'apps'
+                    },
+                    {
+                        title: 'Дизайн кофейни "Bean"',
+                        description: 'Современный дизайн для уютной кофейни',
+                        image: 'https://images.unsplash.com/photo-1493857671505-72967e2e2760?w=600',
+                        category: 'design'
+                    },
+                    {
+                        title: 'Корпоративный сайт "СтройИнвест"',
+                        description: 'Сайт для строительной компании',
+                        image: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=600',
+                        category: 'websites'
+                    },
+                    {
+                        title: 'TaskFlow',
+                        description: 'Канбан-доска для управления задачами',
+                        image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600',
+                        category: 'apps'
+                    },
+                    {
+                        title: 'Мобильное приложение "FitLife"',
+                        description: 'Дизайн UI/UX для фитнес приложения',
+                        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600',
+                        category: 'design'
+                    }
+                ];
+                localStorage.setItem('portfolioProjects', JSON.stringify(defaultProjects));
+            }
+            
+            const savedCategories = localStorage.getItem('portfolioCategories');
+            const savedProjects = localStorage.getItem('portfolioProjects');
+            
+            if (savedCategories) {
+                const categories = JSON.parse(savedCategories);
+                updatePortfolioFilters(categories);
+            }
+            
+            if (savedProjects) {
+                const projects = JSON.parse(savedProjects);
+                updatePortfolioGallery(projects);
             }
         }
-        
-        if (content.site_description) {
-            const heroDesc = document.getElementById('hero-description');
-            if (heroDesc) {
-                heroDesc.textContent = content.site_description;
-            }
-        }
-        
-        if (content.about_text) {
-            const aboutElement = document.getElementById('about-text');
-            if (aboutElement) {
-                aboutElement.textContent = content.about_text;
-            }
-        }
-    }
-    
-    // Загружаем аватарку
-    const savedAvatar = localStorage.getItem('avatar_url');
-    if (savedAvatar) {
-        const avatarElement = document.getElementById('hero-avatar');
-        if (avatarElement) {
-            avatarElement.src = savedAvatar;
-            avatarElement.onerror = function() {
-                this.src = 'https://picsum.photos/seed/profile/400/400.jpg';
-            };
-        }
-    }
-}
 
-// Загрузка достижений
-function loadAchievements() {
-    const savedAchievements = localStorage.getItem('achievements');
-    const achievementsRow = document.getElementById('achievements-row');
-    
-    if (!achievementsRow) return;
-    
-    if (savedAchievements) {
-        const achievements = JSON.parse(savedAchievements);
-        achievementsRow.innerHTML = '';
-        
-        achievements.forEach((achievement) => {
-            const achievementCol = document.createElement('div');
-            achievementCol.className = 'col-md-6 mb-4';
-            achievementCol.innerHTML = `
-                <div class="skill-item">
-                    <i class="${achievement.icon || 'fas fa-star'}"></i>
-                    <h5>${achievement.title || 'Достижение'}</h5>
-                    <p>${achievement.description || ''}</p>
-                </div>
-            `;
-            achievementsRow.appendChild(achievementCol);
+        // ============================================
+        // ЗАГРУЗКА ОСТАЛЬНОГО КОНТЕНТА
+        // ============================================
+
+        // Анимация при прокрутке
+        function animateOnScroll() {
+            const elements = document.querySelectorAll('.fade-in-up');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementBottom = element.getBoundingClientRect().bottom;
+                
+                if (elementTop < window.innerHeight && elementBottom > 0) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        }
+
+        // Загрузка сохраненного контента
+        function loadSavedContent() {
+            const savedContent = localStorage.getItem('mainPageContent');
+            if (savedContent) {
+                const content = JSON.parse(savedContent);
+                
+                if (content['hero-title']) {
+                    const heroTitle = document.getElementById('hero-title');
+                    if (heroTitle) {
+                        heroTitle.textContent = content['hero-title'];
+                    }
+                }
+                
+                if (content['hero-description']) {
+                    const heroDesc = document.getElementById('hero-description');
+                    if (heroDesc) {
+                        heroDesc.textContent = content['hero-description'];
+                    }
+                }
+                
+                if (content.site_title) {
+                    document.title = content.site_title;
+                    const heroTitle = document.getElementById('hero-title');
+                    if (heroTitle) {
+                        heroTitle.textContent = content.site_title;
+                    }
+                }
+                
+                if (content.site_description) {
+                    const heroDesc = document.getElementById('hero-description');
+                    if (heroDesc) {
+                        heroDesc.textContent = content.site_description;
+                    }
+                }
+                
+                if (content.about_text) {
+                    const aboutElement = document.getElementById('about-text');
+                    if (aboutElement) {
+                        aboutElement.textContent = content.about_text;
+                    }
+                }
+            }
+            
+            // Загружаем аватарку
+            const savedAvatar = localStorage.getItem('avatar_url');
+            if (savedAvatar) {
+                const avatarElement = document.getElementById('hero-avatar');
+                if (avatarElement) {
+                    avatarElement.src = savedAvatar;
+                    avatarElement.onerror = function() {
+                        this.src = 'https://picsum.photos/seed/profile/400/400.jpg';
+                    };
+                }
+            }
+        }
+
+        // Загрузка достижений
+        function loadAchievements() {
+            const savedAchievements = localStorage.getItem('achievements');
+            const achievementsRow = document.getElementById('achievements-row');
+            
+            if (!achievementsRow) return;
+            
+            if (savedAchievements) {
+                const achievements = JSON.parse(savedAchievements);
+                achievementsRow.innerHTML = '';
+                
+                achievements.forEach((achievement) => {
+                    const achievementCol = document.createElement('div');
+                    achievementCol.className = 'col-md-6 mb-4';
+                    achievementCol.innerHTML = `
+                        <div class="skill-item">
+                            <i class="${achievement.icon || 'fas fa-star'}"></i>
+                            <h5>${achievement.title || 'Достижение'}</h5>
+                            <p>${achievement.description || ''}</p>
+                        </div>
+                    `;
+                    achievementsRow.appendChild(achievementCol);
+                });
+            } else {
+                // Достижения по умолчанию
+                achievementsRow.innerHTML = `
+                    <div class="col-md-6 mb-4">
+                        <div class="skill-item">
+                            <i class="fas fa-medal"></i>
+                            <h5>Более 50 проектов</h5>
+                            <p>Успешно завершенных и запущенных</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="skill-item">
+                            <i class="fas fa-users"></i>
+                            <h5>Командная работа</h5>
+                            <p>Опыт работы в Agile/Scrum командах</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Загрузка навыков
+        function loadSkills() {
+            const savedSkills = localStorage.getItem('skills');
+            const skillsRow = document.getElementById('skills-row');
+            
+            if (!skillsRow) return;
+            
+            if (savedSkills) {
+                const skills = JSON.parse(savedSkills);
+                skillsRow.innerHTML = '';
+                
+                skills.forEach((skill) => {
+                    const skillCol = document.createElement('div');
+                    skillCol.className = 'col-md-4 mb-4';
+                    skillCol.innerHTML = `
+                        <div class="skill-item">
+                            <i class="${skill.icon || 'fas fa-code'}"></i>
+                            <h5>${skill.title || 'Навык'}</h5>
+                            <p>${skill.description || ''}</p>
+                        </div>
+                    `;
+                    skillsRow.appendChild(skillCol);
+                });
+            }
+        }
+
+        // Загрузка контактов
+        function loadContacts() {
+            const savedContacts = localStorage.getItem('contacts');
+            const contacts = savedContacts ? JSON.parse(savedContacts) : [
+                { type: 'email', label: 'Email', value: 'ivan.petrov@example.com' },
+                { type: 'phone', label: 'Телефон', value: '+7 (999) 123-45-67' },
+                { type: 'address', label: 'Адрес', value: 'Москва, Россия' }
+            ];
+            
+            const contactInfo = document.querySelector('.contact-info');
+            if (!contactInfo) return;
+            
+            contactInfo.innerHTML = '';
+            
+            contacts.forEach(contact => {
+                const contactItem = document.createElement('div');
+                contactItem.className = 'contact-item';
+
+                let icon = 'fas fa-info-circle';
+                let displayElement;
+
+                if (contact.type === 'email') {
+                    icon = 'fas fa-envelope';
+                    displayElement = document.createElement('a');
+                    displayElement.href = `mailto:${contact.value}`;
+                    displayElement.textContent = contact.value;
+                } else if (contact.type === 'phone') {
+                    icon = 'fas fa-phone';
+                    displayElement = document.createElement('a');
+                    displayElement.href = `tel:${contact.value.replace(/[^\d+]/g, '')}`;
+                    displayElement.textContent = contact.value;
+                } else {
+                    icon = 'fas fa-map-marker-alt';
+                    displayElement = document.createElement('span');
+                    displayElement.textContent = contact.value;
+                }
+
+                contactItem.innerHTML = `
+                    <i class="${icon}"></i>
+                    <strong>${contact.label}:</strong>
+                `;
+                
+                contactItem.appendChild(displayElement);
+                contactInfo.appendChild(contactItem);
+            });
+            
+            // Добавляем разделитель
+            const divider = document.createElement('hr');
+            divider.style.cssText = 'margin: 20px 0; border: none; border-top: 1px solid rgba(46, 204, 113, 0.2);';
+            contactInfo.appendChild(divider);
+            
+            // Добавляем социальные сети
+            const socialLinks = document.createElement('div');
+            socialLinks.className = 'social-links';
+            socialLinks.style.cssText = 'text-align: center; margin-top: 20px;';
+            contactInfo.appendChild(socialLinks);
+            
+            loadSocialNetworks();
+        }
+
+        // Загрузка социальных сетей
+        function loadSocialNetworks() {
+            const savedSocials = localStorage.getItem('socialNetworks');
+            const socials = savedSocials ? JSON.parse(savedSocials) : [
+                { name: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/ivanpetrov' },
+                { name: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/ivanpetrov' },
+                { name: 'Telegram', icon: 'fab fa-telegram', url: 'https://telegram.me/ivanpetrov' }
+            ];
+            
+            const socialLinks = document.querySelector('.social-links');
+            if (!socialLinks) return;
+            
+            socialLinks.innerHTML = '';
+
+            socials.forEach(social => {
+                const link = document.createElement('a');
+                link.href = social.url;
+                link.target = '_blank';
+                link.title = social.name;
+                link.innerHTML = `<i class="${social.icon}"></i>`;
+                socialLinks.appendChild(link);
+            });
+        }
+
+        // ============================================
+        // ИНИЦИАЛИЗАЦИЯ
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Инициализируем данные администратора
+            initializeAdminCredentials();
+            
+            // Загружаем контент
+            loadSavedContent();
+            loadPortfolioFromStorage();
+            loadAchievements();
+            loadSkills();
+            loadContacts();
+            
+            // Добавляем классы для анимации
+            const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
+            elementsToAnimate.forEach(element => {
+                element.classList.add('fade-in-up');
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(30px)';
+                element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            });
+            
+            // Запускаем анимацию при прокрутке
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll();
+            
+            console.log('Страница инициализирована');
         });
-    } else {
-        // Достижения по умолчанию
-        achievementsRow.innerHTML = `
-            <div class="col-md-6 mb-4">
-                <div class="skill-item">
-                    <i class="fas fa-medal"></i>
-                    <h5>Более 50 проектов</h5>
-                    <p>Успешно завершенных и запущенных</p>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
-                <div class="skill-item">
-                    <i class="fas fa-users"></i>
-                    <h5>Командная работа</h5>
-                    <p>Опыт работы в Agile/Scrum командах</p>
-                </div>
-            </div>
-        `;
-    }
-}
 
-// Загрузка навыков
-function loadSkills() {
-    const savedSkills = localStorage.getItem('skills');
-    const skillsRow = document.getElementById('skills-row');
-    
-    if (!skillsRow) return;
-    
-    if (savedSkills) {
-        const skills = JSON.parse(savedSkills);
-        skillsRow.innerHTML = '';
-        
-        skills.forEach((skill) => {
-            const skillCol = document.createElement('div');
-            skillCol.className = 'col-md-4 mb-4';
-            skillCol.innerHTML = `
-                <div class="skill-item">
-                    <i class="${skill.icon || 'fas fa-code'}"></i>
-                    <h5>${skill.title || 'Навык'}</h5>
-                    <p>${skill.description || ''}</p>
-                </div>
-            `;
-            skillsRow.appendChild(skillCol);
+        // Обработка нажатия Enter в форме авторизации
+        document.getElementById('authForm')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                loginAdmin();
+            }
         });
-    }
-}
-
-// Загрузка контактов
-function loadContacts() {
-    const savedContacts = localStorage.getItem('contacts');
-    const contacts = savedContacts ? JSON.parse(savedContacts) : [
-        { type: 'email', label: 'Email', value: 'ivan.petrov@example.com' },
-        { type: 'phone', label: 'Телефон', value: '+7 (999) 123-45-67' },
-        { type: 'address', label: 'Адрес', value: 'Москва, Россия' }
-    ];
-    
-    const contactInfo = document.querySelector('.contact-info');
-    if (!contactInfo) return;
-    
-    contactInfo.innerHTML = '';
-    
-    contacts.forEach(contact => {
-        const contactItem = document.createElement('div');
-        contactItem.className = 'contact-item';
-
-        let icon = 'fas fa-info-circle';
-        let displayElement;
-
-        if (contact.type === 'email') {
-            icon = 'fas fa-envelope';
-            displayElement = document.createElement('a');
-            displayElement.href = `mailto:${contact.value}`;
-            displayElement.textContent = contact.value;
-        } else if (contact.type === 'phone') {
-            icon = 'fas fa-phone';
-            displayElement = document.createElement('a');
-            displayElement.href = `tel:${contact.value.replace(/[^\d+]/g, '')}`;
-            displayElement.textContent = contact.value;
-        } else {
-            icon = 'fas fa-map-marker-alt';
-            displayElement = document.createElement('span');
-            displayElement.textContent = contact.value;
-        }
-
-        contactItem.innerHTML = `
-            <i class="${icon}"></i>
-            <strong>${contact.label}:</strong>
-        `;
-        
-        contactItem.appendChild(displayElement);
-        contactInfo.appendChild(contactItem);
-    });
-    
-    // Добавляем разделитель
-    const divider = document.createElement('hr');
-    divider.style.cssText = 'margin: 20px 0; border: none; border-top: 1px solid rgba(46, 204, 113, 0.2);';
-    contactInfo.appendChild(divider);
-    
-    // Добавляем социальные сети
-    const socialLinks = document.createElement('div');
-    socialLinks.className = 'social-links';
-    socialLinks.style.cssText = 'text-align: center; margin-top: 20px;';
-    contactInfo.appendChild(socialLinks);
-    
-    loadSocialNetworks();
-}
-
-// Загрузка социальных сетей
-function loadSocialNetworks() {
-    const savedSocials = localStorage.getItem('socialNetworks');
-    const socials = savedSocials ? JSON.parse(savedSocials) : [
-        { name: 'GitHub', icon: 'fab fa-github', url: 'https://github.com/ivanpetrov' },
-        { name: 'LinkedIn', icon: 'fab fa-linkedin', url: 'https://linkedin.com/in/ivanpetrov' },
-        { name: 'Telegram', icon: 'fab fa-telegram', url: 'https://telegram.me/ivanpetrov' }
-    ];
-    
-    const socialLinks = document.querySelector('.social-links');
-    if (!socialLinks) return;
-    
-    socialLinks.innerHTML = '';
-
-    socials.forEach(social => {
-        const link = document.createElement('a');
-        link.href = social.url;
-        link.target = '_blank';
-        link.title = social.name;
-        link.innerHTML = `<i class="${social.icon}"></i>`;
-        socialLinks.appendChild(link);
-    });
-}
-
-// ============================================
-// ИНИЦИАЛИЗАЦИЯ
-// ============================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Инициализируем данные администратора
-    initializeAdminCredentials();
-    
-    // Загружаем контент
-    loadSavedContent();
-    loadPortfolioFromStorage();
-    loadAchievements();
-    loadSkills();
-    loadContacts();
-    
-    // Добавляем классы для анимации
-    const elementsToAnimate = document.querySelectorAll('.section-title, .about-content, .photo-card, .skill-item, .contact-item');
-    elementsToAnimate.forEach(element => {
-        element.classList.add('fade-in-up');
-        element.style.opacity = '0';
-        element.style.transform = 'translateY(30px)';
-        element.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-    });
-    
-    // Запускаем анимацию при прокрутке
-    window.addEventListener('scroll', animateOnScroll);
-    animateOnScroll();
-    
-    console.log('Страница инициализирована');
-});
-
-// Обработка нажатия Enter в форме авторизации
-document.getElementById('authForm')?.addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') {
-        e.preventDefault();
-        loginAdmin();
-    }
-});
     </script>
 </body>
 </html>
